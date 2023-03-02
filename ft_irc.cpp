@@ -40,7 +40,6 @@ int main(int argc, char **argv) {
     }
 
     client._socklen = sizeof(client._sockaddr);
-    
 
     client._socket = accept(server._socket, (sockaddr*)&client._sockaddr, &client._socklen);
 

@@ -2,13 +2,16 @@ NAME = ircserv
 
 SRC = ft_irc.cpp Client.cpp Server.cpp
 
-OBJ = ${SRC:.ccp=.o}
+OBJ = ${SRC:.cpp=.o}
 
 HEADER = Client.hpp Server.hpp
 
 CC = c++
 
 FLAGS = -Wall -Wextra -Werror -std=c++98
+
+%.o : %.cpp
+	${CC} ${FLAGS} -c $<
 
 all : ${NAME}
 
