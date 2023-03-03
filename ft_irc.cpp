@@ -1,7 +1,90 @@
+#include <poll.h>
+#include <vector>
 #include "Client.hpp"
 #include "Server.hpp"
 
-int main(int argc, char **argv) {
+// Get sockaddr, IPv4 or IPv6:
+void *get_in_addr(sockaddr *sa)
+{
+    if (sa->sa_family == AF_INET)
+        return &(((sockaddr_in*)sa)->sin_addr);
+    return &(((sockaddr_in6*)sa)->sin6_addr);
+}
+
+// Return a listening socket
+int get_listener_socket(char *port)
+{
+    int listener;     // Listening socket descriptor
+    int yes = 1;      // For setsockopt() SO_REUSEADDR, below
+    int rv;
+
+    addrinfo hints, *ai, *p;
+
+    // Get us a socket and bind it
+    memset(&hints, 0, sizeof(hints));
+    hints.ai_family = AF_INET;
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_flags = AI_PASSIVE;
+    if ((rv = getaddrinfo(NULL, port, &hints, &ai)) != 0) {
+        std::cerr << "selectserver: " << gai_strerror(rv) << std::endl;
+        exit(1);
+    }
+
+    for(p = ai; p != NULL; p = p->ai_next) {
+        listener = socket(p->ai_family, p->ai_socktype, p->ai_protocol);
+        if (listener < 0)
+            continue;
+
+        // Lose the pesky "address already in use" error message
+        setsockopt(listener, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));
+
+        if (bind(listener, p->ai_addr, p->ai_addrlen) < 0) {
+            close(listener);
+            continue;
+        }
+        break;
+    }
+
+    // If we got here, it means we didn't get bound
+    if (p == NULL)
+        return (-1);
+
+    freeaddrinfo(ai); // All done with this
+
+    // Listen
+    if (listen(listener, 10) == -1)
+        return (-1);
+    return (listener);
+}
+
+// Add a new file descriptor to the set
+void add_to_pfds(std::vector<pollfd> *pfds, int newfd, int *fd_count, int *fd_size)
+{
+    // If we don't have room, add more space in the pfds array
+    if (*fd_count == *fd_size) {
+        *fd_size *= 2; // Double it
+
+        pfds->resize(*fd_size);
+        // *pfds = (pollfd*)realloc(*pfds, sizeof(**pfds) * (*fd_size));
+    }
+
+    (*pfds)[*fd_count].fd = newfd;
+    (*pfds)[*fd_count].events = POLLIN; // Check ready-to-read
+
+    (*fd_count)++;
+}
+
+// Remove an index from the set
+void del_from_pfds(std::vector<pollfd> pfds, int i, int *fd_count)
+{
+    // Copy the one from the end over this one
+    pfds[i] = pfds[*fd_count - 1];
+    (*fd_count)--;
+}
+
+// Main
+int main(int argc, char **argv)
+{
 
     if (argc != 2)
     {
@@ -12,97 +95,104 @@ int main(int argc, char **argv) {
     Client  client;
     Server  server;
 
+    //server socket
+
     server._name = argv[0];
     client._port = std::strtol(argv[1], NULL, 10);
 
-    server._socket = socket(AF_INET, SOCK_STREAM, 0);
+    char             buf[256];    // Buffer for client data
 
-    if (server._socket == -1)
-    {
-        std::cerr << "Can't create socket." << std::endl;
-        return (-2);
+    // Start off with room for 5 connections
+    // (We'll realloc as necessary)
+    int               fd_count = 0;
+    int               fd_size = 5;
+    // pollfd            *pfds = (pollfd*)malloc(sizeof(*pfds) * fd_size);
+
+    std::vector<pollfd> pfds(fd_size);
+
+    // Set up and get a listening socket
+    server._socket = get_listener_socket(argv[1]);
+
+    if (server._socket == -1) {
+        std::cerr << "error getting listening socket" << std::endl;
+        exit(1);
     }
 
-    server._sockaddr.sin_family = AF_INET;
-    server._sockaddr.sin_port = htons(client._port);
-    server._sockaddr.sin_addr.s_addr = INADDR_ANY;
+    // Add the listener to set
+    pfds[0].fd = server._socket;
+    pfds[0].events = POLLIN; // Report ready to read on incoming connection
 
-    if (bind(server._socket, (sockaddr*)&server._sockaddr, sizeof(server._sockaddr)) == -1)
-    {
-        std::cerr << "Can't bind to IP/port." << std::endl;
-        return (-3);
-    }
+    fd_count = 1; // For the listener
 
-    if (listen(server._socket, SOMAXCONN) == -1)
-    {
-        std::cerr << "Can't listen." << std::endl;
-        return (-4);
-    }
-
-    client._socklen = sizeof(client._sockaddr);
-
-    client._socket = accept(server._socket, (sockaddr*)&client._sockaddr, &client._socklen);
-
-    if (client._socket == -1)
-    {
-        std::cerr << "Problem connecting client to server." << std::endl;
-        return (-5);
-    }
-
-    close(server._socket);
-
-    memset(client._host, 0, NI_MAXHOST);
-    memset(server._svc, 0, NI_MAXSERV);
-
-    int info = getnameinfo((sockaddr*)&client._sockaddr, client._socklen, client._host, NI_MAXHOST, server._svc, NI_MAXSERV, 0);
-
-    if (info)
-        std::cout << client._host << " connected on " << server._svc << std::endl;
-    else
-        std::cout << inet_ntoa(client._sockaddr.sin_addr) << " connected on " << ntohs(client._sockaddr.sin_port) << std::endl;
-
-    char    buf[4096];
-
-    std::string welcome1(":server 001 <nick> :Welcome to the <network> Network, ");
-
-    std::string welcome2("<nick>[!<user>@<host>]");
-
-    std::string welcome_final = welcome1 + welcome2 + "\n";
-
-    send(client._socket, welcome_final.data(), 79, 0);
-    // send(client_socket, ":server 001 <nick> :Welcome to the <network> Network, <nick>[!<user>@<host>]\n", 79, 0);
-    // send(client_socket, ":server 002 <nick> :Your host is <servername>, running version <version>\n", 75, 0);
-    // send(client_socket, ":server 003 <nick> :This server was created <datetime>\n", 57, 0);
-    // send(client25_socket, ":server 004 <nick> <servername> <version> <available umodes> <available cmodes> [<cmodes with param>]\n", 104, 0);
-    // send(client_socket, ":server 372 <nick> <line>\n", 28, 0);
-    // send(client_socket, ":server 375 <nick> <info>\n", 28, 0);
-    // send(client_socket, ":server 376 <nick> :End of /MOTD command\n", 43, 0);
-    // send(client_socket, ":server 422 <nick> :MOTD File is missing\n", 43, 0);
-
+    // Main loop
     while (true)
     {
-        memset(buf, 0, 4096);
+        int poll_count = poll(&pfds[0], pfds.size(), -1);
 
-        int bytes_read = recv(client._socket, buf, 4096, 0);
-        
-        if (bytes_read == -1)
-        {
-            std::cerr << "Problem with recv()." << std::endl;
-            break;
+        if (poll_count == -1) {
+            perror("poll");
+            exit(1);
         }
-        if (bytes_read == 0)
-        {
-            std::cerr << "Client disconnected." << std::endl;
-            break;
-        }
-    
-        if (bytes_read > 0)
-            std::cout << std::string(buf, 0, bytes_read) << std::endl;
 
-        // send(client_socket, buf, bytes_read + 1, 0);
+        // Run through the existing connections looking for data to read
+        for(int i = 0; i < fd_count; i++) {
+
+            // Check if someone's ready to read
+            if (pfds[i].revents & POLLIN) { // We got one!!
+
+                if (pfds[i].fd == server._socket) {
+                    // If listener is ready to read, handle new connection
+
+                    client._socklen = sizeof(client._sockaddr);
+                    client._socket = accept(server._socket, (sockaddr *)&client._sockaddr, &client._socklen);
+                    
+                    send(client._socket, ":server 001 <nick> :Welcome to the <network> Network, <nick>[!<user>@<host>]\n", 78, 0);
+
+                    if (client._socket == -1)
+                        perror("accept");
+                    else
+                    {
+                        add_to_pfds(&pfds, client._socket, &fd_count, &fd_size);
+                        std::cout << "pollserver: new connection from " << inet_ntoa(client._sockaddr.sin_addr) << " on socket " << client._socket << std::endl;
+                    }
+                }
+                else
+                {
+                    // If not the listener, we're just a regular client
+                    int nbytes = recv(pfds[i].fd, buf, sizeof(buf), 0);
+
+                    int sender_fd = pfds[i].fd;
+
+                    if (nbytes <= 0)
+                    {
+                        // Got error or connection closed by client
+                        if (nbytes == 0)
+                            std::cout << "pollserver: socket " << sender_fd << " hung up" << std::endl;
+                        else
+                            perror("recv");
+
+                        close(pfds[i].fd); // Bye!
+
+                        del_from_pfds(pfds, i, &fd_count);
+                    }
+                    else
+                    {
+                        // We got some good data from a client
+                        for(int j = 0; j < fd_count; j++) {
+                            // Send to everyone!
+                            int dest_fd = pfds[j].fd;
+
+                            // Except the listener and ourselves
+                            if (dest_fd != server._socket && dest_fd != sender_fd)
+                            {
+                                if (send(dest_fd, buf, nbytes, 0) == -1)
+                                    perror("send");
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
-
-    close(client._socket);
-
     return (0);
 }
