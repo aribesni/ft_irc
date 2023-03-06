@@ -15,11 +15,17 @@ class Server {
 
     public :
 
-        Server(void);
+        Server(std::string name);
         Server(const Server& src);
         ~Server(void);
 
-    // private :
+        int     getSocket(void) const;
+        void    fillSockAddr(int port);
+        void    setSocket(void);
+        void    _bind(void);
+        void    _listen(void);
+
+    private :
 
         int         _socket;
         std::string _name;
