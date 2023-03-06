@@ -32,12 +32,10 @@ class Client {
 
     private :
 
-        // int         _port;
-        int         _socket;
-        char        _host[NI_MAXHOST];
-        std::string _nick;
-        sockaddr_in _sockaddr;
-        socklen_t   _socklen;
+        int                         _socket;
+        char                        _host[NI_MAXHOST];
+        sockaddr_in                 _sockaddr;
+        socklen_t                   _socklen;
         std::vector<struct pollfd>  _pfds;
 };
 

@@ -2,11 +2,13 @@
 #include <vector>
 #include "Client.hpp"
 #include "Server.hpp"
+#include "User.hpp"
 
 void    ft_loop(Client client, Server server, int fd_size) {
 
-    int     fd_count = 1;
-    char    buf[256];
+    int                         fd_count = 1;
+    char                        buf[256];
+    std::vector<class User>     user_vector;
 
     while (true)
     {
@@ -23,7 +25,11 @@ void    ft_loop(Client client, Server server, int fd_size) {
             if (client.getPfd(i).revents == POLLIN) { // We got one!!
 
                 if (client.getPfd(i).fd == server.getSocket())
+                {
                     client._accept(&server, &fd_count, &fd_size);
+                    User    user(client.getSocket(), "nickname");
+                    user_vector.push_back(user);
+                }
                 else
                 {
                     // If not the listener, we're just a regular client
