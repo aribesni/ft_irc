@@ -26,8 +26,8 @@ void    ft_loop(Client client, Server server, int fd_size) {
 
                 if (client.getPfd(i).fd == server.getSocket())
                 {
-                    client._accept(&server, &fd_count, &fd_size);
-                    User    user(client.getSocket(), "nickname");
+                    User    user;
+                    user._accept(&client, &server, &fd_count, &fd_size);
                     user_vector.push_back(user);
                 }
                 else

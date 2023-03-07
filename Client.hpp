@@ -23,19 +23,20 @@ class Client {
         Client(const Client& src);
         ~Client(void);
 
-        int     getSocket(void) const;
+        // int     getSocket(void) const;
         pollfd  getPfd(int i) const;
         void    fillpfds(Server *server);
         int     _poll(void);
-        void    _accept(Server *server, int *fd_count, int *fd_size);
+        // void    _accept(Server *server, int *fd_count, int *fd_size);
+        void    add_to_pfds(int newfd, int *fd_count, int *fd_size);
         void    del_from_pfds(int i, int *fd_count);
 
     private :
 
-        int                         _socket;
-        char                        _host[NI_MAXHOST];
-        sockaddr_in                 _sockaddr;
-        socklen_t                   _socklen;
+        // int                         _socket;
+        // char                        _host[NI_MAXHOST];
+        // sockaddr_in                 _sockaddr;
+        // socklen_t                   _socklen;
         std::vector<struct pollfd>  _pfds;
 };
 
