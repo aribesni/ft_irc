@@ -10,6 +10,12 @@ void    ft_loop(Client client, Server server, int fd_size) {
     char                        buf[256];
     std::vector<class User>     user_vector;
 
+    // Fill the first 4 elements of the vectpr to start at index 4 and use the socket fd as index
+    for (int i = 0; i < 4; i++)
+    {
+        User    user(-1);
+        user_vector.push_back(user);
+    }
     while (true)
     {
         int poll_count = client._poll();
@@ -29,6 +35,9 @@ void    ft_loop(Client client, Server server, int fd_size) {
                     User    user;
                     user._accept(&client, &server, &fd_count, &fd_size);
                     user_vector.push_back(user);
+                    std::cout << "User socket : " << user_vector[4].getSocket() << std::endl;
+                    if (user_vector.size() > 5)
+                        std::cout << "User socket : " << user_vector[5].getSocket() << std::endl;
                 }
                 else
                 {

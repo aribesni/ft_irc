@@ -4,17 +4,18 @@
 # include <iostream>
 # include "Client.hpp"
 # include "Server.hpp"
+# include "Replies.hpp"
 
 class User {
 
     public :
 
         User(void);
+        User(int fd);
         ~User(void);
 
         int     getSocket(void) const;
         void    _accept(Client *client, Server *server, int *fd_count, int *fd_size);
-
 
     private :
         
@@ -23,6 +24,7 @@ class User {
         std::string _nick;
         sockaddr_in _sockaddr;
         socklen_t   _socklen;
+        Replies     _replies;
 };
 
 #endif

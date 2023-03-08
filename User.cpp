@@ -6,6 +6,8 @@ User::User(void) {
     this->_socklen = sizeof(this->_sockaddr);
 }
 
+User::User(int fd) : _socket(fd) {}
+
 User::~User(void) {}
 
 int User::getSocket(void) const {
@@ -16,7 +18,7 @@ int User::getSocket(void) const {
 void    User::_accept(Client *client, Server *server, int *fd_count, int *fd_size) {
 
     this->_socket = accept(server->getSocket(), (sockaddr *)&this->_sockaddr, &this->_socklen);
-    send(this->getSocket(), ":server 001 <nick> :Welcome to the <network> Network, <nick>[!<user>@<host>]\n", 78, 0);
+    send(this->getSocket(), this->_replies.RPL_WELCOME().data(), 78, 0);
     if (this->getSocket() == -1)
         perror("accept");
     else

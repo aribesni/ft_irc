@@ -4,7 +4,7 @@ SRC = ft_irc.cpp Client.cpp Server.cpp User.cpp
 
 OBJ = ${SRC:.cpp=.o}
 
-HEADER = Client.hpp Server.hpp User.hpp
+HEADER = Client.hpp Replies.hpp Server.hpp User.hpp
 
 CC = c++
 
