@@ -13,11 +13,11 @@ class User {
         ~User(void);
 
         int     getSocket(void) const;
-        void    _accept(Client *client, Server *server, int *fd_count, int *fd_size);
+        void    _accept(Server *server);
 
 
     private :
-        
+
         int         _socket;
         char        _host[NI_MAXHOST];
         std::string _nick;

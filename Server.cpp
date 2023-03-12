@@ -1,7 +1,7 @@
 #include "Server.hpp"
 
-Server::Server(std::string name) : _name(name) {
-
+Server::Server(std::string name, int max_clients) : _name(name) {
+    this->_pollfds = std::vector<pollfd>(max_clients);
     memset(this->_svc, 0, NI_MAXSERV);
 }
 
@@ -14,23 +14,21 @@ int Server::getSocket(void) const {
     return (this->_socket);
 }
 
-void    Server::fillSockAddr(int port) {
-
-    this->_sockaddr.sin_family = AF_INET;
-    this->_sockaddr.sin_port = port;
-    this->_sockaddr.sin_addr.s_addr = INADDR_ANY;
+void    Server::fillServerPollfd(void) {
+    this->_pollfds[0].fd = this->_socket;
+    this->_pollfds[0].events = POLLIN;
 }
 
-void    Server::setSocket(void) {
+void    Server::createSocket(void) {
 
     this->_socket = socket(AF_INET, SOCK_STREAM, 0);
     if (this->_socket == -1)
         std::cerr << "Can't create socket." << std::endl;
 }
 
-void    Server::_bind(void) {
+void    Server::_bind(sockaddr_in hint) {
 
-    if (bind(this->_socket, (sockaddr*)&this->_sockaddr, sizeof(this->_sockaddr)) == -1)
+    if (bind(this->_socket, (sockaddr*)&hint, sizeof(hint)) == -1)
         std::cerr << "Can't bind to IP/port." << std::endl;
 }
 

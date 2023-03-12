@@ -18,7 +18,7 @@
 class Client {
 
     public :
-        
+
         Client(int fd_size);
         Client(const Client& src);
         ~Client(void);
@@ -37,7 +37,7 @@ class Client {
         // char                        _host[NI_MAXHOST];
         // sockaddr_in                 _sockaddr;
         // socklen_t                   _socklen;
-        std::vector<struct pollfd>  _pfds;
+        // std::vector<struct pollfd>  _pfds;
 };
 
 #endif

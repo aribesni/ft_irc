@@ -13,15 +13,12 @@ int User::getSocket(void) const {
     return (this->_socket);
 }
 
-void    User::_accept(Client *client, Server *server, int *fd_count, int *fd_size) {
-
+void    User::_accept(Server *server) {
+// Accept the connection and return new client socker
     this->_socket = accept(server->getSocket(), (sockaddr *)&this->_sockaddr, &this->_socklen);
-    send(this->getSocket(), ":server 001 <nick> :Welcome to the <network> Network, <nick>[!<user>@<host>]\n", 78, 0);
-    if (this->getSocket() == -1)
-        perror("accept");
-    else
-    {
-        client->add_to_pfds(this->_socket, fd_count, fd_size);
-        std::cout << "pollserver: new connection from " << this->_host << " on socket " << this->_socket << std::endl;
-    }
+    // send(this->getSocket(), ":server 001 <my_nick>\n", sizeof("my_nick\n"), 0);
+
+    // send(this->getSocket(), ":server 001 <test> :Welcome to the <network> Network, <test>[!<user>@<host>]\n", 78, 0);
+    // if (this->getSocket() == -1)
+        // perror("accept");
 }
