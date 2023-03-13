@@ -41,7 +41,7 @@ int  User::_init(){
         _nick=msg.getNick();
         _user=msg.getUser();
         _prefix=msg.getPrefix();
-        _msgWelcome = ":" + _prefix + "001 " + _nick + " :Welcome to the IRC__ Network, " + _prefix + "\n";
+        _msgWelcome = ":" + _prefix + " 001 " + _nick + " :Welcome to the IRC__ Network, " + _prefix + "\n";
         return(0);
 }
 
