@@ -1,7 +1,7 @@
 #include "Server.hpp"
 
-Server::Server(std::string name, int max_clients) : _name(name) {
-    this->_pollfds = std::vector<pollfd>(max_clients);
+Server::Server(std::string name) : _name(name) {
+    this->_pollfds = std::vector<pollfd>(1);
     memset(this->_svc, 0, NI_MAXSERV);
 }
 
