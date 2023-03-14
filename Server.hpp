@@ -28,10 +28,10 @@ class Server {
         void    _accept(Client & client);
         void    _listen(void);
         std::vector<struct pollfd>  _pollfds;
-        void    _acceptNewConnection();
-        void    _handleClientRequest(Client & client);
+        void    acceptNewConnection();
+        void    handleClientRequest(Client & client);
         std::vector<Client>  clients;
-        Client & fd_to_client(int fd);
+        Client & getClientWithFd(int fd);
         std::string     getPassword(void) const;
 
     private :

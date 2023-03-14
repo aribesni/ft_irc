@@ -1,6 +1,6 @@
 #include "Client.hpp"
 
-Client  pollfd_to_client(struct pollfd)
+Client  pollgetClientWithFd(struct pollfd)
 {
 	// loop on all client sockets
 	std::vector<Client>::iterator it;

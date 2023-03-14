@@ -25,19 +25,19 @@ void    ft_loop(Server server)
 			{
                 // If there is ready-to-read data in the server socket, a client tries to connect
 				if (server._pollfds[i].fd == server.getSocket())
-					server._acceptNewConnection();
+					server.acceptNewConnection();
 				// If there is ready-to-read data in another socket, a connected client sent data
                 else
                 {
-                    Client & currentClient = server.fd_to_client(server._pollfds[i].fd);
-                    server._handleClientRequest(currentClient);
+                    Client & currentClient = server.getClientWithFd(server._pollfds[i].fd);
+                    server.handleClientRequest(currentClient);
                 }
 			}
 		}
     }
 }
 
-void Server::_acceptNewConnection()
+void Server::acceptNewConnection()
 {
     Client    client;
     this->_accept(client);
@@ -48,7 +48,7 @@ void Server::_acceptNewConnection()
     this->clients.push_back(client);
 }
 
-void Server::_handleClientRequest(Client & client)
+void Server::handleClientRequest(Client & client)
 {
     // Handle client registration
     if (client.getRegistrationStatus() == false)

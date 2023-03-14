@@ -40,7 +40,7 @@ void    Server::_listen(void) {
         std::cerr << "error getting listening socket" << std::endl;
 }
 
-Client & Server::fd_to_client(int fd)
+Client & Server::getClientWithFd(int fd)
 {
     // loop on all client sockets
     std::vector<Client>::iterator it;

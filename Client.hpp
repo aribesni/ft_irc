@@ -7,13 +7,17 @@
 class Client {
 
     public :
-
+        // Constructor Destructor
         Client(void);
         ~Client(void);
 
-        int     getSocket(void) const;
-        void    setSocket(int socket);
-        bool    getRegistrationStatus (void) const;
+        // Getters
+        int         getSocket(void) const;
+        bool        getRegistrationStatus (void) const;
+        
+        // Setters
+        void        setSocket(int socket);
+
         sockaddr_in _sockaddr;
         socklen_t   _socklen;
 
