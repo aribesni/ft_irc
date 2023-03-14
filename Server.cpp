@@ -39,3 +39,33 @@ void    Server::_listen(void) {
     if (this->_socket == -1)
         std::cerr << "error getting listening socket" << std::endl;
 }
+
+Client & Server::fd_to_client(int fd)
+{
+    // loop on all client sockets
+    std::vector<Client>::iterator it;
+    for (it = this->clients.begin(); it != this->clients.end(); ++it)
+    {
+        if ((*it).getSocket() == fd)
+            return (*it);
+    }
+    return (*it);
+}
+
+void    Server::_accept(Client & client) {
+// Accept the connection and return new client socker
+    int newsocket;
+    newsocket = accept(this->getSocket(), (sockaddr *)&client._sockaddr, &client._socklen);
+    client.setSocket(newsocket);
+    std::cout << "new Client " << inet_ntoa(client._sockaddr.sin_addr) << ":" << ntohs(client._sockaddr.sin_port) << " (" << client.getSocket() << ")" << std::endl;
+    // send(this->getSocket(), ":server 001 <my_nick>\n", sizeof("my_nick\n"), 0);
+
+    // send(this->getSocket(), ":server 001 <test> :Welcome to the <network> Network, <test>[!<client>@<host>]\n", 78, 0);
+    // if (this->getSocket() == -1)
+        // perror("accept");
+}
+
+std::string     Server::getPassword(void) const
+{
+    return (this->_password);
+}

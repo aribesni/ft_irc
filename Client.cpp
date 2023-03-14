@@ -8,18 +8,18 @@ Client::Client(void) {
 
 Client::~Client(void) {}
 
-int Client::getSocket(void) const {
-
+int Client::getSocket(void) const
+{
     return (this->_socket);
 }
 
-void    Client::_accept(Server *server) {
-// Accept the connection and return new client socker
-    this->_socket = accept(server->getSocket(), (sockaddr *)&this->_sockaddr, &this->_socklen);
-    std::cout << "new Client " << inet_ntoa(this->_sockaddr.sin_addr) << ":" << ntohs(this->_sockaddr.sin_port) << " (" << this->_socket << ")" << std::endl;
-    // send(this->getSocket(), ":server 001 <my_nick>\n", sizeof("my_nick\n"), 0);
-
-    // send(this->getSocket(), ":server 001 <test> :Welcome to the <network> Network, <test>[!<client>@<host>]\n", 78, 0);
-    // if (this->getSocket() == -1)
-        // perror("accept");
+bool Client::getRegistrationStatus(void) const
+{
+    return (this->_isRegistered);
 }
+
+void Client::setSocket(int socket)
+{
+    this->_socket = socket;
+}
+

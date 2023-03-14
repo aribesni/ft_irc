@@ -11,7 +11,6 @@ void    ft_loop(Server server)
         // #1: address of pollfds to watch, #2: number of pollfds to watch,
         // #3: timeout in ms. negative means infinite delay
         int open_fds = poll(&server._pollfds[0], server._pollfds.size(), -1);
-        // std::cout << "#open fds: " << open_fds << std::endl;
         // Handle poll error
         if (open_fds == -1)
         {
@@ -29,45 +28,47 @@ void    ft_loop(Server server)
 					server._acceptNewConnection();
 				// If there is ready-to-read data in another socket, a connected client sent data
                 else
-					server._handleClientRequest(server._pollfds[i].fd);
+                {
+                    Client & currentClient = server.fd_to_client(server._pollfds[i].fd);
+                    server._handleClientRequest(currentClient);
+                }
 			}
 		}
     }
 }
 
-// Client & Server::fd_to_client(int fd)
-// {
-//     // loop on all client sockets
-//     std::vector<Client>::iterator it;
-//     for (it = this->clients.begin(); it != this->clients.end(); ++it)
-//     {
-//         if ((*it).getSocket() == fd)
-//             return (*it);
-//     }
-//     return (*it);
-// }
-
 void Server::_acceptNewConnection()
 {
     Client    client;
-    client._accept(this);
+    this->_accept(client);
     struct pollfd newpollfd;
     newpollfd.fd = client.getSocket();
     newpollfd.events = POLLIN;
     this->_pollfds.push_back(newpollfd);
+    this->clients.push_back(client);
 }
 
-void Server::_handleClientRequest(int fd)
+void Server::_handleClientRequest(Client & client)
 {
+    // Handle client registration
+    if (client.getRegistrationStatus() == false)
+    {
+        // 1- Parse registration messages and get client nick, user and password
+        // 2- Check user and nick format
+        // 3- Check password
+        // 4- If correct registration, server sends welcome message
+    }
+
+    // Handle other requests
 
     ssize_t buff_size;
-    char buf[258];
-
+    char buf[500];
     buff_size = recv(client.getSocket(), buf, sizeof(buf), 0);
+    std::cout << "buff size" << buff_size << std::endl;
     buf[buff_size] = 0;
     std::cout << "my buf" << buf << std::endl;
     // Handle client registration by parsing [PASS]/NICK/USER commands and put set in
-    send(client.getSocket(), ":server 001 <server> :Welcome to the <network> Network, <hey>[!<client>@<host>]\n", 78, 0);
+    send(client.getSocket(), ":server 001 <server> :Welcome to the <network> Network, <hey>[!<client>@<host>]\n", 81, 0);
     // send(client.getSocket(), welcome.c_str(), welcome.length(), 0);
 }
 
