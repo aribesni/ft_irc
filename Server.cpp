@@ -1,7 +1,9 @@
 #include "Server.hpp"
 
-Server::Server(std::string name) : _name(name) {
+Server::Server(std::string name) : _name(name)
+{
     this->_pollfds = std::vector<pollfd>(1);
+// TO DO: change memset function with c++ equivalent
     memset(this->_svc, 0, NI_MAXSERV);
 }
 
@@ -40,17 +42,17 @@ void    Server::_listen(void) {
         std::cerr << "error getting listening socket" << std::endl;
 }
 
-Client & Server::getClientWithFd(int fd)
-{
-    // loop on all client sockets
-    std::vector<Client>::iterator it;
-    for (it = this->clients.begin(); it != this->clients.end(); ++it)
-    {
-        if ((*it).getSocket() == fd)
-            return (*it);
-    }
-    return (*it);
-}
+// Client & Server::getClientWithFd(int fd)
+// {
+//     // loop on all client sockets
+//     std::vector<Client>::iterator it;
+//     for (it = this->clients.begin(); it != this->clients.end(); ++it)
+//     {
+//         if ((*it).getSocket() == fd)
+//             return (*it);
+//     }
+//     return (*it);
+// }
 
 void    Server::_accept(Client & client) {
 // Accept the connection and return new client socker

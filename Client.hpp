@@ -3,6 +3,7 @@
 
 # include <iostream>
 # include <netdb.h>
+# include <string.h>
 
 class Client {
 
@@ -14,7 +15,7 @@ class Client {
         // Getters
         int         getSocket(void) const;
         bool        getRegistrationStatus (void) const;
-        
+
         // Setters
         void        setSocket(int socket);
 

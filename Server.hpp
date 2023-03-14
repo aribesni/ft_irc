@@ -1,10 +1,11 @@
 #ifndef SERVER_H
 # define SERVER_H
-
+# define BUFFER_SIZE 500
 # include <unistd.h>
 # include <string.h>
 # include <stdlib.h>
 # include <vector>
+# include <map>
 # include <poll.h>
 # include <sys/types.h>
 # include <sys/socket.h>
@@ -30,8 +31,9 @@ class Server {
         std::vector<struct pollfd>  _pollfds;
         void    acceptNewConnection();
         void    handleClientRequest(Client & client);
-        std::vector<Client>  clients;
-        Client & getClientWithFd(int fd);
+        // std::vector<Client>  clients;
+        std::map<int, Client>  clients;
+        Client &        getClientWithFd(int fd);
         std::string     getPassword(void) const;
 
     private :
