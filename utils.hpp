@@ -1,30 +1,21 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   utils.cpp                                          :+:      :+:    :+:   */
+/*   utils.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rliu <rliu@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/03/07 11:08:28 by rliu              #+#    #+#             */
-/*   Updated: 2023/03/09 16:07:13 by rliu             ###   ########.fr       */
+/*   Created: 2023/03/07 10:47:21 by rliu              #+#    #+#             */
+/*   Updated: 2023/03/09 16:07:06 by rliu             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "utils.hpp"
+#ifndef UTILS_HPP
+# define UTILS_HPP
+# include <string>
+# include <vector>
+# include <list>
 
-std::vector<std::string> msg_split(std::string str, std::string delimiter)
-{
-	std::vector<std::string> tokens = std::vector<std::string>();
+std::vector<std::string> msg_split(std::string str, std::string delimiter);
 
-	int end;
-	while ((end = str.find(delimiter)) != -1)
-	{
-		tokens.push_back(str.substr(0, end));
-		str.erase(0, end + delimiter.length());
-	}
-	tokens.push_back(str);
-
-	return tokens;
-}
-
-
+#endif

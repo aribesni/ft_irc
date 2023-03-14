@@ -42,18 +42,6 @@ void    Server::_listen(void) {
         std::cerr << "error getting listening socket" << std::endl;
 }
 
-// Client & Server::getClientWithFd(int fd)
-// {
-//     // loop on all client sockets
-//     std::vector<Client>::iterator it;
-//     for (it = this->clients.begin(); it != this->clients.end(); ++it)
-//     {
-//         if ((*it).getSocket() == fd)
-//             return (*it);
-//     }
-//     return (*it);
-// }
-
 void    Server::_accept(Client & client) {
 // Accept the connection and return new client socker
     int newsocket;
@@ -70,4 +58,65 @@ void    Server::_accept(Client & client) {
 std::string     Server::getPassword(void) const
 {
     return (this->_password);
+}
+
+void Server::acceptNewConnection()
+{
+    Client    client;
+    this->_accept(client);
+    struct pollfd newpollfd;
+    newpollfd.fd = client.getSocket();
+    newpollfd.events = POLLIN;
+    this->_pollfds.push_back(newpollfd);
+    this->clients[newpollfd.fd] = client;
+}
+
+
+
+void Server::handleClientRequest(Client & client)
+{
+    Replies replies;
+    // Handle client registration
+    if (client.getRegistrationStatus() == false)
+    {
+        // 1. Parse registration messages and get client nick, user and password
+            // 1.1 Loop on buffer. When buffer finds \r\n>> create Message, handles Message, then empty buffer and go on with loop
+            // 1.1.1 PASS > check if password is correct. if not skip the rest
+            // 1.1.2 USER > check if user format is correct. if not skip the rest
+            // 1.1.3 NICK > check if nick format is correct and if nick is not already used (ERR_NICKNAMEINUSE). If it is, register user (isRegistered = true). If not ???
+        // 2- If correct registration, server sends block of welcome message
+            // send(this->getSocket(), this->_replies.RPL_WELCOME("001").data(), this->_replies.RPL_WELCOME("001").size(), 0);
+            // send(this->getSocket(), this->_replies.RPL_YOURHOST("002").data(), this->_replies.RPL_YOURHOST("002").size(), 0);
+            // send(this->getSocket(), this->_replies.RPL_CREATED("003").data(), this->_replies.RPL_CREATED("003").size(), 0);
+            // send(this->getSocket(), this->_replies.RPL_MYINFO("004").data(), this->_replies.RPL_MYINFO("004").size() - 1, 0);
+            // send(this->getSocket(), this->_replies.RPL_MOTD("372").data(), this->_replies.RPL_MOTD("372").size(), 0);
+            // send(this->getSocket(), this->_replies.RPL_MOTDSTART("375").data(), this->_replies.RPL_MOTDSTART("375").size(), 0);
+            // send(this->getSocket(), this->_replies.RPL_ENDOFMOTD("376").data(), this->_replies.RPL_ENDOFMOTD("376").size(), 0);
+        char buf[BUFFER_SIZE];
+        recv(client.getSocket(), buf, sizeof(buf), 0);
+        std::cout << "my buf" << buf << std::endl;
+        send(client.getSocket(), replies.RPL_WELCOME("001").data(), replies.RPL_WELCOME("001").size(), 0);
+        client.setAsRegistered();
+    }
+    else if (client.getRegistrationStatus() == true)
+    {
+        // Handle other requests
+        // WIP
+        ssize_t buff_size;
+        char buf[BUFFER_SIZE];
+        // Loop on buff till we get a end of message delimiter /r/n
+        buff_size = recv(client.getSocket(), buf, sizeof(buf), 0);
+        std::cout << "buff size" << buff_size << std::endl;
+        buf[buff_size] = 0;
+        // std::cout << "my buf" << buf << std::endl;
+        // PRIVATE MESSAGE
+        std::map<int, Client>::iterator     _it;
+        for (_it = this->clients.begin(); _it != this->clients.end(); _it++)
+        {
+            if (_it->first == client.getSocket())
+                continue ;
+            if (send(_it->first, buf, buff_size, 0) == -1)
+                perror("send");
+        }
+    }
 }

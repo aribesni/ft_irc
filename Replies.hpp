@@ -22,7 +22,7 @@
 			/* "202" */ std::string RPL_TRACEHANDSHAKE(std::string code) { return (this->_prefix + " " + code + " " + this->_nickname + " " + "H.S. <class> " + this->_server + "\n"); };
 			/* "203" */ std::string RPL_TRACEUNKNOWN(std::string code) { return (this->_prefix + " " + code + " " + this->_nickname + " " + "???? <class> [<connection_address>]" + "\n"); };
 			/* "204" */ std::string RPL_TRACEOPERATOR(std::string code) { return (this->_prefix + " " + code + " " + this->_nickname + " " + "Oper <class> " + this->_nickname + "\n"); };
-			/* "205" */ std::string RPL_TRACEUSER(std::string code) { return (this->_prefix + " " + code + " " + this->_nickname + " " + "User <class> " + this->_nickname + "\n"); };
+			/* "205" */ std::string RPL_TRACEUSER(std::string code) { return (this->_prefix + " " + code + " " + this->_nickname + " " + "Client <class> " + this->_nickname + "\n"); };
 			/* "206" */ std::string RPL_TRACESERVER(std::string code) { return (this->_prefix + " " + code + " " + this->_nickname + " " + "Serv <class> <int>S <int>C " + this->_server + " <nick!user|*!*>@<host|server> [V<protocol_version>]" + "\n"); };
 			/* "207" */ std::string RPL_TRACESERVICE(std::string code) { return (this->_prefix + " " + code + " " + this->_nickname + " " + "Service <class> <name> <type> <active_type>" + "\n"); };
 			/* "208" */ std::string RPL_TRACENEWTYPE(std::string code) { return (this->_prefix + " " + code + " " + this->_nickname + " " + "<newtype> 0 <client_name>" + "\n"); };
@@ -67,7 +67,7 @@
 			/* "317" */ std::string RPL_WHOISIDLE(std::string code) { return (this->_prefix + " " + code + " " + this->_nickname + " " + this->_nickname + " <seconds> :seconds idle" + "\n"); };
 			/* "318" */ std::string RPL_ENDOFWHOIS(std::string code) { return (this->_prefix + " " + code + " " + this->_nickname + " " + this->_nickname + " :<info>" + "\n"); };
 			/* "319" */ std::string RPL_WHOISCHANNELS(std::string code) { return (this->_prefix + " " + code + " " + this->_nickname + " " + this->_nickname + " :*( ( '@' / '+' ) " + this->_channel + " ' ' )" + "\n"); };
-			/* "321" */ std::string RPL_LISTSTART(std::string code) { return (this->_prefix + " " + code + " " + this->_nickname + " " + "Channels :Users Name" + "\n"); };
+			/* "321" */ std::string RPL_LISTSTART(std::string code) { return (this->_prefix + " " + code + " " + this->_nickname + " " + "Channels :Clients Name" + "\n"); };
 			/* "322" */ std::string RPL_LIST(std::string code) { return (this->_prefix + " " + code + " " + this->_nickname + " " + this->_channel + " <#_visible> :<topic>" + "\n"); };
 			/* "323" */ std::string RPL_LISTEND(std::string code) { return (this->_prefix + " " + code + " " + this->_nickname + " " + ":<info>" + "\n"); };
 			/* "324" */ std::string RPL_CHANNELMODEIS(std::string code) { return (this->_prefix + " " + code + " " + this->_nickname + " " + this->_channel + " <mode> <mode_params>" + "\n"); };
@@ -93,13 +93,13 @@
 			/* "371" */ std::string RPL_INFO(std::string code) { return (this->_prefix + " " + code + " " + this->_nickname + " " + ":<string>" + "\n"); };
 			/* "372" */ std::string RPL_MOTD(std::string code) { return (this->_prefix + " " + code + " " + this->_nickname + " " + ":- <string>" + "\n"); };
 			/* "374" */ std::string RPL_ENDOFINFO(std::string code) { return (this->_prefix + " " + code + " " + this->_nickname + " " + ":<info>" + "\n"); };
-			/* "375" */ std::string RPL_MOTDSTART(std::string code) { return (this->_prefix + " " + code + " " + this->_nickname + " " + ":- " + this->_server + " Message of the day -" + "\n"); };
+			/* "375" */ std::string RPL_MOTDSTART(std::string code) { return (this->_prefix + " " + code + " " + this->_nickname + " " + ":- " + this->_server + " BufferParser of the day -" + "\n"); };
 			/* "376" */ std::string RPL_ENDOFMOTD(std::string code) { return (this->_prefix + " " + code + " " + this->_nickname + " " + ":End of /MOTD command" + "\n"); };
 			/* "381" */ std::string RPL_YOUREOPER(std::string code) { return (this->_prefix + " " + code + " " + this->_nickname + " " + ":<info>" + "\n"); };
 			/* "382" */ std::string RPL_REHASHING(std::string code) { return (this->_prefix + " " + code + " " + this->_nickname + " " + "<config_file> :<info>" + "\n"); };
 			/* "383" */ std::string RPL_YOURESERVICE(std::string code) { return (this->_prefix + " " + code + " " + this->_nickname + " " + ":You are service <service_name>" + "\n"); };
 			/* "391" */ std::string RPL_TIME(std::string code) { return (this->_prefix + " " + code + " " + this->_nickname + " " + this->_server + " :<time string>" + "\n"); };
-			/* "392" */ std::string RPL_USERSSTART(std::string code) { return (this->_prefix + " " + code + " " + this->_nickname + " " + ":UserID Terminal Host" + "\n"); };
+			/* "392" */ std::string RPL_USERSSTART(std::string code) { return (this->_prefix + " " + code + " " + this->_nickname + " " + ":ClientID Terminal Host" + "\n"); };
 			/* "393" */ std::string RPL_USERS(std::string code) { return (this->_prefix + " " + code + " " + this->_nickname + " " + ":<username> <ttyline> <hostname>" + "\n"); };
 			/* "394" */ std::string RPL_ENDOFUSERS(std::string code) { return (this->_prefix + " " + code + " " + this->_nickname + " " + ":<info>" + "\n"); };
 			/* "395" */ std::string RPL_NOUSERS(std::string code) { return (this->_prefix + " " + code + " " + this->_nickname + " " + ":<info>" + "\n"); };
