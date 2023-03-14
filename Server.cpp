@@ -43,16 +43,11 @@ void    Server::_listen(void) {
 }
 
 void    Server::_accept(Client & client) {
-// Accept the connection and return new client socker
+// Accept the connection and return new client socket
     int newsocket;
     newsocket = accept(this->getSocket(), (sockaddr *)&client._sockaddr, &client._socklen);
     client.setSocket(newsocket);
     std::cout << "new Client " << inet_ntoa(client._sockaddr.sin_addr) << ":" << ntohs(client._sockaddr.sin_port) << " (" << client.getSocket() << ")" << std::endl;
-    // send(this->getSocket(), ":server 001 <my_nick>\n", sizeof("my_nick\n"), 0);
-
-    // send(this->getSocket(), ":server 001 <test> :Welcome to the <network> Network, <test>[!<client>@<host>]\n", 78, 0);
-    // if (this->getSocket() == -1)
-        // perror("accept");
 }
 
 std::string     Server::getPassword(void) const
@@ -62,23 +57,22 @@ std::string     Server::getPassword(void) const
 
 void Server::acceptNewConnection()
 {
-    Client    client;
+    Client  client;
+    Replies replies;
     this->_accept(client);
     struct pollfd newpollfd;
     newpollfd.fd = client.getSocket();
     newpollfd.events = POLLIN;
     this->_pollfds.push_back(newpollfd);
     this->clients[newpollfd.fd] = client;
+    send(client.getSocket(), replies.RPL_WELCOME("001").data(), replies.RPL_WELCOME("001").size(), 0);
 }
-
-
 
 void Server::handleClientRequest(Client & client)
 {
-    Replies replies;
     // Handle client registration
-    if (client.getRegistrationStatus() == false)
-    {
+    // if (client.getRegistrationStatus() == false)
+    // {
         // 1. Parse registration messages and get client nick, user and password
             // 1.1 Loop on buffer. When buffer finds \r\n>> create Message, handles Message, then empty buffer and go on with loop
             // 1.1.1 PASS > check if password is correct. if not skip the rest
@@ -93,21 +87,29 @@ void Server::handleClientRequest(Client & client)
             // send(this->getSocket(), this->_replies.RPL_MOTDSTART("375").data(), this->_replies.RPL_MOTDSTART("375").size(), 0);
             // send(this->getSocket(), this->_replies.RPL_ENDOFMOTD("376").data(), this->_replies.RPL_ENDOFMOTD("376").size(), 0);
         char buf[BUFFER_SIZE];
-        recv(client.getSocket(), buf, sizeof(buf), 0);
-        std::cout << "my buf" << buf << std::endl;
-        send(client.getSocket(), replies.RPL_WELCOME("001").data(), replies.RPL_WELCOME("001").size(), 0);
-        client.setAsRegistered();
-    }
-    else if (client.getRegistrationStatus() == true)
+        int nbytes = recv(client.getSocket(), buf, sizeof(buf), 0);
+        // std::cout << "my buf" << buf << std::endl;
+        // client.setAsRegistered();
+        if (nbytes <= 0)
+        {
+            // Got error or connection closed by client
+            if (nbytes == 0)
+                std::cout << "pollserver: socket " << client.getSocket() << " hung up" << std::endl;
+            else
+                perror("recv");
+            close(client.getSocket()); // Bye!
+        }
+    // }
+    else //if (client.getRegistrationStatus() == true)
     {
         // Handle other requests
         // WIP
-        ssize_t buff_size;
-        char buf[BUFFER_SIZE];
+        // ssize_t buff_size;
+        // char buf[BUFFER_SIZE];
         // Loop on buff till we get a end of message delimiter /r/n
-        buff_size = recv(client.getSocket(), buf, sizeof(buf), 0);
-        std::cout << "buff size" << buff_size << std::endl;
-        buf[buff_size] = 0;
+        // buff_size = recv(client.getSocket(), buf, sizeof(buf), 0);
+        // std::cout << "buff size" << buff_size << std::endl;
+        // buf[buff_size] = 0;
         // std::cout << "my buf" << buf << std::endl;
         // PRIVATE MESSAGE
         std::map<int, Client>::iterator     _it;
@@ -115,7 +117,7 @@ void Server::handleClientRequest(Client & client)
         {
             if (_it->first == client.getSocket())
                 continue ;
-            if (send(_it->first, buf, buff_size, 0) == -1)
+            if (send(_it->first, buf, nbytes, 0) == -1)
                 perror("send");
         }
     }
