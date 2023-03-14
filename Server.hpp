@@ -1,6 +1,6 @@
 #ifndef SERVER_H
 # define SERVER_H
-# define BUFFER_SIZE 500
+# define BUFFER_SIZE 4096
 # include <unistd.h>
 # include <string.h>
 # include <stdlib.h>
@@ -13,7 +13,7 @@
 # include <arpa/inet.h>
 # include <cstdio>
 # include "Client.hpp"
-
+# include "Replies.hpp"
 class Server {
 
     public :
@@ -33,7 +33,7 @@ class Server {
         void    handleClientRequest(Client & client);
         // std::vector<Client>  clients;
         std::map<int, Client>  clients;
-        Client &        getClientWithFd(int fd);
+        // Client &        getClientWithFd(int fd);
         std::string     getPassword(void) const;
 
     private :

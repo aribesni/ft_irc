@@ -1,10 +1,11 @@
 NAME = ircserv
 
-SRC = ft_irc.cpp Client.cpp Server.cpp
+SRC = ft_irc.cpp Client.cpp Server.cpp \
+		utils.cpp Command.cpp
 
 OBJ = ${SRC:.cpp=.o}
 
-HEADER = Replies.hpp Client.hpp Server.hpp
+HEADER = Replies.hpp Client.hpp Server.hpp utils.hpp
 
 CC = c++
 

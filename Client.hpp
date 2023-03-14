@@ -18,7 +18,12 @@ class Client {
 
         // Setters
         void        setSocket(int socket);
-
+        void        setNick(std::string &nickname);
+        void        setUsr(std::string &usrname);
+        void        setPass(std::string &pass);
+        void        setHostname(std::string &hostname);
+        void        setAsRegistered(void);
+        // int         _init();
         sockaddr_in _sockaddr;
         socklen_t   _socklen;
 
@@ -26,8 +31,13 @@ class Client {
         std::string _password;
         int         _socket;
         char        _host[NI_MAXHOST];
-        std::string _nick;
         bool        _isRegistered;
+        std::string _prefix;
+        std::string _hostname;
+        std::string _user;
+        std::string _nick;
+        std::string _pass;
+        std::string _msgWelcome;
 };
 
 #endif
