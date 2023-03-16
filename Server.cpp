@@ -11,6 +11,7 @@ Server::~Server(void) {}
 
 Server::Server(const Server& src) { *this = src; }
 
+
 int Server::getSocket(void) const {
 
     return (this->_socket);
@@ -60,7 +61,7 @@ std::string     Server::getPassword(void) const
 
 void Server::acceptNewClient()
 {
-    Client  client;
+    Client  client(this);
     this->_accept(client);
     struct pollfd newpollfd;
     newpollfd.fd = client.getSocket();
@@ -73,23 +74,31 @@ void Server::acceptNewClient()
         // 1.1.2 USER > check if user format is correct. if not skip the rest
         // 1.1.3 NICK > check if nick format is correct and if nick is not already used (ERR_NICKNAMEINUSE). If it is, register user (isRegistered = true). If not ???
     // 2- If correct registration, server sends block of welcome message
+    client.setPassword(this->_password);
     char buf[BUFFER_SIZE];
     recv(client.getSocket(), buf, sizeof(buf), 0);
     std::vector<Message>  msgList = bufferParser(buf);
     multiMessge_exec(msgList, client);
     client.setPrefix();
-    client.setAsRegistered(); // if registration succeed, set client as registered
-    if (client.getRegistrationStatus() == true) // send welcome messages
-    {
-        Replies replies;
-        send(client.getSocket(), replies.RPL_WELCOME("001").data(), replies.RPL_WELCOME("001").size(), 0);
-        send(client.getSocket(), replies.RPL_YOURHOST("002").data(), replies.RPL_YOURHOST("002").size(), 0);
-        send(client.getSocket(), replies.RPL_CREATED("003").data(), replies.RPL_CREATED("003").size(), 0);
-        send(client.getSocket(), replies.RPL_MYINFO("004").data(), replies.RPL_MYINFO("004").size(), 0);
-        send(client.getSocket(), replies.RPL_MOTD("372").data(), replies.RPL_MOTD("372").size(), 0);
-        send(client.getSocket(), replies.RPL_MOTDSTART("375").data(), replies.RPL_MOTDSTART("375").size(), 0);
-        send(client.getSocket(), replies.RPL_ENDOFMOTD("376").data(), replies.RPL_ENDOFMOTD("376").size(), 0);
+    if (client.checkRegisCondition()){
+        client.setAsRegistered(); // if registration succeed, set client as registered
+        if (client.getRegistrationStatus() == true) // send welcome messages
+        {
+            Replies replies;
+            send(client.getSocket(), replies.RPL_WELCOME("001").data(), replies.RPL_WELCOME("001").size(), 0);
+            send(client.getSocket(), replies.RPL_YOURHOST("002").data(), replies.RPL_YOURHOST("002").size(), 0);
+            send(client.getSocket(), replies.RPL_CREATED("003").data(), replies.RPL_CREATED("003").size(), 0);
+            send(client.getSocket(), replies.RPL_MYINFO("004").data(), replies.RPL_MYINFO("004").size(), 0);
+            send(client.getSocket(), replies.RPL_MOTD("372").data(), replies.RPL_MOTD("372").size(), 0);
+            send(client.getSocket(), replies.RPL_MOTDSTART("375").data(), replies.RPL_MOTDSTART("375").size(), 0);
+            send(client.getSocket(), replies.RPL_ENDOFMOTD("376").data(), replies.RPL_ENDOFMOTD("376").size(), 0);
+        }
     }
+    else{
+        close(client.getSocket()); // Bye!
+        this->clients.erase(client.getSocket());
+    }
+   
     // else deal with client registration issue
 }
 
@@ -123,3 +132,6 @@ void Server::handleClientRequest(Client & client)
         }
     }
 }
+
+
+void Server::setPassword(char * password){_password = password;}
