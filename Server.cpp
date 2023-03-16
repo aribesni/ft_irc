@@ -46,6 +46,14 @@ void    Server::_accept(Client & client) {
 // Accept the connection and return new client socket
     int newsocket;
     newsocket = accept(this->getSocket(), (sockaddr *)&client._sockaddr, &client._socklen);
+    char buf[BUFFER_SIZE];
+    recv(client.getSocket(), buf, sizeof(buf), 0);
+    std::vector<Message>  msgList = bufferParser(buf);
+    multiMessge_exec(msgList, client);
+    client.setPrefix();
+    //std::cout << "my buf" << buf << std::endl;
+    // send(client.getSocket(), replies.RPL_WELCOME("001").data(), replies.RPL_WELCOME("001").size(), 0);
+    //     client.setAsRegistered();
     client.setSocket(newsocket);
     std::cout << "new Client " << inet_ntoa(client._sockaddr.sin_addr) << ":" << ntohs(client._sockaddr.sin_port) << " (" << client.getSocket() << ")" << std::endl;
 }
