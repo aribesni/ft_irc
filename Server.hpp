@@ -14,6 +14,8 @@
 # include <cstdio>
 # include "Client.hpp"
 # include "Replies.hpp"
+# include "bufferParser.hpp"
+# include "Message.hpp"
 class Server {
 
     public :

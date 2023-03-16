@@ -23,26 +23,15 @@ void Client::setSocket(int socket)
     this->_socket = socket;
 }
 
-// int  Client::_init(){
-//         //recv pass nick user
-//         char buf[BUFFER_SIZE];
-//         memset(buf, 0, BUFFER_SIZE);
-//         sleep(1);
-//         recv(this->getSocket(), buf, sizeof(buf), 0);
-//         BufferParser msg(buf);
-//         // parsing and save info in user
-//         msg.parsingCMD_init(*this);
-//         if(_pass != "password"){
-//              std::cout << "wrong password!\n" ;// ?need to send one message to clean?
-//              return(1); // here should send RPL:462
-//         }
-//         _prefix = _nick + "!" + _user + "@" + _hostname;
-//         _msgWelcome = ":" + _prefix + " 001 " + _nick + " :Welcome to the IRC__ Network, " + _prefix + "\n";
-//         return(0);
-// }
+void  Client::setPrefix(void){
+        _prefix = _nick + "!" + _user + "@" + _hostname;
+//      _msgWelcome = ":" + _prefix + " 001 " + _nick + " :Welcome to the IRC__ Network, " + _prefix + "\n";
+       // std::cout << "test_setprefic: "<<_prefix << std::endl;
+ }
 
 void  Client::setNick(std::string &nickname){
     _nick = nickname;
+    //std::cout << "test_nick: " << _nick << std::endl;
 }
 
 void  Client::setAsRegistered(void){
@@ -51,12 +40,15 @@ void  Client::setAsRegistered(void){
 
 void  Client::setUsr(std::string &usrname){
     _user = usrname;
+    //std::cout << "test_user: " << _user<< std::endl;
 }
 
 void  Client::setPass(std::string &pass){
     _pass = pass;
+    //std::cout << "test_pass: " << _pass << std::endl;
 }
 
 void  Client::setHostname(std::string &hostname){
     _hostname = hostname;
+    //std::cout << "test_pass: " << _hostname << std::endl;
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Command.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gduchate <gduchate@student.42.fr>          +#+  +:+       +#+        */
+/*   By: rliu <rliu@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 17:43:49 by rliu              #+#    #+#             */
-/*   Updated: 2023/03/14 15:34:09 by gduchate         ###   ########.fr       */
+/*   Updated: 2023/03/16 11:39:28 by rliu             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,13 +22,13 @@ void Command::init_command(){
     _command["USER"] = &cmd_user;
 }
 
-void cmd_pass(std::vector<std::string> parametre, Client & client){
+void cmd_pass(std::vector<std::string> &parametre, Client &client){
     client.setPass(parametre[0]);
 }
-void cmd_nick(std::vector<std::string>  parametre, Client & client){
+void cmd_nick(std::vector<std::string>  &parametre, Client &client){
     client.setNick(parametre[0]);
 }
-void cmd_user(std::vector<std::string>  parametre, Client & client){
+void cmd_user(std::vector<std::string>  &parametre, Client &client){
     client.setUsr(parametre[0]);
     client.setHostname(parametre[2]);
 }
