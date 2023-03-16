@@ -14,6 +14,7 @@ class Client {
 
         // Getters
         int         getSocket(void) const;
+        std::string getNick(void) const;
         bool        getRegistrationStatus (void) const;
 
         // Setters
@@ -23,6 +24,7 @@ class Client {
         void        setPass(std::string &pass);
         void        setHostname(std::string &hostname);
         void        setAsRegistered(void);
+        void        setPrefix(void);
         // int         _init();
         sockaddr_in _sockaddr;
         socklen_t   _socklen;

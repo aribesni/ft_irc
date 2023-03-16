@@ -1,8 +1,7 @@
-    #ifndef REPLIES_H
-	# define REPLIES_H
+#ifndef REPLIES_H
+# define REPLIES_H
 
-	# include <iostream>
-	# include <ctime>
+# include <iostream>
 
 	class Replies {
 
