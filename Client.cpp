@@ -13,6 +13,11 @@ int Client::getSocket(void) const
     return (this->_socket);
 }
 
+std::string Client::getNick(void) const {
+
+    return (this->_nick);
+}
+
 bool Client::getRegistrationStatus(void) const
 {
     return (this->_isRegistered);
