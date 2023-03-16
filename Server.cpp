@@ -79,8 +79,6 @@ void Server::acceptNewConnection()
     this->clients[newpollfd.fd] = client;
 }
 
-
-
 void Server::handleClientRequest(Client & client)
 {
     Replies replies;
