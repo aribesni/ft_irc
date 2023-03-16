@@ -18,6 +18,16 @@ std::string Client::getNick(void) const {
     return (this->_nick);
 }
 
+std::string Client::getUser(void) const {
+
+    return (this->_user);
+}
+
+std::string Client::getPrefix(void) const {
+
+    return (this->_prefix);
+}
+
 bool Client::getRegistrationStatus(void) const
 {
     return (this->_isRegistered);
