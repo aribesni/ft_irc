@@ -46,11 +46,6 @@ void    Server::_accept(Client & client) {
 // Accept the connection and return new client socket
     int newsocket;
     newsocket = accept(this->getSocket(), (sockaddr *)&client._sockaddr, &client._socklen);
-    char buf[BUFFER_SIZE];
-    recv(client.getSocket(), buf, sizeof(buf), 0);
-    std::vector<Message>  msgList = bufferParser(buf);
-    multiMessge_exec(msgList, client);
-    client.setPrefix();
     //std::cout << "my buf" << buf << std::endl;
     // send(client.getSocket(), replies.RPL_WELCOME("001").data(), replies.RPL_WELCOME("001").size(), 0);
     //     client.setAsRegistered();
@@ -78,6 +73,11 @@ void Server::acceptNewConnection()
         // 1.1.2 USER > check if user format is correct. if not skip the rest
         // 1.1.3 NICK > check if nick format is correct and if nick is not already used (ERR_NICKNAMEINUSE). If it is, register user (isRegistered = true). If not ???
     // 2- If correct registration, server sends block of welcome message
+    char buf[BUFFER_SIZE];
+    recv(client.getSocket(), buf, sizeof(buf), 0);
+    std::vector<Message>  msgList = bufferParser(buf);
+    multiMessge_exec(msgList, client);
+    client.setPrefix();
     client.setAsRegistered(); // if registration succeed, set client as registered
     if (client.getRegistrationStatus() == true) // send welcome messages
     {
