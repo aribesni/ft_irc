@@ -43,7 +43,7 @@ void    Server::_listen(void) {
 }
 
 void    Server::_accept(Client & client) {
-// Accept the connection and return new client socker
+// Accept the connection and return new client socket
     int newsocket;
     newsocket = accept(this->getSocket(), (sockaddr *)&client._sockaddr, &client._socklen);
     char buf[BUFFER_SIZE];
@@ -56,11 +56,6 @@ void    Server::_accept(Client & client) {
     //     client.setAsRegistered();
     client.setSocket(newsocket);
     std::cout << "new Client " << inet_ntoa(client._sockaddr.sin_addr) << ":" << ntohs(client._sockaddr.sin_port) << " (" << client.getSocket() << ")" << std::endl;
-    // send(this->getSocket(), ":server 001 <my_nick>\n", sizeof("my_nick\n"), 0);
-
-    // send(this->getSocket(), ":server 001 <test> :Welcome to the <network> Network, <test>[!<client>@<host>]\n", 78, 0);
-    // if (this->getSocket() == -1)
-        // perror("accept");
 }
 
 std::string     Server::getPassword(void) const
@@ -70,54 +65,60 @@ std::string     Server::getPassword(void) const
 
 void Server::acceptNewConnection()
 {
-    Client    client;
+    Client  client;
     this->_accept(client);
     struct pollfd newpollfd;
     newpollfd.fd = client.getSocket();
     newpollfd.events = POLLIN;
     this->_pollfds.push_back(newpollfd);
     this->clients[newpollfd.fd] = client;
+    // 1. Parse registration messages and get client nick, user and password
+        // 1.1 Loop on buffer. When buffer finds \r\n>> create Message, handles Message, then empty buffer and go on with loop
+        // 1.1.1 PASS > check if password is correct. if not skip the rest
+        // 1.1.2 USER > check if user format is correct. if not skip the rest
+        // 1.1.3 NICK > check if nick format is correct and if nick is not already used (ERR_NICKNAMEINUSE). If it is, register user (isRegistered = true). If not ???
+    // 2- If correct registration, server sends block of welcome message
+    client.setAsRegistered(); // if registration succeed, set client as registered
+    if (client.getRegistrationStatus() == true) // send welcome messages
+    {
+        Replies replies;
+        send(client.getSocket(), replies.RPL_WELCOME("001").data(), replies.RPL_WELCOME("001").size(), 0);
+        send(client.getSocket(), replies.RPL_YOURHOST("002").data(), replies.RPL_YOURHOST("002").size(), 0);
+        send(client.getSocket(), replies.RPL_CREATED("003").data(), replies.RPL_CREATED("003").size(), 0);
+        send(client.getSocket(), replies.RPL_MYINFO("004").data(), replies.RPL_MYINFO("004").size(), 0);
+        send(client.getSocket(), replies.RPL_MOTD("372").data(), replies.RPL_MOTD("372").size(), 0);
+        send(client.getSocket(), replies.RPL_MOTDSTART("375").data(), replies.RPL_MOTDSTART("375").size(), 0);
+        send(client.getSocket(), replies.RPL_ENDOFMOTD("376").data(), replies.RPL_ENDOFMOTD("376").size(), 0);
+    }
+    // else deal with client registration issue
 }
 
 void Server::handleClientRequest(Client & client)
-{
-    Replies replies;
-    // Handle client registration
-    if (client.getRegistrationStatus() == false)
+{    
+    // Handle other requests
+    // WIP
+
+    // PRIVATE MESSAGES BETWEEN CLIENTS
+    char buf[BUFFER_SIZE];
+    int nbytes = recv(client.getSocket(), buf, sizeof(buf), 0);
+    if (nbytes <= 0)
     {
-        // 1. Parse registration messages and get client nick, user and password
-            // 1.1 Loop on buffer. When buffer finds \r\n>> create Message, handles Message, then empty buffer and go on with loop
-            // 1.1.1 PASS > check if password is correct. if not skip the rest
-            // 1.1.2 USER > check if user format is correct. if not skip the rest
-            // 1.1.3 NICK > check if nick format is correct and if nick is not already used (ERR_NICKNAMEINUSE). If it is, register user (isRegistered = true). If not ???
-        // 2- If correct registration, server sends block of welcome message
-            // send(this->getSocket(), this->_replies.RPL_WELCOME("001").data(), this->_replies.RPL_WELCOME("001").size(), 0);
-            // send(this->getSocket(), this->_replies.RPL_YOURHOST("002").data(), this->_replies.RPL_YOURHOST("002").size(), 0);
-            // send(this->getSocket(), this->_replies.RPL_CREATED("003").data(), this->_replies.RPL_CREATED("003").size(), 0);
-            // send(this->getSocket(), this->_replies.RPL_MYINFO("004").data(), this->_replies.RPL_MYINFO("004").size() - 1, 0);
-            // send(this->getSocket(), this->_replies.RPL_MOTD("372").data(), this->_replies.RPL_MOTD("372").size(), 0);
-            // send(this->getSocket(), this->_replies.RPL_MOTDSTART("375").data(), this->_replies.RPL_MOTDSTART("375").size(), 0);
-            // send(this->getSocket(), this->_replies.RPL_ENDOFMOTD("376").data(), this->_replies.RPL_ENDOFMOTD("376").size(), 0);
-        
+        // Got error or connection closed by client
+        if (nbytes == 0)
+            std::cout << "pollserver: socket " << client.getSocket() << " hung up" << std::endl;
+        else
+            perror("recv");
+        close(client.getSocket()); // Bye!
+        this->clients.erase(client.getSocket()); // remove client from map
     }
-    else if (client.getRegistrationStatus() == true)
+    else
     {
-        // Handle other requests
-        // WIP
-        ssize_t buff_size;
-        char buf[BUFFER_SIZE];
-        // Loop on buff till we get a end of message delimiter /r/n
-        buff_size = recv(client.getSocket(), buf, sizeof(buf), 0);
-        std::cout << "buff size" << buff_size << std::endl;
-        buf[buff_size] = 0;
-        // std::cout << "my buf" << buf << std::endl;
-        // PRIVATE MESSAGE
         std::map<int, Client>::iterator     _it;
         for (_it = this->clients.begin(); _it != this->clients.end(); _it++)
         {
-            if (_it->first == client.getSocket())
+            if (_it->first == client.getSocket()) // don't send message to client's own fd
                 continue ;
-            if (send(_it->first, buf, buff_size, 0) == -1)
+            if (send(_it->first, buf, nbytes, 0) == -1) // send message to all the other clients fds
                 perror("send");
         }
     }
