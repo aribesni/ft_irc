@@ -24,6 +24,7 @@ class Client {
         void        setPass(std::string &pass);
         void        setHostname(std::string &hostname);
         void        setAsRegistered(void);
+        void        setPrefix(void);
         // int         _init();
         sockaddr_in _sockaddr;
         socklen_t   _socklen;
