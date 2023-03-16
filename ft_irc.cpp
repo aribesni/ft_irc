@@ -27,7 +27,7 @@ void    ft_loop(Server server)
 			{
                 // If there is ready-to-read data in the server socket, a client tries to connect
 				if (server._pollfds[i].fd == server.getSocket())
-					server.acceptNewConnection();
+					server.acceptNewClient();
 				// If there is ready-to-read data in another socket, a connected client sent data
                 else
                     server.handleClientRequest(server.clients[server._pollfds[i].fd]);

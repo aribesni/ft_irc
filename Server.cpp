@@ -58,7 +58,7 @@ std::string     Server::getPassword(void) const
     return (this->_password);
 }
 
-void Server::acceptNewConnection()
+void Server::acceptNewClient()
 {
     Client  client;
     this->_accept(client);
