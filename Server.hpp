@@ -31,7 +31,7 @@ class Server {
         void    _accept(Client & client);
         void    _listen(void);
         std::vector<struct pollfd>  _pollfds;
-        void    acceptNewConnection();
+        void    acceptNewClient();
         void    handleClientRequest(Client & client);
         // std::vector<Client>  clients;
         std::map<int, Client>  clients;
