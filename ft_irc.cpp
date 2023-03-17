@@ -49,7 +49,7 @@ int main(int argc, char **argv)
     // Create a server object
     Server  server(argv[0]);
 
-    server.setPassword(argv[1]);
+    server.setPassword(argv[2]);
 
     // Create server socket
     server.createSocket();
