@@ -87,7 +87,8 @@ void Server::acceptNewClient()
         send(client.getSocket(), replies.RPL_CREATED("003").data(), replies.RPL_CREATED("003").size(), 0);
         send(client.getSocket(), replies.RPL_MYINFO("004").data(), replies.RPL_MYINFO("004").size(), 0);
         send(client.getSocket(), replies.RPL_MOTDSTART("375").data(), replies.RPL_MOTDSTART("375").size(), 0);
-        send(client.getSocket(), replies.RPL_MOTD("372").data(), replies.RPL_MOTD("372").size(), 0);
+        // send(client.getSocket(), replies.RPL_MOTD("372").data(), replies.RPL_MOTD("372").size(), 0);
+        replies.sendMotd(client.getSocket());
         send(client.getSocket(), replies.RPL_ENDOFMOTD("376").data(), replies.RPL_ENDOFMOTD("376").size(), 0);
     }
     // else deal with client registration issue
