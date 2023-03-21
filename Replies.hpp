@@ -8,34 +8,34 @@
 
 		public :
 
-			Replies(Client &client)
+			Replies(Client *client)
 			{
-				this->_network = "Internet Relay Network";
-				this->_nickname = client.getNick();
-				this->_user = client.getUser();
+				this->_network = "Internet Relay";
+				this->_nickname = client->getNick();
+				this->_user = client->getUser();
 				this->_host = "localhost";
 				this->_server = "Ircserv";
 				this->_channel = "<channel>";
 				this->_date_time = "Tue March 14 at 12:05";
 				this->_version = "1.0";
-				this->_prefix = client.getPrefix();
+				this->_prefix = client->getPrefix();
 			}
 			~Replies(void) {};
 
 			void	sendMotd(int client_socket) {
 
-				std::string motd1 = "Welcome to our Ircserv IRC Network !\n";
-				std::string motd2 = "For any inquiries please refer to aribesni@student.42.fr, gduchate@student.42.fr or rliu@student.42.fr.\n";
-				std::string motd3 = "Enjoy your time here.\n";
-				send(client_socket, this->RPL_MOTD("372", "\n").data(), this->RPL_MOTD("372", "\n").size(), 0);
-				send(client_socket, this->RPL_MOTD("372", "\n").data(), this->RPL_MOTD("372", "\n").size(), 0);
+				std::string motd1 = "Welcome to our Ircserv IRC Network !\r\n";
+				std::string motd2 = "For any inquiries please refer to aribesni@student.42.fr, gduchate@student.42.fr or rliu@student.42.fr.\r\n";
+				std::string motd3 = "Enjoy your time here.\r\n";
+				send(client_socket, this->RPL_MOTD("372", "\r\n").data(), this->RPL_MOTD("372", "\r\n").size(), 0);
+				send(client_socket, this->RPL_MOTD("372", "\r\n").data(), this->RPL_MOTD("372", "\r\n").size(), 0);
 				send(client_socket, this->RPL_MOTD("372", motd1).data(), this->RPL_MOTD("372", motd1).size(), 0);
-				send(client_socket, this->RPL_MOTD("372", "\n").data(), this->RPL_MOTD("372", "\n").size(), 0);
+				send(client_socket, this->RPL_MOTD("372", "\r\n").data(), this->RPL_MOTD("372", "\r\n").size(), 0);
 				send(client_socket, this->RPL_MOTD("372", motd2).data(), this->RPL_MOTD("372", motd2).size(), 0);
-				send(client_socket, this->RPL_MOTD("372", "\n").data(), this->RPL_MOTD("372", "\n").size(), 0);
+				send(client_socket, this->RPL_MOTD("372", "\r\n").data(), this->RPL_MOTD("372", "\r\n").size(), 0);
 				send(client_socket, this->RPL_MOTD("372", motd3).data(), this->RPL_MOTD("372", motd3).size(), 0);
-				send(client_socket, this->RPL_MOTD("372", "\n").data(), this->RPL_MOTD("372", "\n").size(), 0);
-				send(client_socket, this->RPL_MOTD("372", "\n").data(), this->RPL_MOTD("372", "\n").size(), 0);
+				send(client_socket, this->RPL_MOTD("372", "\r\n").data(), this->RPL_MOTD("372", "\r\n").size(), 0);
+				send(client_socket, this->RPL_MOTD("372", "\r\n").data(), this->RPL_MOTD("372", "\r\n").size(), 0);
 			}
 
 			/* "001" */ std::string RPL_WELCOME(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + ":Welcome to the " + this->_network + " Network, " + this->_prefix + "\r\n"); };
@@ -122,7 +122,7 @@
 			/* "374" */ std::string RPL_ENDOFINFO(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + ":<info>" + "\r\n"); };
 			/* "375" */ std::string RPL_MOTDSTART(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + ":- " + this->_server + " Message of the day -" + "\r\n"); };
 			/* "376" */ std::string RPL_ENDOFMOTD(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + ":End of /MOTD command" + "\r\n"); };
-			/* "381" */ std::string RPL_YOUREOPER(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + ":<info>" + "\r\n"); };
+			/* "381" */ std::string RPL_YOUREOPER(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + ":You are now an IRC operator" + "\r\n"); };
 			/* "382" */ std::string RPL_REHASHING(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + "<config_file> :<info>" + "\r\n"); };
 			/* "383" */ std::string RPL_YOURESERVICE(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + ":You are service <service_name>" + "\r\n"); };
 			/* "391" */ std::string RPL_TIME(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + this->_server + " :<time string>" + "\r\n"); };

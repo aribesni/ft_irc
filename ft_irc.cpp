@@ -7,6 +7,10 @@
 
 void    ft_loop(Server server)
 {
+    // server._pollfds[0].fd = -1;
+    // server._pollfds[1].fd = -1;
+    // server._pollfds[2].fd = -1;
+    // server._pollfds[3].fd = -1;
     while (true)
     {
         // Watch pollfds and get number of open fds
@@ -28,10 +32,9 @@ void    ft_loop(Server server)
                 // If there is ready-to-read data in the server socket, a client tries to connect
 				if (server._pollfds[i].fd == server.getSocket())
 					server.acceptNewClient();
-				// If there is ready-to-read data in another socket, a connected client sent data
-                else
+                else // If there is ready-to-read data in another socket, a connected client sent data
                     server.handleClientRequest(server.clients[server._pollfds[i].fd]);
-			}
+            }
 		}
     }
 }
@@ -56,7 +59,7 @@ int main(int argc, char **argv)
     sockaddr_in hint;
     hint.sin_family = AF_INET;
     hint.sin_port = htons(port);
-    hint.sin_addr.s_addr = INADDR_ANY; /* listens to all the local interfaces (all local IP addresses)*/
+    hint.sin_addr.s_addr = INADDR_ANY; // Listens to all the local interfaces (all local IP addresses)
 
     // Bind server socket to an address specified by hint
     server._bind(hint);

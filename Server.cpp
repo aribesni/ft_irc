@@ -42,15 +42,15 @@ void    Server::_listen(void) {
         std::cerr << "error getting listening socket" << std::endl;
 }
 
-void    Server::_accept(Client & client) {
+void    Server::_accept(Client *client) {
 // Accept the connection and return new client socket
     int newsocket;
-    newsocket = accept(this->getSocket(), (sockaddr *)&client._sockaddr, &client._socklen);
+    newsocket = accept(this->getSocket(), (sockaddr *)&client->_sockaddr, &client->_socklen);
     //std::cout << "my buf" << buf << std::endl;
     // send(client.getSocket(), replies.RPL_WELCOME("001").data(), replies.RPL_WELCOME("001").size(), 0);
     //     client.setAsRegistered();
-    client.setSocket(newsocket);
-    std::cout << "new Client " << inet_ntoa(client._sockaddr.sin_addr) << ":" << ntohs(client._sockaddr.sin_port) << " (" << client.getSocket() << ")" << std::endl;
+    client->setSocket(newsocket);
+    std::cout << "new Client " << inet_ntoa(client->_sockaddr.sin_addr) << ":" << ntohs(client->_sockaddr.sin_port) << " (" << client->getSocket() << ")" << std::endl;
 }
 
 std::string     Server::getPassword(void) const
@@ -60,10 +60,10 @@ std::string     Server::getPassword(void) const
 
 void Server::acceptNewClient()
 {
-    Client  client;
+    Client  *client = new Client();
     this->_accept(client);
     struct pollfd newpollfd;
-    newpollfd.fd = client.getSocket();
+    newpollfd.fd = client->getSocket();
     newpollfd.events = POLLIN;
     this->_pollfds.push_back(newpollfd);
     this->clients[newpollfd.fd] = client;
@@ -74,50 +74,55 @@ void Server::acceptNewClient()
         // 1.1.3 NICK > check if nick format is correct and if nick is not already used (ERR_NICKNAMEINUSE). If it is, register user (isRegistered = true). If not ???
     // 2- If correct registration, server sends block of welcome message
     char buf[BUFFER_SIZE];
-    recv(client.getSocket(), buf, sizeof(buf), 0);
+    recv(client->getSocket(), buf, sizeof(buf), 0);
     std::vector<Message>  msgList = bufferParser(buf);
     multiMessge_exec(msgList, client);
-    client.setPrefix();
-    client.setAsRegistered(); // if registration succeed, set client as registered
-    if (client.getRegistrationStatus() == true) // send welcome messages
+    client->setPrefix();
+    client->setAsRegistered(); // if registration succeed, set client as registered
+    if (client->getRegistrationStatus() == true) // send welcome messages
     {
         Replies replies(client);
-        send(client.getSocket(), replies.RPL_WELCOME("001").data(), replies.RPL_WELCOME("001").size(), 0);
-        send(client.getSocket(), replies.RPL_YOURHOST("002").data(), replies.RPL_YOURHOST("002").size(), 0);
-        send(client.getSocket(), replies.RPL_CREATED("003").data(), replies.RPL_CREATED("003").size(), 0);
-        send(client.getSocket(), replies.RPL_MYINFO("004").data(), replies.RPL_MYINFO("004").size(), 0);
-        send(client.getSocket(), replies.RPL_MOTDSTART("375").data(), replies.RPL_MOTDSTART("375").size(), 0);
-        // send(client.getSocket(), replies.RPL_MOTD("372").data(), replies.RPL_MOTD("372").size(), 0);
-        replies.sendMotd(client.getSocket());
-        send(client.getSocket(), replies.RPL_ENDOFMOTD("376").data(), replies.RPL_ENDOFMOTD("376").size(), 0);
+        send(client->getSocket(), replies.RPL_WELCOME("001").data(), replies.RPL_WELCOME("001").size(), 0);
+        send(client->getSocket(), replies.RPL_YOURHOST("002").data(), replies.RPL_YOURHOST("002").size(), 0);
+        send(client->getSocket(), replies.RPL_CREATED("003").data(), replies.RPL_CREATED("003").size(), 0);
+        send(client->getSocket(), replies.RPL_MYINFO("004").data(), replies.RPL_MYINFO("004").size(), 0);
+        send(client->getSocket(), replies.RPL_MOTDSTART("375").data(), replies.RPL_MOTDSTART("375").size(), 0);
+        replies.sendMotd(client->getSocket());
+        send(client->getSocket(), replies.RPL_ENDOFMOTD("376").data(), replies.RPL_ENDOFMOTD("376").size(), 0);
     }
     // else deal with client registration issue
 }
 
-void Server::handleClientRequest(Client & client)
-{    
+void Server::handleClientRequest(Client *client)
+{
     // Handle other requests
     // WIP
 
     // PRIVATE MESSAGES BETWEEN CLIENTS
     char buf[BUFFER_SIZE];
-    int nbytes = recv(client.getSocket(), buf, sizeof(buf), 0);
+    int nbytes = recv(client->getSocket(), buf, sizeof(buf), 0);
+
+    // TESTING /OPER COMMAND
+    std::vector<Message>  msgList = bufferParser(buf);
+    msgList[0].execCMD(client);
+    //
+
     if (nbytes <= 0)
     {
         // Got error or connection closed by client
         if (nbytes == 0)
-            std::cout << "pollserver: socket " << client.getSocket() << " hung up" << std::endl;
+            std::cout << "pollserver: socket " << client->getSocket() << " hung up" << std::endl;
         else
             perror("recv");
-        close(client.getSocket()); // Bye!
-        this->clients.erase(client.getSocket()); // remove client from map
+        close(client->getSocket()); // Bye!
+        this->clients.erase(client->getSocket()); // remove client from map
     }
     else
     {
-        std::map<int, Client>::iterator     _it;
+        std::map<int, Client*>::iterator     _it;
         for (_it = this->clients.begin(); _it != this->clients.end(); _it++)
         {
-            if (_it->first == client.getSocket()) // don't send message to client's own fd
+            if (_it->first == client->getSocket()) // don't send message to client's own fd
                 continue ;
             if (send(_it->first, buf, nbytes, 0) == -1) // send message to all the other clients fds
                 perror("send");
