@@ -21,6 +21,8 @@ class Client {
         // Getters
         int         getSocket(void) const;
         std::string getNick(void) const;
+        std::string getUser(void) const;
+        std::string getPrefix(void) const;
         bool        getRegistrationStatus (void) const;
 
         // Setters
