@@ -39,17 +39,15 @@ void    ft_loop(Server server)
 int main(int argc, char **argv)
 {
     // Check for correct usage
-    if (argc != 3)
+    if (argc != 2)
     {
-        std::cout << "Port number and password needed. ./ircserv <port> <password> " << std::endl;
+        std::cout << "Port number needed." << std::endl;
         return (-1);
     }
     long port = std::strtol(argv[1], NULL, 10);
 
     // Create a server object
     Server  server(argv[0]);
-
-    server.setPassword(argv[2]);
 
     // Create server socket
     server.createSocket();

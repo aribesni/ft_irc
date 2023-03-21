@@ -6,7 +6,7 @@
 /*   By: rliu <rliu@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 17:43:58 by rliu              #+#    #+#             */
-/*   Updated: 2023/03/16 16:39:35 by rliu             ###   ########.fr       */
+/*   Updated: 2023/03/16 12:12:34 by rliu             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,7 @@
 #include <iostream>
 #include <vector>
 #include "Client.hpp"
-#include "Server.hpp"
 #include "Message.hpp"
-
 class Client;
 
 class Command{
