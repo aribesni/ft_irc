@@ -28,7 +28,16 @@ std::vector<std::string> msg_split(std::string str, std::string delimiter)
 	return tokens;
 }
 
-
+void msg_replace(std::string &message, char find, char replace){
+    // (void) replace;
+    // (void) find;
+    // std::cout <<message << " test1\n";
+    // std::cout << message.size() << std::endl;
+    for(size_t i= 0; i < message.size(); i++){
+        if(message[i]== find)
+            message.replace(i, 1, 1, replace);
+    }
+}
 // Parser buffer from char * to a vector of class Message
 std::vector<Message>  bufferParser(char* buf){
     std::string                                     message;
@@ -36,8 +45,9 @@ std::vector<Message>  bufferParser(char* buf){
     std::vector<std::vector<std::string> >          tokens;
     std::vector<Message>                            msgList;
     size_t                                          msgSize = 0;
-
     message = buf;
+    msg_replace(message, 4, ' ');
+    std::cout << "test message: " << message;
     lines= msg_split(message, "\r\n");
     msgSize = lines.size();
     for (size_t i=0; i<msgSize; ++i){
