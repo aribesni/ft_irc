@@ -37,9 +37,6 @@ class Server {
         std::map<int, Client>  clients;
         // Client &        getClientWithFd(int fd);
         std::string     getPassword(void) const;
-        // set password
-        void setPassword(char * password);
-  
 
     private :
         std::string                 _password;
