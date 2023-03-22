@@ -6,7 +6,7 @@
 /*   By: gduchate <gduchate@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 17:43:49 by rliu              #+#    #+#             */
-/*   Updated: 2023/03/22 12:35:14 by gduchate         ###   ########.fr       */
+/*   Updated: 2023/03/22 15:49:11 by gduchate         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,8 @@ void cmd_user(std::vector<std::string>  &parametre, Client &client){
     client.setHostname(parametre[2]);
 }
 void cmd_ping(std::vector<std::string>  &parametre, Client &client){
-    std::string answer = "PONG " + parametre[0];
+    // As a result of server correctly responding "PONG", the irssi client interface does not
+    // show [LAG] message anymore
+    std::string answer = "PONG " + parametre[0] + "\r\n";
     send(client.getSocket(), answer.c_str(), answer.size(), 0);
 }

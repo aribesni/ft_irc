@@ -111,6 +111,11 @@ void Server::handleClientRequest(Client & client)
     }
     else
     {
+        // Handle buffer as a vector of messages
+        std::vector<Message>  msgList = bufferParser(buf);
+        std::cout << "buf: " << buf << std::endl;
+        // Execute all messages that could be parsed
+        multiMessge_exec(msgList, client);
         std::map<int, Client>::iterator     _it;
         for (_it = this->clients.begin(); _it != this->clients.end(); _it++)
         {
