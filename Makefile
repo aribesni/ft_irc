@@ -12,12 +12,12 @@ CC = c++
 
 FLAGS = -Wall -Wextra -Werror -std=c++98
 
-%.o : %.cpp
+%.o : %.cpp ${HEADER}
 	${CC} ${FLAGS} -c $<
 
 all : ${NAME}
 
-${NAME} : ${OBJ}
+${NAME} : ${OBJ} ${HEADER}
 		${CC} ${OBJ} ${FLAGS} -o ${NAME}
 
 clean :
