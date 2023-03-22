@@ -12,7 +12,12 @@ Message::Message(std::vector<std::string> &tokens):_cmd(tokens[0]), _params(toke
     // Display tokens
     // for (size_t i = 0; i < tokens.size(); i++)
     //     std::cout << "token " << i << ": " << tokens[i] << std::endl;
+
+    // if cmd token is recognized: this->executeCommand()
+// Merge Message and Command
 }
+
+
 
 std::string 				Message::getCMD(void){return(_cmd);}
 std::vector<std::string>	Message::getParams(void){return(_params);}
