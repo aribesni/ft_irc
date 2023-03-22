@@ -17,13 +17,14 @@ std::vector<std::string> msg_split(std::string str, std::string delimiter)
 {
 	std::vector<std::string> tokens = std::vector<std::string>();
 
-	int end;
-	while ((end = str.find(delimiter)) != -1)
+	size_t end;
+	while ((end = str.find(delimiter)) != std::string::npos || str == "\n")
 	{
 		tokens.push_back(str.substr(0, end));
-		str.erase(0, end + delimiter.length());
+		str = str.substr(end + delimiter.size());
 	}
-	tokens.push_back(str);
+    if (str != "")
+	    tokens.push_back(str);
 
 	return tokens;
 }
@@ -37,15 +38,11 @@ std::vector<Message>  bufferParser(char* buf){
     std::vector<Message>                            msgList;
     size_t                                          msgSize = 0;
 
+    // message = buf;
     lines = msg_split(message, "\r\n");
     // Display lines vector
-    std::cout << "lines.size()" << lines.size() << std::endl;
-    for (size_t i = 0; i < lines.size(); i++)
-    {
-        std::cout << "lines: " << i << " " << lines[i];
-    }
     msgSize = lines.size();
-    for (size_t i=0; i<msgSize; ++i)
+    for (size_t i = 0; i < msgSize; i++)
     {
         tokens.push_back(msg_split(lines[i], " "));
         Message msg(tokens[i]);
