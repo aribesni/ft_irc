@@ -19,5 +19,10 @@ std::vector<std::string>	Message::getParams(void){return(_params);}
 
 void						Message::execCMD(Client &client){
     if(g_cmd._command.find(_cmd) != g_cmd._command.end())
+    {
+        std::cout << "[Client] (" << client.getSocket() << ") Command " << _cmd << " is being processed." << std::endl;
         g_cmd._command[_cmd](_params, client);
+    }
+    else
+        std::cout << "[Client] (" << client.getSocket() << ") Command " << _cmd << " not found." << std::endl;
 }

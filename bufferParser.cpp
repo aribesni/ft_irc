@@ -15,17 +15,27 @@
 // split by delimiter
 std::vector<std::string> msg_split(std::string str, std::string delimiter)
 {
+	// std::vector<std::string> tokens = std::vector<std::string>();
+
+	// size_t end;
+	// while ((end = str.find(delimiter)) != std::string::npos || str == "\n")
+	// {
+	// 	tokens.push_back(str.substr(0, end));
+	// 	str = str.substr(end + delimiter.size());
+	// }
+    // if (str != "")
+	//     tokens.push_back(str);
+	// return tokens;
+
 	std::vector<std::string> tokens = std::vector<std::string>();
 
-	size_t end;
-	while ((end = str.find(delimiter)) != std::string::npos || str == "\n")
+	int end;
+	while ((end = str.find(delimiter)) != -1)
 	{
 		tokens.push_back(str.substr(0, end));
-		str = str.substr(end + delimiter.size());
+		str.erase(0, end + delimiter.length());
 	}
-    if (str != "")
-	    tokens.push_back(str);
-
+	tokens.push_back(str);
 	return tokens;
 }
 

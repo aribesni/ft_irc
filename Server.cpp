@@ -70,23 +70,22 @@ void Server::acceptNewClient()
         // 1.1.3 NICK > check if nick format is correct and if nick is not already used (ERR_NICKNAMEINUSE). If it is, register user (isRegistered = true). If not ???
     // 2- If correct registration, server sends block of welcome message
     char buf[BUFFER_SIZE];
-    recv(client.getSocket(), buf, sizeof(buf), 0);
-    std::vector<Message>  msgList = bufferParser(buf);
-    multiMessge_exec(msgList, client);
-    client.setPrefix();
-    client.setAsRegistered(); // if registration succeed, set client as registered
-    if (client.getRegistrationStatus() == true) // send welcome messages
+    while (client.getRegistrationStatus() == false)
     {
-        Replies replies(client);
-        send(client.getSocket(), replies.RPL_WELCOME("001").data(), replies.RPL_WELCOME("001").size(), 0);
-        send(client.getSocket(), replies.RPL_YOURHOST("002").data(), replies.RPL_YOURHOST("002").size(), 0);
-        send(client.getSocket(), replies.RPL_CREATED("003").data(), replies.RPL_CREATED("003").size(), 0);
-        send(client.getSocket(), replies.RPL_MYINFO("004").data(), replies.RPL_MYINFO("004").size(), 0);
-        send(client.getSocket(), replies.RPL_MOTDSTART("375").data(), replies.RPL_MOTDSTART("375").size(), 0);
-        // send(client.getSocket(), replies.RPL_MOTD("372").data(), replies.RPL_MOTD("372").size(), 0);
-        replies.sendMotd(client.getSocket());
-        send(client.getSocket(), replies.RPL_ENDOFMOTD("376").data(), replies.RPL_ENDOFMOTD("376").size(), 0);
+        recv(client.getSocket(), buf, sizeof(buf), 0);
+        std::vector<Message>  msgList = bufferParser(buf);
+        multiMessge_exec(msgList, client);
     }
+    client.setPrefix();
+    Replies replies(client);
+    send(client.getSocket(), replies.RPL_WELCOME("001").data(), replies.RPL_WELCOME("001").size(), 0);
+    send(client.getSocket(), replies.RPL_YOURHOST("002").data(), replies.RPL_YOURHOST("002").size(), 0);
+    send(client.getSocket(), replies.RPL_CREATED("003").data(), replies.RPL_CREATED("003").size(), 0);
+    send(client.getSocket(), replies.RPL_MYINFO("004").data(), replies.RPL_MYINFO("004").size(), 0);
+    send(client.getSocket(), replies.RPL_MOTDSTART("375").data(), replies.RPL_MOTDSTART("375").size(), 0);
+    // send(client.getSocket(), replies.RPL_MOTD("372").data(), replies.RPL_MOTD("372").size(), 0);
+    replies.sendMotd(client.getSocket());
+    send(client.getSocket(), replies.RPL_ENDOFMOTD("376").data(), replies.RPL_ENDOFMOTD("376").size(), 0);
     // else deal with client registration issue
     this->clients[newpollfd.fd] = client;
 }
@@ -113,16 +112,16 @@ void Server::handleClientRequest(Client & client)
     {
         // Handle buffer as a vector of messages
         std::vector<Message>  msgList = bufferParser(buf);
-        std::cout << "buf: " << buf << std::endl;
+        std::cout << "[Client] (" << client.getSocket() << ")" << " received buf: " << buf << std::endl;
         // Execute all messages that could be parsed
         multiMessge_exec(msgList, client);
-        std::map<int, Client>::iterator     _it;
-        for (_it = this->clients.begin(); _it != this->clients.end(); _it++)
-        {
-            if (_it->first == client.getSocket()) // don't send message to client's own fd
-                continue ;
-            if (send(_it->first, buf, nbytes, 0) == -1) // send message to all the other clients fds
-                perror("send");
-        }
+        // std::map<int, Client>::iterator     _it;
+        // for (_it = this->clients.begin(); _it != this->clients.end(); _it++)
+        // {
+        //     if (_it->first == client.getSocket()) // don't send message to client's own fd
+        //         continue ;
+        //     if (send(_it->first, buf, nbytes, 0) == -1) // send message to all the other clients fds
+        //         perror("send");
+        // }
     }
 }
