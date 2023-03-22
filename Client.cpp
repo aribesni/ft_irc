@@ -6,6 +6,12 @@ Client::Client(void) : _isRegistered(false) {
     this->_socklen = sizeof(this->_sockaddr);
 }
 
+//@add_ran constructor to add server ponter
+Client::Client(Server *server) : _server(server), _isRegistered(false){
+    memset(this->_host, 0, NI_MAXHOST);
+    this->_socklen = sizeof(this->_sockaddr);
+ }
+
 Client::~Client(void) {}
 
 int Client::getSocket(void) const
@@ -23,6 +29,11 @@ std::string Client::getUser(void) const {
     return (this->_user);
 }
 
+std::string Client::getPassword(void) const {
+
+    return (this->_password);
+}
+
 std::string Client::getPrefix(void) const {
 
     return (this->_prefix);
@@ -32,6 +43,8 @@ bool Client::getRegistrationStatus(void) const
 {
     return (this->_isRegistered);
 }
+
+
 
 void Client::setSocket(int socket)
 {
@@ -66,4 +79,9 @@ void  Client::setPass(std::string &pass){
 void  Client::setHostname(std::string &hostname){
     _hostname = hostname;
     //std::cout << "test_pass: " << _hostname << std::endl;
+}
+
+void  Client::setPassword(std::string &password){
+    _password = password;
+    //std::cout << "test_pass: " << _pass << std::endl;
 }

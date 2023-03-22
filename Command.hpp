@@ -6,7 +6,7 @@
 /*   By: rliu <rliu@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 17:43:58 by rliu              #+#    #+#             */
-/*   Updated: 2023/03/16 12:12:34 by rliu             ###   ########.fr       */
+/*   Updated: 2023/03/22 18:31:13 by rliu             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 #include <vector>
 #include "Client.hpp"
 #include "Message.hpp"
+#include "Replies.hpp"
 class Client;
 
 class Command{
@@ -26,7 +27,9 @@ class Command{
 
         void init_command();
 
-        std::map<std::string, void(*)(std::vector<std::string>&, Client&)>	_command;
+        std::map<std::string, void(*)(std::vector<std::string>&, Client&)>	_command;    
+        void rplSender(Client &client, std::string code);
+        void msgSender(Client &client, std::string cmd, std::string msg);
 };
 
 //fuctions of cmd

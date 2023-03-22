@@ -5,12 +5,14 @@
 # include <netdb.h>
 # include <string.h>
 
+class Server;
 class Client {
 
     public :
         // Constructor Destructor
         Client(void);
         ~Client(void);
+        Client(Server *server);//@ran_add
 
         // Getters
         int         getSocket(void) const;
@@ -18,21 +20,26 @@ class Client {
         std::string getUser(void) const;
         std::string getPrefix(void) const;
         bool        getRegistrationStatus (void) const;
+        Server      *getServer(void) const;//@ran_add
+        std::string getPassword(void) const;
 
         // Setters
         void        setSocket(int socket);
         void        setNick(std::string &nickname);
         void        setUsr(std::string &usrname);
-        void        setPass(std::string &pass);
+        void        setPass(std::string &pass); 
+         void       setPassword(std::string &password); 
         void        setHostname(std::string &hostname);
         void        setAsRegistered(void);
         void        setPrefix(void);
+
         // int         _init();
         sockaddr_in _sockaddr;
         socklen_t   _socklen;
 
     private :
-        std::string _password;
+        Server         *_server; //@ran_add
+        std::string _password;//server password
         int         _socket;
         char        _host[NI_MAXHOST];
         bool        _isRegistered;

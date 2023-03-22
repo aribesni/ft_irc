@@ -37,6 +37,7 @@ class Server {
         std::map<int, Client>  clients;
         // Client &        getClientWithFd(int fd);
         std::string     getPassword(void) const;
+        void setPassword(char * password);//ran_add
 
     private :
         std::string                 _password;
