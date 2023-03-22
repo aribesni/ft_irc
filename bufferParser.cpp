@@ -31,20 +31,26 @@ std::vector<std::string> msg_split(std::string str, std::string delimiter)
 
 // Parser buffer from char * to a vector of class Message
 std::vector<Message>  bufferParser(char* buf){
-    std::string                                     message;
+    std::string                                     message(buf);
     std::vector<std::string>                        lines;
     std::vector<std::vector<std::string> >          tokens;
     std::vector<Message>                            msgList;
     size_t                                          msgSize = 0;
 
-    message = buf;
-    lines= msg_split(message, "\r\n");
+    lines = msg_split(message, "\r\n");
+    // Display lines vector
+    std::cout << "lines.size()" << lines.size() << std::endl;
+    for (size_t i = 0; i < lines.size(); i++)
+    {
+        std::cout << "lines: " << i << " " << lines[i];
+    }
     msgSize = lines.size();
-    for (size_t i=0; i<msgSize; ++i){
+    for (size_t i=0; i<msgSize; ++i)
+    {
         tokens.push_back(msg_split(lines[i], " "));
         Message msg(tokens[i]);
         msgList.push_back(msg);
-        }
+    }
     return (msgList);
 }
 

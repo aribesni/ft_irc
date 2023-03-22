@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Command.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rliu <rliu@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: gduchate <gduchate@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 17:43:58 by rliu              #+#    #+#             */
-/*   Updated: 2023/03/16 12:12:34 by rliu             ###   ########.fr       */
+/*   Updated: 2023/03/22 12:34:06 by gduchate         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,6 @@ class Command{
 void cmd_pass(std::vector<std::string>&  parametre, Client& client);
 void cmd_nick(std::vector<std::string>&  parametre, Client& client);
 void cmd_user(std::vector<std::string>&  parametre, Client& client);
-
+void cmd_ping(std::vector<std::string>  &parametre, Client& client);
 
 #endif

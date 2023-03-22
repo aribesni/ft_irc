@@ -6,7 +6,7 @@ Command     g_cmd;
 Message::Message(void){}
 
 Message::~Message(void){}
-	
+
 Message::Message(std::vector<std::string> &tokens):_cmd(tokens[0]), _params(tokens.begin()+1, tokens.end()){
     //_params.insert(_params.begin(), tokens.begin()+1, tokens.end());
 }
