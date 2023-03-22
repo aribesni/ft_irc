@@ -28,12 +28,12 @@ class Server {
         void    fillServerPollfd(void);
         void    createSocket(void);
         void    _bind(sockaddr_in bind);
-        void    _accept(Client *client);
+        void    _accept(Client &client);
         void    _listen(void);
         std::vector<struct pollfd>  _pollfds;
         void    acceptNewClient();
-        void    handleClientRequest(Client *client);
-        std::map<int, Client*>  clients;
+        void    handleClientRequest(Client &client);
+        std::map<int, Client>  clients;
         // Client &        getClientWithFd(int fd);
         std::string     getPassword(void) const;
 

@@ -16,7 +16,7 @@ class Message
 
 		std::string 				getCMD(void);
 		std::vector<std::string>	getParams(void);
-		void						execCMD(Client *client);
+		void						execCMD(Client &client);
 
 	private:
 		std::string					_prefix;

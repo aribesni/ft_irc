@@ -29,13 +29,13 @@ class Command{
 
         void init_command();
 
-        std::map<std::string, void(*)(std::vector<std::string>&, Client*)>	_command;
+        std::map<std::string, void(*)(std::vector<std::string>&, Client&)>	_command;
 };
 
 //fuctions of cmd
-void    cmd_pass(std::vector<std::string>& parametre, Client *client);
-void    cmd_nick(std::vector<std::string>& parametre, Client *client);
-void    cmd_user(std::vector<std::string>& parametre, Client *client);
-void    cmd_oper(std::vector<std::string>& parametre, Client *client);
+void    cmd_pass(std::vector<std::string>& parametre, Client& client);
+void    cmd_nick(std::vector<std::string>& parametre, Client& client);
+void    cmd_user(std::vector<std::string>& parametre, Client& client);
+void    cmd_oper(std::vector<std::string>& parametre, Client& client);
 
 #endif

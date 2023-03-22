@@ -23,21 +23,26 @@ void    Command::init_command(){
     _command["OPER"] = &cmd_oper;
 }
 
-void    cmd_pass(std::vector<std::string> &parametre, Client *client) {
-    client->setPass(parametre[0]);
+void    cmd_pass(std::vector<std::string> &parametre, Client& client) {
+    client.setPass(parametre[0]);
 }
-void    cmd_nick(std::vector<std::string> &parametre, Client *client) {
-    client->setNick(parametre[0]);
+void    cmd_nick(std::vector<std::string> &parametre, Client& client) {
+    client.setNick(parametre[0]);
 }
-void    cmd_user(std::vector<std::string> &parametre, Client *client) {
-    client->setUsr(parametre[0]);
-    client->setHostname(parametre[2]);
+void    cmd_user(std::vector<std::string> &parametre, Client& client) {
+    client.setUsr(parametre[0]);
+    client.setHostname(parametre[2]);
 }
-void    cmd_oper(std::vector<std::string> &parametre, Client *client) {
+void    cmd_oper(std::vector<std::string> &parametre, Client& client) {
 
     (void)client;
     Replies replies(client);
 
     if (/*parametre[0] == "operator" &&*/ parametre[1] == "password")
-        send(client->getSocket(), replies.RPL_YOUREOPER("381").data(), replies.RPL_YOUREOPER("381").size(), 0);
+    {
+        send(client.getSocket(), replies.RPL_YOUREOPER("381").data(), replies.RPL_YOUREOPER("381").size(), 0);
+        send(client.getSocket(), replies.RPL_UMODEIS("221").data(), replies.RPL_UMODEIS("221").size(), 0);
+    }
+    else
+        send(client.getSocket(), replies.ERR_PASSWDMISMATCH("464").data(), replies.ERR_PASSWDMISMATCH("464").size(), 0);
 }

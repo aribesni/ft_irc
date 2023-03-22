@@ -49,7 +49,7 @@ std::vector<Message>  bufferParser(char* buf){
 }
 
 // excute every message
-void multiMessge_exec(std::vector<Message> msgList, Client *client){
+void multiMessge_exec(std::vector<Message> msgList, Client &client){
     for (size_t i=0; i < msgList.size(); ++i)
         msgList[i].execCMD(client);
 }

@@ -22,6 +22,6 @@
 # include "Command.hpp"
 
 std::vector<Message>  bufferParser(char* buf);
-void multiMessge_exec(std::vector<Message> msgList, Client *client);
+void multiMessge_exec(std::vector<Message> msgList, Client &client);
 
 #endif
