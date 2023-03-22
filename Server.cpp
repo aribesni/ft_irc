@@ -43,12 +43,9 @@ void    Server::_listen(void) {
 }
 
 void    Server::_accept(Client & client) {
-// Accept the connection and return new client socket
+// Accept the connection and set new client socket
     int newsocket;
     newsocket = accept(this->getSocket(), (sockaddr *)&client._sockaddr, &client._socklen);
-    //std::cout << "my buf" << buf << std::endl;
-    // send(client.getSocket(), replies.RPL_WELCOME("001").data(), replies.RPL_WELCOME("001").size(), 0);
-    //     client.setAsRegistered();
     client.setSocket(newsocket);
     std::cout << "new Client " << inet_ntoa(client._sockaddr.sin_addr) << ":" << ntohs(client._sockaddr.sin_port) << " (" << client.getSocket() << ")" << std::endl;
 }
@@ -95,7 +92,7 @@ void Server::acceptNewClient()
 }
 
 void Server::handleClientRequest(Client & client)
-{    
+{
     // Handle other requests
     // WIP
 
@@ -114,6 +111,11 @@ void Server::handleClientRequest(Client & client)
     }
     else
     {
+        // Handle buffer as a vector of messages
+        std::vector<Message>  msgList = bufferParser(buf);
+        std::cout << "buf: " << buf << std::endl;
+        // Execute all messages that could be parsed
+        multiMessge_exec(msgList, client);
         std::map<int, Client>::iterator     _it;
         for (_it = this->clients.begin(); _it != this->clients.end(); _it++)
         {
