@@ -88,6 +88,7 @@ void Server::acceptNewClient()
         send(client.getSocket(), replies.RPL_MOTDSTART("375").data(), replies.RPL_MOTDSTART("375").size(), 0);
         replies.sendMotd(client.getSocket());
         send(client.getSocket(), replies.RPL_ENDOFMOTD("376").data(), replies.RPL_ENDOFMOTD("376").size(), 0);
+        send(client.getSocket(), replies.RPL_UMODEIS("221").data(), replies.RPL_UMODEIS("221").size(), 0);
     }
     // else deal with client registration issue
     this->clients[newpollfd.fd] = client;

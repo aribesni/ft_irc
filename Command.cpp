@@ -35,12 +35,13 @@ void    cmd_user(std::vector<std::string> &parametre, Client& client) {
 }
 void    cmd_oper(std::vector<std::string> &parametre, Client& client) {
 
-    (void)client;
     Replies replies(client);
 
     if (/*parametre[0] == "operator" &&*/ parametre[1] == "password")
     {
         send(client.getSocket(), replies.RPL_YOUREOPER("381").data(), replies.RPL_YOUREOPER("381").size(), 0);
+        client.setMode("wio");
+        replies.setVariables(&client);
         send(client.getSocket(), replies.RPL_UMODEIS("221").data(), replies.RPL_UMODEIS("221").size(), 0);
     }
     else

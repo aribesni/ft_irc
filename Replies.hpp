@@ -10,18 +10,23 @@
 
 			Replies(Client &client)
 			{
+				setVariables(&client);
+			}
+			~Replies(void) {};
+
+			void	setVariables(Client *client) {
+
 				this->_network = "Internet Relay";
-				this->_nickname = client.getNick();
-				this->_user = client.getUser();
+				this->_nickname = client->getNick();
+				this->_user = client->getUser();
 				this->_host = "localhost";
 				this->_server = "Ircserv";
 				this->_channel = "<channel>";
 				this->_date_time = "Tue March 14 at 12:05";
 				this->_version = "1.0";
-				this->_mode_oper = "wio";
-				this->_prefix = client.getPrefix();
+				this->_mode = client->getMode();
+				this->_prefix = client->getPrefix();
 			}
-			~Replies(void) {};
 
 			void	sendMotd(int client_socket) {
 
@@ -63,7 +68,7 @@
 			/* "216" */ std::string RPL_STATSKLINE(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + "K " + this->_host + " * <username> <port> <class>" + "\r\n"); };
 			/* "218" */ std::string RPL_STATSYLINE(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + "Y <class> <ping_freq> <connect_freq> <max_sendq>" + "\r\n"); };
 			/* "219" */ std::string RPL_ENDOFSTATS(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + "<query> :<info>" + "\r\n"); };
-			/* "221" */ std::string RPL_UMODEIS(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + "+" + this->_mode_oper + "\r\n"); };
+			/* "221" */ std::string RPL_UMODEIS(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + "+" + this->_mode + "\r\n"); };
 			/* "234" */ std::string RPL_SERVLIST(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + "<name> " + this->_server + " <mask> <type> <hopcount> <info>" + "\r\n"); };
 			/* "235" */ std::string RPL_SERVLISTEND(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + "<mask> <type> :<info>" + "\r\n"); };
 			/* "241" */ std::string RPL_STATSLLINE(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + "L <hostmask> * " + this->_server + " <maxdepth>" + "\r\n"); };
@@ -195,7 +200,7 @@
 				std::string	_channel;
 				std::string	_date_time;
 				std::string	_version;
-				std::string	_mode_oper;
+				std::string	_mode;
 				std::string	_prefix;
 	};
 

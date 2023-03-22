@@ -28,6 +28,16 @@ std::string Client::getPrefix(void) const {
     return (this->_prefix);
 }
 
+std::string Client::getMode(void) const {
+
+    return (this->_mode);
+}
+
+std::string Client::getHostName(void) const {
+
+    return (this->_hostname);
+}
+
 bool Client::getRegistrationStatus(void) const
 {
     return (this->_isRegistered);
@@ -51,6 +61,7 @@ void  Client::setNick(std::string &nickname){
 
 void  Client::setAsRegistered(void){
     _isRegistered = true;
+    this->setMode("wi");
 }
 
 void  Client::setUsr(std::string &usrname){
@@ -66,4 +77,9 @@ void  Client::setPass(std::string &pass){
 void  Client::setHostname(std::string &hostname){
     _hostname = hostname;
     //std::cout << "test_pass: " << _hostname << std::endl;
+}
+
+void    Client::setMode(std::string mode) {
+
+    this->_mode = mode;
 }
