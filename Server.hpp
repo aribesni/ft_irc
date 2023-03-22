@@ -16,6 +16,8 @@
 # include "Replies.hpp"
 # include "bufferParser.hpp"
 # include "Message.hpp"
+# include "Channel.hpp"
+
 class Server {
 
     public :
@@ -39,10 +41,11 @@ class Server {
         std::string     getPassword(void) const;
 
     private :
-        std::string                 _password;
-        int                         _socket;
-        std::string                 _name;
-        char                        _svc[NI_MAXSERV];
+        std::string                     _password;
+        int                             _socket;
+        std::string                     _name;
+        char                            _svc[NI_MAXSERV];
+        std::map<std::string, Channel>  _channels; /* channelName, Channel object*/
 };
 
 #endif
