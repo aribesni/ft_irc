@@ -7,10 +7,6 @@
 
 void    ft_loop(Server server)
 {
-    // server._pollfds[0].fd = -1;
-    // server._pollfds[1].fd = -1;
-    // server._pollfds[2].fd = -1;
-    // server._pollfds[3].fd = -1;
     while (true)
     {
         // Watch pollfds and get number of open fds
