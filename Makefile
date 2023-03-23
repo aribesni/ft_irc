@@ -3,22 +3,22 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: gduchate <gduchate@student.42.fr>          +#+  +:+       +#+         #
+#    By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/03/22 18:38:46 by gduchate          #+#    #+#              #
-#    Updated: 2023/03/22 18:42:29 by gduchate         ###   ########.fr        #
+#    Updated: 2023/03/23 18:04:39 by guillemette      ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = ircserv
 
 SRC = ft_irc.cpp Client.cpp Server.cpp \
-		bufferParser.cpp Message.cpp Command.cpp Channel.cpp
+		Message.cpp Channel.cpp Command.cpp
 
 OBJ = ${SRC:.cpp=.o}
 
 HEADER = Replies.hpp Client.hpp Server.hpp \
-			bufferParser.hpp Message.hpp Command.hpp Channel.hpp
+		 Message.hpp Channel.hpp Command.hpp
 
 CC = c++
 

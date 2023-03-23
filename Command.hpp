@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Command.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gduchate <gduchate@student.42.fr>          +#+  +:+       +#+        */
+/*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 17:43:58 by rliu              #+#    #+#             */
-/*   Updated: 2023/03/22 19:36:01 by gduchate         ###   ########.fr       */
+/*   Updated: 2023/03/23 18:27:30 by guillemette      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,32 +15,26 @@
 #include <map>
 #include <iostream>
 #include <vector>
-#include "Server.hpp"
-#include "Client.hpp"
 #include "Message.hpp"
 
 class Client;
 
 class Command
 {
-    private:
-        Client&         _client;
-        Server&         _server;
-        std::string     _name;
-    public:
-        Command(Client &client, Server &server, std::string commandName);
-        // Command(void);
-        ~Command(void);
+	private:
+	public:
+		Command(void);
+		~Command(void);
 
-        void init_command();
-        std::map<std::string, void(*)(std::vector<std::string>&, Client&)>	_command;
+		void initCmdMap();
+		std::map<std::string, void(*)(Message*)>	_cmdMap;
 };
 
-//fuctions of cmd
-        void cmd_pass(std::vector<std::string> &parametre, Client& client);
-        void cmd_nick(std::vector<std::string> &parametre, Client& client);
-        void cmd_user(std::vector<std::string> &parametre, Client& client);
-        void cmd_ping(std::vector<std::string> &parametre, Client& client);
-        void cmd_join(std::vector<std::string> &parametre, Client& client);
+// CMD
+	void cmd_pass(Message* message);
+	void cmd_nick(Message* message);
+	void cmd_user(Message* message);
+	void cmd_ping(Message* message);
+	void cmd_join(Message* message);
 
 #endif

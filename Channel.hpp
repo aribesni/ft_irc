@@ -10,7 +10,7 @@ class Channel
 {
 
 	public:
-
+		// CONSTRUCTOR / DESTRUCTOR
 		Channel();
 		// Channel( Channel const & src );
 		~Channel();
