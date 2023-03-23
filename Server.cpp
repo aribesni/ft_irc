@@ -67,7 +67,6 @@ void Server::acceptNewClient()
     newpollfd.fd = client.getSocket();
     newpollfd.events = POLLIN;
     this->_pollfds.push_back(newpollfd);
-   
     // 1. Parse registration messages and get client nick, user and password
         // 1.1 Loop on buffer. When buffer finds \r\n>> create Message, handles Message, then empty buffer and go on with loop
         // 1.1.1 PASS > check if password is correct. if not skip the rest
@@ -93,7 +92,7 @@ void Server::acceptNewClient()
         send(client.getSocket(), replies.RPL_ENDOFMOTD("376").data(), replies.RPL_ENDOFMOTD("376").size(), 0);
     }
     // else deal with client registration issue
-     this->clients[newpollfd.fd] = client;
+    this->clients[newpollfd.fd] = client;
 }
 
 void Server::handleClientRequest(Client & client)
