@@ -1,27 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   bufferParser.hpp                                   :+:      :+:    :+:   */
+/*   utils.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rliu <rliu@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/03/14 15:42:23 by gduchate          #+#    #+#             */
-/*   Updated: 2023/03/23 17:50:11 by rliu             ###   ########.fr       */
+/*   Created: 2023/03/23 18:14:27 by rliu              #+#    #+#             */
+/*   Updated: 2023/03/23 18:14:48 by rliu             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef BUFFERPARSER_HPP
-# define BUFFERPARSER_HPP
-# include "Client.hpp"
-# include <vector>
-# include <string>
-#include <iostream>
-# include <algorithm>
-# include "Message.hpp"
-# include "Client.hpp"
-# include "Command.hpp"
-class Message;
-std::vector<Message>  bufferParser(char* buf);
-void multiMessge_exec(std::vector<Message> msgList, Client& client);
-
-#endif

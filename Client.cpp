@@ -34,6 +34,11 @@ std::string Client::getPassword(void) const {
     return (this->_password);
 }
 
+std::string Client::getPass(void) const {
+
+    return (this->_pass);
+}
+
 std::string Client::getPrefix(void) const {
 
     return (this->_prefix);
@@ -57,9 +62,25 @@ void  Client::setPrefix(void){
        // std::cout << "test_setprefic: "<<_prefix << std::endl;
  }
 
-void  Client::setNick(std::string &nickname){
+int  Client::setNick(std::string &nickname){
     _nick = nickname;
-    //std::cout << "test_nick: " << _nick << std::endl;
+
+    std::cout << "test_nick: " << _nick << std::endl;
+        if (_nick.size() > 9 || _nick.empty()){
+        _nick = creatNickname();
+        return (432);
+    }
+    std::map<int, Client>::iterator     it;
+    for (it = _server->clients.begin(); it != _server->clients.end(); it++)
+    {
+        if (it->first == getSocket()) // don't send message to client's own fd
+            continue ;
+        if (nickname == it->second._nick){
+            _nick = creatNickname();
+            return(433);
+        }
+    }
+    return (0);
 }
 
 void  Client::setAsRegistered(void){
@@ -84,4 +105,13 @@ void  Client::setHostname(std::string &hostname){
 void  Client::setPassword(std::string &password){
     _password = password;
     //std::cout << "test_pass: " << _pass << std::endl;
+}
+
+std::string Client::creatNickname(void){
+    std::ostringstream oOStrStream;
+    oOStrStream << getSocket();
+    
+    std::string name = "Guest" + oOStrStream.str();
+    std::cout << "creatname " << name << std::cout;
+    return(name);
 }

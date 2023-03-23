@@ -5,25 +5,34 @@
 # include "Client.hpp"
 # include <string>
 
+
+
 	class Replies{
 
 		public :
-			Replies(Client &client)
+			Replies(void)
 			{
 				this->_network = "Internet Relay Network";
-				this->_nickname = client.getNick();
-				this->_user = client.getUser();
+				// this->_nickname = client.getNick();
+				// this->_user = client.getUser();
 				this->_host = "localhost";
 				this->_server = "Ircserv";
 				this->_channel = "<channel>";
 				this->_date_time = "Tue March 14 at 12:05";
 				this->_version = "1.0";
-				this->_prefix = client.getPrefix();
-				init_replies();
+				// this->_prefix = client.getPrefix();
+				// init_replies();
 			}
 			~Replies(void){}
 			std::map<std::string, std::string>	_replies;//add_ran
-			//add_ran			
+			//add_ran
+			std::map<std::string, std::string> getReplies(std::string nick, std::string user, std::string prefix){
+				this->_nickname = nick;
+				this->_user = user;
+				this->_prefix = prefix;
+				init_replies();
+				return (_replies);
+			}			
 			void init_replies(void){
 			_replies["001"] = RPL_WELCOME("001");
 			_replies["002"] = RPL_YOURHOST("002");

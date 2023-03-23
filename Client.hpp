@@ -2,8 +2,11 @@
 # define CLIENT_H
 
 # include <iostream>
+#include <sstream>
 # include <netdb.h>
-# include <string.h>
+# include <string>
+# include "Server.hpp"
+#include <stdlib.h>
 
 class Server;
 class Client {
@@ -22,23 +25,26 @@ class Client {
         bool        getRegistrationStatus (void) const;
         Server      *getServer(void) const;//@ran_add
         std::string getPassword(void) const;
+        std::string getPass(void) const;
 
         // Setters
         void        setSocket(int socket);
-        void        setNick(std::string &nickname);
+        int         setNick(std::string &nickname);
         void        setUsr(std::string &usrname);
         void        setPass(std::string &pass); 
-         void       setPassword(std::string &password); 
+        void        setPassword(std::string &password); 
         void        setHostname(std::string &hostname);
         void        setAsRegistered(void);
         void        setPrefix(void);
+
+        std::string creatNickname(void);
 
         // int         _init();
         sockaddr_in _sockaddr;
         socklen_t   _socklen;
 
     private :
-        Server         *_server; //@ran_add
+        Server      *_server; //@ran_add
         std::string _password;//server password
         int         _socket;
         char        _host[NI_MAXHOST];
@@ -49,6 +55,7 @@ class Client {
         std::string _nick;
         std::string _pass;
         std::string _msgWelcome;
+        
 };
 
 #endif

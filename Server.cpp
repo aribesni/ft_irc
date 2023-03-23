@@ -57,7 +57,7 @@ std::string     Server::getPassword(void) const
 
 void Server::acceptNewClient()
 {
-    Client  client;
+    Client  client(this);
     client.setPassword(_password);
     this->_accept(client);
     struct pollfd newpollfd;
@@ -71,24 +71,28 @@ void Server::acceptNewClient()
         // 1.1.3 NICK > check if nick format is correct and if nick is not already used (ERR_NICKNAMEINUSE). If it is, register user (isRegistered = true). If not ???
     // 2- If correct registration, server sends block of welcome message
     char buf[BUFFER_SIZE];
-    while (client.getRegistrationStatus() == false)
-    {
-        recv(client.getSocket(), buf, sizeof(buf), 0);
-        std::vector<Message>  msgList = bufferParser(buf);
-        multiMessge_exec(msgList, client);
+    memset(buf, 0, BUFFER_SIZE);
+    recv(client.getSocket(), buf, sizeof(buf), 0);
+    std::vector<Message>  msgList = bufferParser(buf);
+    multiMessge_exec(msgList, client);
+    if(this->_password == client.getPass()){
+        client.setAsRegistered();
+        client.setPrefix();
     }
-    client.setPrefix();
-    Replies replies(client);
-    send(client.getSocket(), replies.RPL_WELCOME("001").data(), replies.RPL_WELCOME("001").size(), 0);
-    send(client.getSocket(), replies.RPL_YOURHOST("002").data(), replies.RPL_YOURHOST("002").size(), 0);
-    send(client.getSocket(), replies.RPL_CREATED("003").data(), replies.RPL_CREATED("003").size(), 0);
-    send(client.getSocket(), replies.RPL_MYINFO("004").data(), replies.RPL_MYINFO("004").size(), 0);
-    send(client.getSocket(), replies.RPL_MOTDSTART("375").data(), replies.RPL_MOTDSTART("375").size(), 0);
-    // send(client.getSocket(), replies.RPL_MOTD("372").data(), replies.RPL_MOTD("372").size(), 0);
-    replies.sendMotd(client.getSocket());
-    send(client.getSocket(), replies.RPL_ENDOFMOTD("376").data(), replies.RPL_ENDOFMOTD("376").size(), 0);
-    // else deal with client registration issue
-    this->clients[newpollfd.fd] = client;
+    if (client.getRegistrationStatus() == true){
+        Replies replies;
+        replies.getReplies(client.getNick(), client.getUser(), client.getPrefix());
+        send(client.getSocket(), replies.RPL_WELCOME("001").data(), replies.RPL_WELCOME("001").size(), 0);
+        send(client.getSocket(), replies.RPL_YOURHOST("002").data(), replies.RPL_YOURHOST("002").size(), 0);
+        send(client.getSocket(), replies.RPL_CREATED("003").data(), replies.RPL_CREATED("003").size(), 0);
+        send(client.getSocket(), replies.RPL_MYINFO("004").data(), replies.RPL_MYINFO("004").size(), 0);
+        send(client.getSocket(), replies.RPL_MOTDSTART("375").data(), replies.RPL_MOTDSTART("375").size(), 0);
+        // send(client.getSocket(), replies.RPL_MOTD("372").data(), replies.RPL_MOTD("372").size(), 0);
+        replies.sendMotd(client.getSocket());
+        send(client.getSocket(), replies.RPL_ENDOFMOTD("376").data(), replies.RPL_ENDOFMOTD("376").size(), 0);
+        // else deal with client registration issue
+        this->clients[newpollfd.fd] = client;
+    }
 }
 
 void Server::handleClientRequest(Client & client)
