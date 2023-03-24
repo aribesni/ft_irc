@@ -55,5 +55,5 @@ void    cmd_wallops(std::vector<std::string> &parametre, Client& client) {
     (void)parametre;
     Replies replies(client);
     if (client.getMode() != "wio")
-        send(client.getSocket(), replies.ERR_NOPRIVILEGES("481", "Permission denied, you do not have the correct irc operator privileges").data(), replies.ERR_NOPRIVILEGES("481", "Permission denied, you do not have the correct irc operator privileges").size(), 0);
+        send(client.getSocket(), replies.ERR_NOPRIVILEGES("481", "Permission Denied- You're not an IRC operator").data(), replies.ERR_NOPRIVILEGES("481", "Permission Denied- You're not an IRC operator").size(), 0);
 }

@@ -104,7 +104,6 @@ void Server::handleClientRequest(Client &client)
     int nbytes = recv(client.getSocket(), buf, sizeof(buf), 0);
 
     // TESTING /OPER COMMAND
-    std::cout << "BUF : " << buf << std::endl;
     std::vector<Message>  msgList = bufferParser(buf);
     msgList[0].execCMD(client);
     // multiMessge_exec(msgList, client);
