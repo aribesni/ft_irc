@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Server.hpp                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/03/23 18:14:04 by guillemette       #+#    #+#             */
+/*   Updated: 2023/03/23 18:46:13 by guillemette      ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef SERVER_H
 # define SERVER_H
 # define BUFFER_SIZE 4096
@@ -13,35 +25,46 @@
 # include <arpa/inet.h>
 # include <cstdio>
 # include "Client.hpp"
-# include "Replies.hpp"
-# include "bufferParser.hpp"
 # include "Message.hpp"
+# include "Channel.hpp"
+# include "Replies.hpp"
+
+class Message;
+
 class Server {
 
-    public :
+	public :
+		// CONSTRUCTOR / DESTRUCTOR
+		Server(std::string name);
+		Server(const Server& src);
+		~Server(void);
 
-        Server(std::string name);
-        Server(const Server& src);
-        ~Server(void);
+		// GETTERS
+		int							getSocket(void) const;
+		std::string					getPassword(void) const;
 
-        int     getSocket(void) const;
-        void    fillServerPollfd(void);
-        void    createSocket(void);
-        void    _bind(sockaddr_in bind);
-        void    _accept(Client &client);
-        void    _listen(void);
-        std::vector<struct pollfd>  _pollfds;
-        void    acceptNewClient();
-        void    handleClientRequest(Client &client);
-        std::map<int, Client>  clients;
-        // Client &        getClientWithFd(int fd);
-        std::string     getPassword(void) const;
+		// METHODS
+		void						fillServerPollfd(void);
+		void						createSocket(void);
+		void						_bind(sockaddr_in bind);
+		void						_accept(Client & client);
+		void						_listen(void);
+		std::vector<Message>		bufferParser(char* buf, Client & client);
+		void						execMultiMsg(std::vector<Message> msgList);
+		void						acceptNewClient();
+		void						handleClientRequest(Client & client);
+		// std::vector<Client>  clients;
+		std::map<int, Client>		clients;
+		std::vector<struct pollfd>	_pollfds;
+		// Client &        getClientWithFd(int fd);
+		std::map<std::string, Channel>	_channels; /* channelName, Channel object*/
 
-    private :
-        std::string                 _password;
-        int                         _socket;
-        std::string                 _name;
-        char                        _svc[NI_MAXSERV];
+	private :
+		std::string						_password;
+		int								_socket;
+		std::string						_name;
+		char							_svc[NI_MAXSERV];
+
 };
 
 #endif

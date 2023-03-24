@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Client.hpp                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/03/23 18:12:51 by guillemette       #+#    #+#             */
+/*   Updated: 2023/03/23 18:28:25 by guillemette      ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef CLIENT_H
 # define CLIENT_H
 
@@ -7,46 +19,44 @@
 
 class Client {
 
-    public :
+	public :
+		// CONSTRUCTOR / DESTRUCTOR
+		Client(void);
+		~Client(void);
 
-        // Constructor Destructor
-        Client(void);
-        ~Client(void);
-
-        // Getters
-        int         getSocket(void) const;
-        std::string getNick(void) const;
-        std::string getUser(void) const;
-        std::string getPrefix(void) const;
+		// GETTERS
+		int			getSocket(void) const;
+		std::string	getNick(void) const;
+		std::string	getUser(void) const;
+		std::string	getPrefix(void) const;
         std::string getMode(void) const;
         std::string getHostName(void) const;
-        bool        getRegistrationStatus (void) const;
+		bool		getRegistrationStatus (void) const;
 
-        // Setters
-        void        setSocket(int socket);
-        void        setNick(std::string &nickname);
-        void        setUsr(std::string &usrname);
-        void        setPass(std::string &pass);
-        void        setHostname(std::string &hostname);
-        void        setAsRegistered(void);
-        void        setPrefix(void);
+		// SETTERS
+		void		setSocket(int socket);
+		void		setNick(std::string &nickname);
+		void		setUsr(std::string &usrname);
+		void		setPass(std::string &pass);
+		void		setHostname(std::string &hostname);
+		void		setAsRegistered(void);
+		void		setPrefix(void);
         void        setMode(std::string mode);
-        // int         _init();
-        sockaddr_in _sockaddr;
-        socklen_t   _socklen;
 
-    private :
+		sockaddr_in _sockaddr;
+		socklen_t   _socklen;
 
-        std::string _password;
-        int         _socket;
-        char        _host[NI_MAXHOST];
-        bool        _isRegistered;
-        std::string _prefix;
-        std::string _hostname;
-        std::string _user;
-        std::string _nick;
-        std::string _pass;
-        std::string _msgWelcome;
+	private :
+		std::string	_password;
+		int			_socket;
+		char		_host[NI_MAXHOST];
+		bool		_isRegistered;
+		std::string	_prefix;
+		std::string	_hostname;
+		std::string	_user;
+		std::string	_nick;
+		std::string	_pass;
+		std::string	_msgWelcome;
         std::string _mode;
 };
 
