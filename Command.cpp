@@ -21,6 +21,7 @@ void    Command::init_command(){
     _command["NICK"] = &cmd_nick;
     _command["USER"] = &cmd_user;
     _command["OPER"] = &cmd_oper;
+    _command["wallops"] = &cmd_wallops;
 }
 
 void    cmd_pass(std::vector<std::string> &parametre, Client& client) {
@@ -33,6 +34,7 @@ void    cmd_user(std::vector<std::string> &parametre, Client& client) {
     client.setUsr(parametre[0]);
     client.setHostname(parametre[2]);
 }
+
 void    cmd_oper(std::vector<std::string> &parametre, Client& client) {
 
     Replies replies(client);
@@ -46,4 +48,12 @@ void    cmd_oper(std::vector<std::string> &parametre, Client& client) {
     }
     else
         send(client.getSocket(), replies.ERR_PASSWDMISMATCH("464").data(), replies.ERR_PASSWDMISMATCH("464").size(), 0);
+}
+
+void    cmd_wallops(std::vector<std::string> &parametre, Client& client) {
+
+    (void)parametre;
+    Replies replies(client);
+    if (client.getMode() != "wio")
+        send(client.getSocket(), replies.ERR_NOPRIVILEGES("481", "Permission denied, you do not have the correct irc operator privileges").data(), replies.ERR_NOPRIVILEGES("481", "Permission denied, you do not have the correct irc operator privileges").size(), 0);
 }

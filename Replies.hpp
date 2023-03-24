@@ -181,7 +181,7 @@
 			/* "476" */ std::string ERR_BADCHANMASK(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + this->_channel + " :<reason>" + "\r\n"); };
 			/* "477" */ std::string ERR_NOCHANMODES(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + this->_channel + " :<reason>" + "\r\n"); };
 			/* "478" */ std::string ERR_BANLISTFULL(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + this->_channel + " <char> :<reason>" + "\r\n"); };
-			/* "481" */ std::string ERR_NOPRIVILEGES(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + ":<reason>" + "\r\n"); };
+			/* "481" */ std::string ERR_NOPRIVILEGES(std::string code, std::string reason) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + ":" + reason + "\r\n"); };
 			/* "482" */ std::string ERR_CHANOPRIVSNEEDED(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + this->_channel + " :<reason>" + "\r\n"); };
 			/* "483" */ std::string ERR_CANTKILLSERVER(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + ":<reason>" + "\r\n"); };
 			/* "484" */ std::string ERR_RESTRICTED(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + ":<reason>" + "\r\n"); };
