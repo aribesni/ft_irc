@@ -35,7 +35,8 @@ std::vector<std::string> msg_split(std::string str, std::string delimiter)
 		tokens.push_back(str.substr(0, end));
 		str.erase(0, end + delimiter.length());
 	}
-	tokens.push_back(str);
+    if (!str.empty())
+	    tokens.push_back(str);
 	return tokens;
 }
 
@@ -64,6 +65,7 @@ std::vector<Message>  bufferParser(char* buf){
     for (size_t i=0; i<msgSize; ++i){
         tokens.push_back(msg_split(lines[i], " "));
         Message msg(tokens[i]);
+
         msgList.push_back(msg);
         }
     return (msgList);
