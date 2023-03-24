@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
+/*   By: gduchate <gduchate@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 18:14:02 by guillemette       #+#    #+#             */
-/*   Updated: 2023/03/24 11:31:00 by guillemette      ###   ########.fr       */
+/*   Updated: 2023/03/24 16:12:52 by gduchate         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -183,7 +183,7 @@ std::vector<Message>	Server::bufferParser(char* buf, Client &client){
 	for (size_t i = 0; i < msgSize; i++)
 	{
 		tokens.push_back(msg_split(lines[i], " "));
-		Message msg(tokens[i], client, this, lines[i]);
+		Message msg(tokens[i], &client, this, lines[i]);
 		msgList.push_back(msg);
 	}
 	return (msgList);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Replies.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
+/*   By: gduchate <gduchate@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 18:14:00 by guillemette       #+#    #+#             */
-/*   Updated: 2023/03/23 18:14:01 by guillemette      ###   ########.fr       */
+/*   Updated: 2023/03/24 16:27:14 by gduchate         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -151,7 +151,7 @@
 			/* "407" */ std::string ERR_TOOMANYTARGETS(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + "<target> :<reason>" + "\r\n"); };
 			/* "408" */ std::string ERR_NOSUCHSERVICE(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + "<service_name> :<reason>" + "\r\n"); };
 			/* "409" */ std::string ERR_NOORIGIN(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + ":<reason>" + "\r\n"); };
-			/* "411" */ std::string ERR_NORECIPIENT(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + ":<reason>" + "\r\n"); };
+			/* "411" */ std::string ERR_NORECIPIENT(std::string cmd) { return (":" + this->_prefix + " 411 " + this->_nickname + ":No recipient given (" + cmd + ")" + "\r\n"); };
 			/* "412" */ std::string ERR_NOTEXTTOSEND(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + ":<reason>" + "\r\n"); };
 			/* "413" */ std::string ERR_NOTOPLEVEL(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + "<mask> :<reason>" + "\r\n"); };
 			/* "414" */ std::string ERR_WILDTOPLEVEL(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + "<mask> :<reason>" + "\r\n"); };

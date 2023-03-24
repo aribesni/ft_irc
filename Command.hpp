@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Command.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
+/*   By: gduchate <gduchate@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 17:43:58 by rliu              #+#    #+#             */
-/*   Updated: 2023/03/23 20:04:16 by guillemette      ###   ########.fr       */
+/*   Updated: 2023/03/24 15:19:02 by gduchate         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,10 +31,11 @@ class Command
 };
 
 // CMD
-	void cmd_pass(Message* message);
-	void cmd_nick(Message* message);
-	void cmd_user(Message* message);
-	void cmd_ping(Message* message);
-	void cmd_join(Message* message);
-	void cmd_privmsg(Message* message);
+	void	cmd_pass(Message* message);
+	void	cmd_nick(Message* message);
+	void	cmd_user(Message* message);
+	void	cmd_ping(Message* message);
+	void	cmd_join(Message* message);
+	void	cmd_privmsg(Message* message);
+	void	cmd_part(Message* message);
 #endif

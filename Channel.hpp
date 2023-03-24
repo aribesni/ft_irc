@@ -5,6 +5,7 @@
 # include <string>
 # include "Client.hpp"
 # include <vector>
+# include <algorithm>
 
 class Channel
 {
@@ -15,13 +16,17 @@ class Channel
 		Channel(std::string chanName, Client * client);
 		Channel( Channel const & src );
 		~Channel();
+
+		// OVERLOADS
+		Channel &		operator=( Channel const & rhs );
+
 		// GETTERS
 		std::string				getName(void) const;
 		std::vector<Client* >	getListOfClients(void) const;
 
-		// SETTERS
-		void					addAClient(Client * client);
-		Channel &		operator=( Channel const & rhs );
+		// METHODS
+		void					addClient(Client * client);
+		void					removeClient(Client * client);
 
 	private:
 		std::string				_name;

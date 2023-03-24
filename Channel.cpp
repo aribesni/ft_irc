@@ -42,14 +42,23 @@ Channel &		Channel::operator=( Channel const & rhs )
 ** --------------------------------- METHODS ----------------------------------
 */
 
+void	Channel::addClient(Client * client)
+{
+	_listOfClients.push_back(client);
+}
+
+void	Channel::removeClient(Client * client)
+{
+	std::vector<Client *>::iterator it;
+	it = std::find(_listOfClients.begin(),_listOfClients.end(), client);
+	_listOfClients.erase(it);
+}
+
 /*
 ** --------------------------------- SETTERS ---------------------------------
 */
 
-void	Channel::addAClient(Client * client)
-{
-	_listOfClients.push_back(client);
-}
+
 
 /*
 ** --------------------------------- GETTERS ---------------------------------
