@@ -6,7 +6,7 @@
 /*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 17:43:58 by rliu              #+#    #+#             */
-/*   Updated: 2023/03/23 18:27:30 by guillemette      ###   ########.fr       */
+/*   Updated: 2023/03/23 20:04:16 by guillemette      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 #include <iostream>
 #include <vector>
 #include "Message.hpp"
-
+#include "Channel.hpp"
 class Client;
 
 class Command
@@ -36,5 +36,5 @@ class Command
 	void cmd_user(Message* message);
 	void cmd_ping(Message* message);
 	void cmd_join(Message* message);
-
+	void cmd_privmsg(Message* message);
 #endif

@@ -6,7 +6,7 @@
 /*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 18:13:55 by guillemette       #+#    #+#             */
-/*   Updated: 2023/03/23 18:28:52 by guillemette      ###   ########.fr       */
+/*   Updated: 2023/03/24 11:34:58 by guillemette      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,8 +21,8 @@ Command     g_cmd;
 
 // Message::Message(void){}
 
-// TO DO: add toupper function in cmd tokenisation
-Message::Message(std::vector<std::string> &tokens, Client &client, Server *server):_cmd(tokens[0]), _params(tokens.begin()+1, tokens.end()), _client(client), _server(server)
+Message::Message(std::vector<std::string> &tokens, Client &client, Server *server, std::string fullMsg) :
+	_fullMsg(fullMsg), _cmd(tokens[0]), _params(tokens.begin()+1, tokens.end()), _client(client), _server(server)
 {
 	// Display tokens
 	// for (size_t i = 0; i < tokens.size(); i++)
@@ -53,6 +53,8 @@ void						Message::execCmd()
 /*
 ** --------------------------------- GETTERS ----------------------------------
 */
+
+std::string 				Message::getFullMsg(void) const {return(_fullMsg);}
 
 std::string 				Message::getCMD(void) const {return(_cmd);}
 

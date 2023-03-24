@@ -6,7 +6,7 @@
 /*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 18:14:04 by guillemette       #+#    #+#             */
-/*   Updated: 2023/03/23 18:30:18 by guillemette      ###   ########.fr       */
+/*   Updated: 2023/03/23 18:46:13 by guillemette      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,14 +57,14 @@ class Server {
 		std::map<int, Client>		clients;
 		std::vector<struct pollfd>	_pollfds;
 		// Client &        getClientWithFd(int fd);
-
+		std::map<std::string, Channel>	_channels; /* channelName, Channel object*/
 
 	private :
 		std::string						_password;
 		int								_socket;
 		std::string						_name;
 		char							_svc[NI_MAXSERV];
-		std::map<std::string, Channel>	_channels; /* channelName, Channel object*/
+
 };
 
 #endif

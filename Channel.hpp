@@ -12,14 +12,20 @@ class Channel
 	public:
 		// CONSTRUCTOR / DESTRUCTOR
 		Channel();
-		// Channel( Channel const & src );
+		Channel(std::string chanName, Client * client);
+		Channel( Channel const & src );
 		~Channel();
+		// GETTERS
+		std::string				getName(void) const;
+		std::vector<Client* >	getListOfClients(void) const;
 
-		// Channel &		operator=( Channel const & rhs );
+		// SETTERS
+		void					addAClient(Client * client);
+		Channel &		operator=( Channel const & rhs );
 
 	private:
-		std::string			_name;
-		std::vector<Client>	_listOfClients;
+		std::string				_name;
+		std::vector<Client*>	_listOfClients;
 
 
 };
