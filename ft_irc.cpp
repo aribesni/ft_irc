@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_irc.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
+/*   By: gduchate <gduchate@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 18:13:49 by guillemette       #+#    #+#             */
-/*   Updated: 2023/03/23 18:28:46 by guillemette      ###   ########.fr       */
+/*   Updated: 2023/03/24 17:54:07 by gduchate         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,8 +31,9 @@ void    ft_loop(Server server)
 			exit(1);
 		}
 		// Run through the pollfds looking for data to read
-		for (size_t i = 0; i < server.clients.size() + 1; i++)
+		for (size_t i = 0; i < server._pollfds.size(); i++)
 		{
+			// std::cout << "number of open fds" << server.getClients().size() + 1 << std::endl;
 			// We're checking for the POLLIN event in all the pollfds (POLLIN='new data ready-to-read')
 			if (server._pollfds[i].revents & POLLIN)
 			{
@@ -41,7 +42,7 @@ void    ft_loop(Server server)
 					server.acceptNewClient();
 				// If there is ready-to-read data in another socket, a connected client sent data
 				else
-					server.handleClientRequest(server.clients[server._pollfds[i].fd]);
+					server.handleClientRequest(server.getClients()[server._pollfds[i].fd]);
 			}
 		}
 	}

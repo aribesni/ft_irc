@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
+/*   By: gduchate <gduchate@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 18:14:04 by guillemette       #+#    #+#             */
-/*   Updated: 2023/03/23 18:46:13 by guillemette      ###   ########.fr       */
+/*   Updated: 2023/03/24 18:00:20 by gduchate         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,8 +40,9 @@ class Server {
 		~Server(void);
 
 		// GETTERS
-		int							getSocket(void) const;
 		std::string					getPassword(void) const;
+		int							getSocket(void) const;
+		std::map<int, Client>&		getClients(void);
 
 		// METHODS
 		void						fillServerPollfd(void);
@@ -53,8 +54,8 @@ class Server {
 		void						execMultiMsg(std::vector<Message> msgList);
 		void						acceptNewClient();
 		void						handleClientRequest(Client & client);
-		// std::vector<Client>  clients;
-		std::map<int, Client>		clients;
+
+
 		std::vector<struct pollfd>	_pollfds;
 		// Client &        getClientWithFd(int fd);
 		std::map<std::string, Channel>	_channels; /* channelName, Channel object*/
@@ -64,6 +65,7 @@ class Server {
 		int								_socket;
 		std::string						_name;
 		char							_svc[NI_MAXSERV];
+		std::map<int, Client>			_clients;
 
 };
 

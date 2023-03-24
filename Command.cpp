@@ -6,7 +6,7 @@
 /*   By: gduchate <gduchate@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 17:43:49 by rliu              #+#    #+#             */
-/*   Updated: 2023/03/24 16:27:39 by gduchate         ###   ########.fr       */
+/*   Updated: 2023/03/24 18:55:27 by gduchate         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,20 +100,29 @@ void cmd_part(Message * message)
 	// Errors to be handled:
 	// ERR_NEEDMOREPARAMS              ERR_NOSUCHCHANNEL
     // ERR_NOTONCHANNEL
-	std::string chanName = message->getParams()[0];
+	std::string msgtarget = message->getParams()[0];
 	Server * server = message->getServer();
 	Client * client = message->getClient();
+	std::string fullMsg = ":" + client->getPrefix() + " " + message->getFullMsg() + "\r\n";
 	// if channel does not exist, don't do anything
-	if (server->_channels.find(chanName) == server->_channels.end())
+	if (server->_channels.find(msgtarget) == server->_channels.end())
 	{
-		std::cout << "Channel " << chanName << " does not exist" << std::endl;
+		std::cout << "Channel " << msgtarget << " does not exist" << std::endl;
 	}
 	else
 	{
-		std::cout << "Channel " << chanName << " already exist" << std::endl;
-		server->_channels[chanName].removeClient(client);
-		std::cout << "User removed from channel." << std::endl;
+		std::vector<Client*> listOfClients = server->_channels[msgtarget].getListOfClients();
+		for (size_t i = 0; i < listOfClients.size(); i++)
+		{
+			// if (listOfClients[i]->getSocket() != client->getSocket())
+			// {
+				// std::cout << "This client is in the chan: " << listOfClients[i]->getSocket() <<std::endl;
+				std::cout << "This message is being sent: " << fullMsg << " to client " << listOfClients[i]->getSocket() << std::endl;
+				send(listOfClients[i]->getSocket(), fullMsg.c_str(), fullMsg.size(), 0);
+			// }
+		}
 	}
+	(void)message;
 }
 
 // sendTo(irc::User &toUser, std::string message) { toUser.write(":" + this->getPrefix() + " " + message); }
@@ -143,12 +152,11 @@ void cmd_privmsg(Message * message)
 		return ;
 	}
 	std::string msgtarget = message->getParams()[0];
-
-
-
+	std::string fullMsg = ":" + client->getPrefix() + " " + message->getFullMsg() + "\r\n";
 	if (msgtarget[0] == '#')
 	{
-		std::string fullMsg = ":" + client->getPrefix() + " " + message->getFullMsg() + "\r\n";
+		// Msgtarget is a chan
+
 		std::cout << "Message sent to a channel" << std::endl;
 		std::vector<Client*> listOfClients = server->_channels[msgtarget].getListOfClients();
 		for (size_t i = 0; i < listOfClients.size(); i++)
@@ -161,12 +169,26 @@ void cmd_privmsg(Message * message)
 			}
 		}
 	}
+	else
+	{
+		// Msg target is a user
+		// Search if target nick exists
+		for (size_t i = 0; i < server->getClients().size(); i++)
+		{
+			if (server->getClients()[i].getNick() == msgtarget)
+			{
+				std::cout << "Targer user found" << std::endl;
+				send(server->getClients()[i].getSocket(), fullMsg.c_str(), fullMsg.size(), 0);
+				return ;
+			}
+		}
+		std::cout << "Target user not found." << std::endl;
+	}
 	// if msgtarget starts with #>> it is a channel
 	// 		search for client list in server
 	// 		send to everyone expect oneself
 
 	// if msgtarget does not start with #>> it is a user
-	(void)message;
 }
 
 /* ************************************************************************** */
