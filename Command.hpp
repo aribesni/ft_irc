@@ -6,7 +6,7 @@
 /*   By: gduchate <gduchate@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 17:43:58 by rliu              #+#    #+#             */
-/*   Updated: 2023/03/22 12:34:06 by gduchate         ###   ########.fr       */
+/*   Updated: 2023/03/24 15:19:02 by gduchate         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,24 +15,27 @@
 #include <map>
 #include <iostream>
 #include <vector>
-#include "Client.hpp"
 #include "Message.hpp"
+#include "Channel.hpp"
 class Client;
 
-class Command{
-    public:
-        Command(void);
-        ~Command(void);
+class Command
+{
+	private:
+	public:
+		Command(void);
+		~Command(void);
 
-        void init_command();
-
-        std::map<std::string, void(*)(std::vector<std::string>&, Client&)>	_command;
+		void initCmdMap();
+		std::map<std::string, void(*)(Message*)>	_cmdMap;
 };
 
-//fuctions of cmd
-void cmd_pass(std::vector<std::string>&  parametre, Client& client);
-void cmd_nick(std::vector<std::string>&  parametre, Client& client);
-void cmd_user(std::vector<std::string>&  parametre, Client& client);
-void cmd_ping(std::vector<std::string>  &parametre, Client& client);
-
+// CMD
+	void	cmd_pass(Message* message);
+	void	cmd_nick(Message* message);
+	void	cmd_user(Message* message);
+	void	cmd_ping(Message* message);
+	void	cmd_join(Message* message);
+	void	cmd_privmsg(Message* message);
+	void	cmd_part(Message* message);
 #endif

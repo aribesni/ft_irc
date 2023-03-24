@@ -69,6 +69,8 @@
 		"utility": "cpp",
 		"numbers": "cpp",
 		"ranges": "cpp",
-		"span": "cpp"
+		"span": "cpp",
+		"__node_handle": "cpp",
+		"__tree": "cpp"
 	}
 }
