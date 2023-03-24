@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gduchate <gduchate@student.42.fr>          +#+  +:+       +#+        */
+/*   By: rliu <rliu@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 18:14:02 by guillemette       #+#    #+#             */
-/*   Updated: 2023/03/24 16:12:52 by gduchate         ###   ########.fr       */
+/*   Updated: 2023/03/24 20:01:15 by rliu             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,6 @@ void	Server::_accept(Client & client) {
 	std::cout << "new Client " << inet_ntoa(client._sockaddr.sin_addr) << ":" << ntohs(client._sockaddr.sin_port) << " (" << client.getSocket() << ")" << std::endl;
 }
 
-
 void	Server::acceptNewClient()
 {
 	Client  client;
@@ -87,10 +86,19 @@ void	Server::acceptNewClient()
 	char buf[BUFFER_SIZE];
 	while (client.getRegistrationStatus() == false)
 	{
+		memset(buf,0, BUFFER_SIZE);
 		recv(client.getSocket(), buf, sizeof(buf), 0);
 		std::vector<Message>  msgList = this->bufferParser(buf, client);
 		execMultiMsg(msgList);
+		if(this->_password != client.getPass())
+		{
+			std::cout << "pollserver: socket " << client.getSocket() << " hung up" << std::endl;
+			close(client.getSocket()); // Bye!
+			this->clients.erase(client.getSocket());
+		}
+		
 	}
+	
 	client.setPrefix();
 	Replies replies(client);
 	send(client.getSocket(), replies.RPL_WELCOME("001").data(), replies.RPL_WELCOME("001").size(), 0);
@@ -163,11 +171,18 @@ std::vector<std::string>	msg_split(std::string str, std::string delimiter)
 		tokens.push_back(str.substr(0, end));
 		str.erase(0, end + delimiter.length());
 	}
-	tokens.push_back(str);
+	if (!str.empty())
+	    tokens.push_back(str);
 	return tokens;
 }
 
+void Server::msg_replace(std::string &message, char find, char replace){
 
+    for(size_t i= 0; i < message.size(); i++){
+        if(message[i]== find)
+            message.replace(i, 1, 1, replace);
+    }
+}
 // Parser buffer from char * to a vector of class Message
 std::vector<Message>	Server::bufferParser(char* buf, Client &client){
 	std::string                                     message(buf);
@@ -177,6 +192,7 @@ std::vector<Message>	Server::bufferParser(char* buf, Client &client){
 	size_t                                          msgSize = 0;
 
 	// message = buf;
+	msg_replace(message, 4, ' ');
 	lines = msg_split(message, "\r\n");
 	// Display lines vector
 	msgSize = lines.size();
@@ -211,3 +227,4 @@ std::string				Server::getPassword(void) const
 }
 
 /* ************************************************************************** */
+void Server::setPassword(char * password){_password = password;}

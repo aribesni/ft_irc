@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Command.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gduchate <gduchate@student.42.fr>          +#+  +:+       +#+        */
+/*   By: rliu <rliu@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 17:43:49 by rliu              #+#    #+#             */
-/*   Updated: 2023/03/24 16:27:39 by gduchate         ###   ########.fr       */
+/*   Updated: 2023/03/24 20:02:21 by rliu             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,26 +41,74 @@ void Command::initCmdMap()
 }
 
 /*
+** --------------------------------- utils---------------------------------
+*/
+void rplSender(Client &client, std::string code){
+    Replies reply(client);
+    // replies.getReplies(client.getNick(), client.getUser(), client.getPrefix());
+    std::string  rpl= reply._replies[code];
+    send(client.getSocket(), rpl.c_str(), rpl.size(), 0);
+}
+
+void msgSender(Client &client, std::string cmd, std::string msg){
+    std::string msgSend = client.getPrefix() + " " + cmd + " " + msg + "/r/n";
+    send(client.getSocket(), msgSend.c_str(), msgSend.size(), 0);
+}
+
+std::string creatNickname(Client &client){
+    std::ostringstream oOStrStream;
+    oOStrStream << client.getSocket();
+    
+    std::string name = "Guest" + oOStrStream.str();
+    return(name);
+}
+/*
 ** --------------------------------- COMMANDS ---------------------------------
 */
 
 
 void cmd_pass(Message * message)
 {
-	message->getClient()->setPass(message->getParams()[0]);
+	if (message->getServer()->getPassword() != message->getParams()[0]){
+		std::cout << "wrong password\n"; 
+		return;
+		// close(message->getServer()->getSocket()); // Bye!
+		// message->getServer()->clients.erase(message->getServer()->getSocket()); 
+    }
+	else 
+		message->getClient()->setPass( message->getParams()[0]);
+       
 }
 
 void cmd_nick(Message * message)
 {
-   message->getClient()->setNick(message->getParams()[0]);
+	std::string nick = message->getParams()[0];
+    if (nick.size() > 9 || nick.empty()){
+        nick = creatNickname(*(message->getClient()));
+        rplSender(*(message->getClient()), "432");
+    }
+	
+    std::map<int, Client>::iterator     it;
+    for (it = message->getServer()->clients.begin(); it != message->getServer()->clients.end(); it++)
+    {
+        if (it->first == message->getClient()->getSocket()) // don't send message to client's own fd
+            continue ;
+        if (nick == it->second.getNick()){
+            nick = creatNickname(*(message->getClient()));
+            rplSender(*(message->getClient()), "432");
+        }
+    }
+   	message->getClient()->setNick(message->getParams()[0]);
+	if(nick != message->getParams()[0])
+		msgSender(*(message->getClient()), "NICK", nick);
 }
 
 void cmd_user(Message * message)
 {
-   message->getClient()->setUsr(message->getParams()[0]);
-   message->getClient()->setHostname(message->getParams()[2]);
+	message->getClient()->setUsr(message->getParams()[0]);
+	message->getClient()->setHostname(message->getParams()[2]);
 	// To be edited afterwards depending on registration checks and put in the acceptNewClient func
-   message->getClient()->setAsRegistered();
+	message->getClient()->setAsRegistered();
 }
 
 void cmd_ping(Message * message)
@@ -168,5 +216,3 @@ void cmd_privmsg(Message * message)
 	// if msgtarget does not start with #>> it is a user
 	(void)message;
 }
-
-/* ************************************************************************** */

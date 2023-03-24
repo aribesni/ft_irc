@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Replies.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gduchate <gduchate@student.42.fr>          +#+  +:+       +#+        */
+/*   By: rliu <rliu@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 18:14:00 by guillemette       #+#    #+#             */
-/*   Updated: 2023/03/24 16:27:14 by gduchate         ###   ########.fr       */
+/*   Updated: 2023/03/24 18:31:56 by rliu             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,153 @@
 				this->_prefix = client.getPrefix();
 			}
 			~Replies(void) {};
-
+			std::map<std::string, std::string>	_replies;//add_ran
+						std::map<std::string, std::string> getReplies(std::string nick, std::string user, std::string prefix){
+				this->_nickname = nick;
+				this->_user = user;
+				this->_prefix = prefix;
+				init_replies();
+				return (_replies);
+			}			
+			void init_replies(void){
+			_replies["001"] = RPL_WELCOME("001");
+			_replies["002"] = RPL_YOURHOST("002");
+			_replies["003"] = RPL_CREATED("003");
+			_replies["004"] = RPL_MYINFO("004");
+			_replies["005"] = RPL_BOUNCE("005");
+			_replies["043"] = RPL_SAVENICK("043");
+			_replies["202"] = RPL_TRACEHANDSHAKE("202");
+			_replies["203"] = RPL_TRACEUNKNOWN("203");
+			_replies["204"] = RPL_TRACEOPERATOR("204");
+			_replies["205"] = RPL_TRACEUSER("205"); 
+			_replies["206"] = RPL_TRACESERVER("206"); 
+			_replies["207"] = RPL_TRACESERVICE("207");
+			_replies["208"] = RPL_TRACENEWTYPE("208"); 
+			_replies["209"] = RPL_TRACECLASS("209"); 
+			_replies["211"] = RPL_STATSLINKINFO("211"); 
+			_replies["213"] = RPL_STATSCLINE("213"); 
+			_replies["214"] = RPL_STATSNLINE("214"); 
+			_replies["215"] = RPL_STATSILINE("215"); 
+			_replies["216"] = RPL_STATSKLINE("216");
+			_replies["218"] = RPL_STATSYLINE("218");
+			_replies["219"] = RPL_ENDOFSTATS("219"); 
+			_replies["221"] = RPL_UMODEIS("221"); 
+			_replies["234"] = RPL_SERVLIST("234");
+			_replies["235"] = RPL_SERVLISTEND("235"); 
+			_replies["241"] = RPL_STATSLLINE("241");
+			_replies["242"] = RPL_STATSUPTIME("242"); 
+			_replies["243"] = RPL_STATSOLINE("243"); 
+			_replies["244"] = RPL_STATSHLINE("244"); 
+			_replies["251"] = RPL_LUSERCLIENT("251"); 
+			_replies["252"] = RPL_LUSEROP("252"); 
+			_replies["253"] = RPL_LUSERUNKNOWN("253"); 
+			_replies["254"] = RPL_LUSERCHANNELS("254"); 
+			_replies["255"] = RPL_LUSERME("255"); 
+			_replies["256"] = RPL_ADMINME("256"); 
+			_replies["257"] = RPL_ADMINLOC1("257"); 
+			_replies["258"] = RPL_ADMINLOC2("258");
+			_replies["259"] = RPL_ADMINEMAIL("259"); 
+			_replies["261"] = RPL_TRACELOG("261");
+			_replies["262"] = RPL_TRACEEND("262"); 
+			_replies["263"] = RPL_TRYAGAIN("263");
+			_replies["301"] = RPL_AWAY("301");
+			_replies["302"] = RPL_USERHOST("302"); 
+			_replies["303"] = RPL_ISON("303"); 
+			_replies["305"] = RPL_UNAWAY("305"); 
+			_replies["306"] = RPL_NOWAWAY("306");
+			_replies["311"] = RPL_WHOISUSER("311"); 
+			_replies["312"] = RPL_WHOISSERVER("312");
+			_replies["313"] = RPL_WHOISOPERATOR("313");
+			_replies["314"] = RPL_WHOWASUSER("314");
+			_replies["315"] = RPL_ENDOFWHO("315"); 
+			_replies["317"] = RPL_WHOISIDLE("317");
+			_replies["318"] = RPL_ENDOFWHOIS("318");
+			_replies["319"] = RPL_WHOISCHANNELS("319"); 
+			_replies["321"] = RPL_LISTSTART("321"); 
+			_replies["322"] = RPL_LIST("322"); 
+			_replies["323"] = RPL_LISTEND("323"); 
+			_replies["324"] = RPL_CHANNELMODEIS("324"); 
+			_replies["325"] = RPL_UNIQOPIS("325");
+			_replies["331"] = RPL_NOTOPIC("331");
+			_replies["332"] = RPL_TOPIC("332"); 
+			_replies["341"] = RPL_INVITING("341");  
+			_replies["342"] = RPL_SUMMONING("342"); 
+			_replies["345"] = RPL_ENDOFREOPLIST("345");
+			_replies["347"] = RPL_ENDOFINVITELIST("347");
+			_replies["348"] = RPL_EXCEPTLIST("348");
+			_replies["349"] = RPL_ENDOFEXCEPTLIST("349");
+			_replies["351"] = RPL_VERSION("351"); 
+			_replies["352"] = RPL_WHOREPLY("352");
+			_replies["353"] = RPL_NAMREPLY("353");  
+			_replies["364"] = RPL_LINKS("364");
+			_replies["365"] = RPL_ENDOFLINKS("365"); 
+			_replies["366"] = RPL_ENDOFNAMES("366");
+			_replies["367"] = RPL_BANLIST("367"); 
+			_replies["368"] = RPL_ENDOFBANLIST("368");
+			_replies["369"] = RPL_ENDOFWHOWAS("369");
+			//_replies["372"] = RPL_MOTD("372");
+			_replies["375"] = RPL_MOTDSTART("375");
+			_replies["376"] = RPL_ENDOFMOTD("376"); 
+			_replies["381"] = RPL_YOUREOPER("381"); 
+			_replies["382"] = RPL_REHASHING("382"); 
+			_replies["383"] = RPL_YOURESERVICE("383"); 
+			_replies["391"] = RPL_TIME("391"); 
+			_replies["392"] = RPL_USERSSTART("392"); 
+			_replies["393"] = RPL_USERS("393");
+			_replies["394"] = RPL_ENDOFUSERS("394"); 
+			_replies["395"] = RPL_NOUSERS("395"); 
+			_replies["401"] = ERR_NOSUCHNICK("401");
+			_replies["402"] = ERR_NOSUCHSERVER("402");
+			_replies["403"] = ERR_NOSUCHCHANNEL("403");
+			_replies["404"] = ERR_CANNOTSENDTOCHAN("404");
+			_replies["405"] = ERR_TOOMANYCHANNELS("405"); 
+			_replies["406"] = ERR_WASNOSUCHNICK("406");
+			_replies["407"] = ERR_TOOMANYTARGETS("407"); 
+			_replies["411"] = ERR_NORECIPIENT("411"); 
+			_replies["412"] = ERR_NOTEXTTOSEND("412");
+			_replies["413"] = ERR_NOTOPLEVEL("413");
+			_replies["414"] = ERR_WILDTOPLEVEL("414");
+			_replies["415"] = ERR_BADMASK("415"); 
+			_replies["416"] = ERR_TOOMANYMATCHES("416");
+			_replies["421"] = ERR_UNKNOWNCOMMAND("421");  
+			_replies["422"] = ERR_NOMOTD("422"); 
+			_replies["423"] = ERR_NOADMININFO("423");
+			_replies["424"] = ERR_FILEERROR("424"); 
+			_replies["431"] = ERR_NONICKNAMEGIVEN("431"); 
+			_replies["432"] = ERR_ERRONEUSNICKNAME("432");
+			_replies["433"] = ERR_NICKNAMEINUSE("433"); 
+			_replies["436"] = ERR_NICKCOLLISION("436"); 
+			_replies["437"] = ERR_UNAVAILRESOURCE("437");
+			_replies["441"] = ERR_USERNOTINCHANNEL("441");
+			_replies["442"] = ERR_NOTONCHANNEL("442");
+			_replies["443"] = ERR_USERONCHANNEL("443");
+			_replies["444"] = ERR_NOLOGIN("444"); 
+			_replies["445"] = ERR_SUMMONDISABLED("445");
+			_replies["446"] = ERR_USERSDISABLED("446"); 
+			_replies["451"] = ERR_NOTREGISTERED("451"); 
+			_replies["461"] = ERR_NEEDMOREPARAMS("461");
+			_replies["462"] = ERR_ALREADYREGISTRED("462");
+			_replies["463"] = ERR_NOPERMFORHOST("463"); 
+			_replies["464"] = ERR_PASSWDMISMATCH("464");
+			_replies["465"] = ERR_YOUREBANNEDCREEP("465");
+			_replies["467"] = ERR_KEYSET("467");
+			_replies["471"] = ERR_CHANNELISFULL("471");
+			_replies["472"] = ERR_UNKNOWNMODE("472");
+			_replies["473"] = ERR_INVITEONLYCHAN("473");
+			_replies["474"] = ERR_BANNEDFROMCHAN("474");
+			_replies["475"] = ERR_BADCHANNELKEY("475");
+			_replies["476"] = ERR_BADCHANMASK("476");
+			_replies["477"] = ERR_NOCHANMODES("477");
+			_replies["478"] = ERR_BANLISTFULL("478");
+			_replies["481"] = ERR_NOPRIVILEGES("481"); 
+			_replies["482"] = ERR_CHANOPRIVSNEEDED("482");
+			_replies["483"] = ERR_CANTKILLSERVER("483"); 
+			_replies["484"] = ERR_RESTRICTED("484"); 
+			_replies["485"] = ERR_UNIQOPRIVSNEEDED("485");
+			_replies["491"] = ERR_NOOPERHOST("491"); 
+			_replies["501"] = ERR_UMODEUNKNOWNFLAG("501");
+			_replies["502"] = ERR_USERSDONTMATCH("502");
+			}
 			void	sendMotd(int client_socket) {
 
 				std::string motd1 = "Welcome to our Ircserv IRC Network !\n";

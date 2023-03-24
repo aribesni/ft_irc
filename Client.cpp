@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
+/*   By: rliu <rliu@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 18:12:21 by guillemette       #+#    #+#             */
-/*   Updated: 2023/03/23 18:33:53 by guillemette      ###   ########.fr       */
+/*   Updated: 2023/03/24 19:55:21 by rliu             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,8 @@ Client::~Client(void) {}
 */
 
 int			Client::getSocket(void) const{return (this->_socket);}
+
+std::string	Client::getPass(void) const{return (this->_pass);}
 
 std::string	Client::getNick(void) const{return (this->_nick);}
 
