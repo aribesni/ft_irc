@@ -202,8 +202,8 @@ void    cmd_wallops(Message * message) {
 	{
 		while (i < server->getClients().size())
 		{
-			if (server->getClients()[i].getMode() == "wio" || server->getClients()[i].getMode() == "wi")
-				send(server->getClients()[i].getSocket(), wallop.data(), wallop.size(), 0);
+			if (server->getClients()[i].getMode().find("w") != std::string::npos) // check if client has "w" mode
+				send(server->getClients()[i].getSocket(), wallop.data(), wallop.size(), 0); // sends message to all clients with "w" mode including the sender
 			i++;
 		}
 	}
