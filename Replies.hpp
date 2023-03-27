@@ -6,7 +6,7 @@
 /*   By: rliu <rliu@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 18:14:00 by guillemette       #+#    #+#             */
-/*   Updated: 2023/03/24 18:31:56 by rliu             ###   ########.fr       */
+/*   Updated: 2023/03/27 16:24:45 by rliu             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,15 +22,22 @@
 
 			Replies(Client &client)
 			{
-				this->_network = "Internet Relay Network";
-				this->_nickname = client.getNick();
-				this->_user = client.getUser();
-				this->_host = "localhost";
+				setVariables(&client);
+			}
+			~Replies(void) {};
+
+			void	setVariables(Client *client) {
+
+				this->_network = "Internet Relay";
+				this->_nickname = client->getNick();
+				this->_user = client->getUser();
+				this->_host = client->getHostName() ;
 				this->_server = "Ircserv";
 				this->_channel = "<channel>";
 				this->_date_time = "Tue March 14 at 12:05";
 				this->_version = "1.0";
-				this->_prefix = client.getPrefix();
+				this->_mode = client->getMode();
+				this->_prefix = client->getPrefix();
 			}
 			~Replies(void) {};
 			std::map<std::string, std::string>	_replies;//add_ran
@@ -182,18 +189,18 @@
 			}
 			void	sendMotd(int client_socket) {
 
-				std::string motd1 = "Welcome to our Ircserv IRC Network !\n";
-				std::string motd2 = "For any inquiries please refer to aribesni@student.42.fr, gduchate@student.42.fr or rliu@student.42.fr.\n";
-				std::string motd3 = "Enjoy your time here.\n";
-				send(client_socket, this->RPL_MOTD("372", "\n").data(), this->RPL_MOTD("372", "\n").size(), 0);
-				send(client_socket, this->RPL_MOTD("372", "\n").data(), this->RPL_MOTD("372", "\n").size(), 0);
+				std::string motd1 = "Welcome to our Ircserv IRC Network !\r\n";
+				std::string motd2 = "For any inquiries please refer to aribesni@student.42.fr, gduchate@student.42.fr or rliu@student.42.fr.\r\n";
+				std::string motd3 = "Enjoy your time here.\r\n";
+				send(client_socket, this->RPL_MOTD("372", "\r\n").data(), this->RPL_MOTD("372", "\r\n").size(), 0);
+				send(client_socket, this->RPL_MOTD("372", "\r\n").data(), this->RPL_MOTD("372", "\r\n").size(), 0);
 				send(client_socket, this->RPL_MOTD("372", motd1).data(), this->RPL_MOTD("372", motd1).size(), 0);
-				send(client_socket, this->RPL_MOTD("372", "\n").data(), this->RPL_MOTD("372", "\n").size(), 0);
+				send(client_socket, this->RPL_MOTD("372", "\r\n").data(), this->RPL_MOTD("372", "\r\n").size(), 0);
 				send(client_socket, this->RPL_MOTD("372", motd2).data(), this->RPL_MOTD("372", motd2).size(), 0);
-				send(client_socket, this->RPL_MOTD("372", "\n").data(), this->RPL_MOTD("372", "\n").size(), 0);
+				send(client_socket, this->RPL_MOTD("372", "\r\n").data(), this->RPL_MOTD("372", "\r\n").size(), 0);
 				send(client_socket, this->RPL_MOTD("372", motd3).data(), this->RPL_MOTD("372", motd3).size(), 0);
-				send(client_socket, this->RPL_MOTD("372", "\n").data(), this->RPL_MOTD("372", "\n").size(), 0);
-				send(client_socket, this->RPL_MOTD("372", "\n").data(), this->RPL_MOTD("372", "\n").size(), 0);
+				send(client_socket, this->RPL_MOTD("372", "\r\n").data(), this->RPL_MOTD("372", "\r\n").size(), 0);
+				send(client_socket, this->RPL_MOTD("372", "\r\n").data(), this->RPL_MOTD("372", "\r\n").size(), 0);
 			}
 
 			/* "001" */ std::string RPL_WELCOME(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + ":Welcome to the " + this->_network + " Network, " + this->_prefix + "\r\n"); };
@@ -220,7 +227,7 @@
 			/* "216" */ std::string RPL_STATSKLINE(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + "K " + this->_host + " * <username> <port> <class>" + "\r\n"); };
 			/* "218" */ std::string RPL_STATSYLINE(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + "Y <class> <ping_freq> <connect_freq> <max_sendq>" + "\r\n"); };
 			/* "219" */ std::string RPL_ENDOFSTATS(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + "<query> :<info>" + "\r\n"); };
-			/* "221" */ std::string RPL_UMODEIS(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + "<user_modes> [<user_mode_params>]" + "\r\n"); };
+			/* "221" */ std::string RPL_UMODEIS(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + "+" + this->_mode + "\r\n"); };
 			/* "234" */ std::string RPL_SERVLIST(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + "<name> " + this->_server + " <mask> <type> <hopcount> <info>" + "\r\n"); };
 			/* "235" */ std::string RPL_SERVLISTEND(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + "<mask> <type> :<info>" + "\r\n"); };
 			/* "241" */ std::string RPL_STATSLLINE(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + "L <hostmask> * " + this->_server + " <maxdepth>" + "\r\n"); };
@@ -280,7 +287,7 @@
 			/* "374" */ std::string RPL_ENDOFINFO(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + ":<info>" + "\r\n"); };
 			/* "375" */ std::string RPL_MOTDSTART(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + ":- " + this->_server + " Message of the day -" + "\r\n"); };
 			/* "376" */ std::string RPL_ENDOFMOTD(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + ":End of /MOTD command" + "\r\n"); };
-			/* "381" */ std::string RPL_YOUREOPER(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + ":<info>" + "\r\n"); };
+			/* "381" */ std::string RPL_YOUREOPER(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + ":You are now an IRC operator" + "\r\n"); };
 			/* "382" */ std::string RPL_REHASHING(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + "<config_file> :<info>" + "\r\n"); };
 			/* "383" */ std::string RPL_YOURESERVICE(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + ":You are service <service_name>" + "\r\n"); };
 			/* "391" */ std::string RPL_TIME(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + this->_server + " :<time string>" + "\r\n"); };
@@ -319,10 +326,10 @@
 			/* "445" */ std::string ERR_SUMMONDISABLED(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + ":<reason>" + "\r\n"); };
 			/* "446" */ std::string ERR_USERSDISABLED(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + ":<reason>" + "\r\n"); };
 			/* "451" */ std::string ERR_NOTREGISTERED(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + ":<reason>" + "\r\n"); };
-			/* "461" */ std::string ERR_NEEDMOREPARAMS(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + "<command> :<reason>" + "\r\n"); };
+			/* "461" */ std::string ERR_NEEDMOREPARAMS(std::string code, std::string command) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + command + " :Not enough parameters" + "\r\n"); };
 			/* "462" */ std::string ERR_ALREADYREGISTRED(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + ":<reason>" + "\r\n"); };
 			/* "463" */ std::string ERR_NOPERMFORHOST(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + ":<reason>" + "\r\n"); };
-			/* "464" */ std::string ERR_PASSWDMISMATCH(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + ":<reason>" + "\r\n"); };
+			/* "464" */ std::string ERR_PASSWDMISMATCH(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + ":Password incorrect" + "\r\n"); };
 			/* "465" */ std::string ERR_YOUREBANNEDCREEP(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + ":<reason>" + "\r\n"); };
 			/* "467" */ std::string ERR_KEYSET(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + this->_channel + " :<reason>" + "\r\n"); };
 			/* "471" */ std::string ERR_CHANNELISFULL(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + this->_channel + " :<reason>" + "\r\n"); };
@@ -333,7 +340,7 @@
 			/* "476" */ std::string ERR_BADCHANMASK(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + this->_channel + " :<reason>" + "\r\n"); };
 			/* "477" */ std::string ERR_NOCHANMODES(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + this->_channel + " :<reason>" + "\r\n"); };
 			/* "478" */ std::string ERR_BANLISTFULL(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + this->_channel + " <char> :<reason>" + "\r\n"); };
-			/* "481" */ std::string ERR_NOPRIVILEGES(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + ":<reason>" + "\r\n"); };
+			/* "481" */ std::string ERR_NOPRIVILEGES(std::string code, std::string reason) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + ":" + reason + "\r\n"); };
 			/* "482" */ std::string ERR_CHANOPRIVSNEEDED(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + this->_channel + " :<reason>" + "\r\n"); };
 			/* "483" */ std::string ERR_CANTKILLSERVER(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + ":<reason>" + "\r\n"); };
 			/* "484" */ std::string ERR_RESTRICTED(std::string code) { return (":" + this->_prefix + " " + code + " " + this->_nickname + " " + ":<reason>" + "\r\n"); };
@@ -352,6 +359,7 @@
 				std::string	_channel;
 				std::string	_date_time;
 				std::string	_version;
+				std::string	_mode;
 				std::string	_prefix;
 	};
 

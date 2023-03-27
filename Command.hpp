@@ -41,4 +41,7 @@ class Command
 	void	cmd_join(Message* message);
 	void	cmd_privmsg(Message* message);
 	void	cmd_part(Message* message);
+    void    cmd_oper(Message* message);
+    void    cmd_wallops(Message* message);
+
 #endif

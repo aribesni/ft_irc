@@ -6,7 +6,7 @@
 /*   By: rliu <rliu@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 18:14:02 by guillemette       #+#    #+#             */
-/*   Updated: 2023/03/24 20:01:15 by rliu             ###   ########.fr       */
+/*   Updated: 2023/03/27 16:24:18 by rliu             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,8 +88,10 @@ void	Server::acceptNewClient()
 	{
 		memset(buf,0, BUFFER_SIZE);
 		recv(client.getSocket(), buf, sizeof(buf), 0);
+		// std::cout << "[Client] (" << client.getSocket() << ")" << " received buf: " << buf << std::endl;
 		std::vector<Message>  msgList = this->bufferParser(buf, client);
 		execMultiMsg(msgList);
+		// std::cout << "[Client] (" << client.getSocket() << ")" << " is now registered" << std::endl;
 		if(this->_password != client.getPass())
 		{
 			std::cout << "pollserver: socket " << client.getSocket() << " hung up" << std::endl;
@@ -109,8 +111,9 @@ void	Server::acceptNewClient()
 	// send(client.getSocket(), replies.RPL_MOTD("372").data(), replies.RPL_MOTD("372").size(), 0);
 	replies.sendMotd(client.getSocket());
 	send(client.getSocket(), replies.RPL_ENDOFMOTD("376").data(), replies.RPL_ENDOFMOTD("376").size(), 0);
+	send(client.getSocket(), replies.RPL_UMODEIS("221").data(), replies.RPL_UMODEIS("221").size(), 0); // displays client's privileges
 	// else deal with client registration issue
-	this->clients[newpollfd.fd] = client;
+	this->getClients()[newpollfd.fd] = client;
 }
 
 void	Server::handleClientRequest(Client & client)
@@ -129,23 +132,15 @@ void	Server::handleClientRequest(Client & client)
 		else
 			perror("recv");
 		close(client.getSocket()); // Bye!
-		this->clients.erase(client.getSocket()); // remove client from map
+		this->getClients().erase(client.getSocket()); // remove client from map
 	}
 	else
 	{
 		// Handle buffer as a vector of messages
 		std::vector<Message>  msgList = this->bufferParser(buf, client);
-		std::cout << "[Client] (" << client.getSocket() << ")" << " received buf: " << buf << std::endl;
+		// std::cout << "[Client] (" << client.getSocket() << ")" << " received buf: " << buf << std::endl;
 		// Execute all messages that could be parsed
 		execMultiMsg(msgList);
-		// std::map<int, Client>::iterator     _it;
-		// for (_it = this->clients.begin(); _it != this->clients.end(); _it++)
-		// {
-		//     if (_it->first == client.getSocket()) // don't send message to client's own fd
-		//         continue ;
-		//     if (send(_it->first, buf, nbytes, 0) == -1) // send message to all the other clients fds
-		//         perror("send");
-		// }
 	}
 }
 
@@ -216,7 +211,8 @@ void					Server::execMultiMsg(std::vector<Message> msgList)
 ** --------------------------------- GETTERS ----------------------------------
 */
 
-int						Server::getSocket(void) const {
+int						Server::getSocket(void) const
+{
 
 	return (this->_socket);
 }
@@ -226,5 +222,10 @@ std::string				Server::getPassword(void) const
 	return (this->_password);
 }
 
-/* ************************************************************************** */
+std::map<int, Client>&	Server::getClients(void)
+{
+	return (this->_clients);
+}
+
+/* *************************setter************************************************* */
 void Server::setPassword(char * password){_password = password;}
