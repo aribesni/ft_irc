@@ -6,7 +6,7 @@
 /*   By: rliu <rliu@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 18:14:02 by guillemette       #+#    #+#             */
-/*   Updated: 2023/03/27 16:24:18 by rliu             ###   ########.fr       */
+/*   Updated: 2023/03/27 17:00:27 by rliu             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,7 +96,8 @@ void	Server::acceptNewClient()
 		{
 			std::cout << "pollserver: socket " << client.getSocket() << " hung up" << std::endl;
 			close(client.getSocket()); // Bye!
-			this->clients.erase(client.getSocket());
+			this->getClients().erase(client.getSocket());
+			break;
 		}
 		
 	}

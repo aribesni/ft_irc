@@ -6,7 +6,7 @@
 /*   By: rliu <rliu@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 17:43:49 by rliu              #+#    #+#             */
-/*   Updated: 2023/03/27 16:20:05 by rliu             ###   ########.fr       */
+/*   Updated: 2023/03/27 16:56:44 by rliu             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,15 +45,9 @@ void Command::initCmdMap()
 /*
 ** --------------------------------- utils---------------------------------
 */
-void rplSender(Client &client, std::string code){
-    Replies reply(client);
-    // replies.getReplies(client.getNick(), client.getUser(), client.getPrefix());
-    std::string  rpl= reply._replies[code];
-    send(client.getSocket(), rpl.c_str(), rpl.size(), 0);
-}
 
 void msgSender(Client &client, std::string cmd, std::string msg){
-    std::string msgSend = client.getPrefix() + " " + cmd + " " + msg + "/r/n";
+    std::string msgSend = ":"+client.getPrefix() + " " + cmd + " " + msg + "/r/n";
     send(client.getSocket(), msgSend.c_str(), msgSend.size(), 0);
 }
 
@@ -84,20 +78,21 @@ void cmd_pass(Message * message)
 
 void cmd_nick(Message * message)
 {
+	Replies reply(*(message->getClient()));
 	std::string nick = message->getParams()[0];
     if (nick.size() > 9 || nick.empty()){
         nick = creatNickname(*(message->getClient()));
-        rplSender(*(message->getClient()), "432");
+        send(message->getClient()->getSocket(),reply.ERR_ERRONEUSNICKNAME("432").c_str(), reply.ERR_ERRONEUSNICKNAME("432").size(), 0);
     }
 	
     std::map<int, Client>::iterator     it;
-    for (it = message->getServer()->clients.begin(); it != message->getServer()->clients.end(); it++)
+    for (it = message->getServer()->getClients().begin(); it != message->getServer()->getClients().end(); it++)
     {
         if (it->first == message->getClient()->getSocket()) // don't send message to client's own fd
             continue ;
         if (nick == it->second.getNick()){
             nick = creatNickname(*(message->getClient()));
-            rplSender(*(message->getClient()), "432");
+            send(message->getClient()->getSocket(),reply.ERR_NICKNAMEINUSE("433").c_str(), reply.ERR_NICKNAMEINUSE("433").size(), 0);
         }
     }
    	message->getClient()->setNick(message->getParams()[0]);
