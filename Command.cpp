@@ -175,16 +175,16 @@ void    cmd_oper(Message * message) {
     Replies replies(*client);
 
 	if (message->getParams().size() < 2) // check if both <name> and <password> are entered
-        send(client->getSocket(), replies.ERR_NEEDMOREPARAMS("461", "OPER").data(), replies.ERR_NEEDMOREPARAMS("461", "OPER").size(), 0);
+        send(client->getSocket(), replies.ERR_NEEDMOREPARAMS("OPER").data(), replies.ERR_NEEDMOREPARAMS("OPER").size(), 0);
     else if (message->getParams()[0] == "operator" && message->getParams()[1] == "password") // checks if <name> is set as "operator" and <password> as "password"
     {
-        send(client->getSocket(), replies.RPL_YOUREOPER("381").data(), replies.RPL_YOUREOPER("381").size(), 0);
+        send(client->getSocket(), replies.RPL_YOUREOPER().data(), replies.RPL_YOUREOPER().size(), 0);
         client->setMode("wio"); // sets client's privileged to operator
         replies.setVariables(client); // updates client's new info
-        send(client->getSocket(), replies.RPL_UMODEIS("221").data(), replies.RPL_UMODEIS("221").size(), 0); // displays new privileges
+        send(client->getSocket(), replies.RPL_UMODEIS().data(), replies.RPL_UMODEIS().size(), 0); // displays new privileges
     }
     else
-        send(client->getSocket(), replies.ERR_PASSWDMISMATCH("464").data(), replies.ERR_PASSWDMISMATCH("464").size(), 0); // wrong password
+        send(client->getSocket(), replies.ERR_PASSWDMISMATCH().data(), replies.ERR_PASSWDMISMATCH().size(), 0); // wrong password
 }
 
 void    cmd_wallops(Message * message) {
@@ -197,7 +197,7 @@ void    cmd_wallops(Message * message) {
 	std::string wallop = ":" + client->getPrefix() + " WALLOPS " + message->getParams()[0] + "\r\n";
 
     if (client->getMode() != "wio") // check if user has operator privileges
-        send(client->getSocket(), replies.ERR_NOPRIVILEGES("481", "Permission Denied- You're not an IRC operator").data(), replies.ERR_NOPRIVILEGES("481", "Permission Denied- You're not an IRC operator").size(), 0);
+        send(client->getSocket(), replies.ERR_NOPRIVILEGES("Permission Denied- You're not an IRC operator").data(), replies.ERR_NOPRIVILEGES("Permission Denied- You're not an IRC operator").size(), 0);
 	else
 	{
 		while (i < server->getClients().size())

@@ -95,15 +95,15 @@ void	Server::acceptNewClient()
 	}
 	client.setPrefix();
 	Replies replies(client);
-	send(client.getSocket(), replies.RPL_WELCOME("001").data(), replies.RPL_WELCOME("001").size(), 0);
-	send(client.getSocket(), replies.RPL_YOURHOST("002").data(), replies.RPL_YOURHOST("002").size(), 0);
-	send(client.getSocket(), replies.RPL_CREATED("003").data(), replies.RPL_CREATED("003").size(), 0);
-	send(client.getSocket(), replies.RPL_MYINFO("004").data(), replies.RPL_MYINFO("004").size(), 0);
-	send(client.getSocket(), replies.RPL_MOTDSTART("375").data(), replies.RPL_MOTDSTART("375").size(), 0);
+	send(client.getSocket(), replies.RPL_WELCOME().data(), replies.RPL_WELCOME().size(), 0);
+	send(client.getSocket(), replies.RPL_YOURHOST().data(), replies.RPL_YOURHOST().size(), 0);
+	send(client.getSocket(), replies.RPL_CREATED().data(), replies.RPL_CREATED().size(), 0);
+	send(client.getSocket(), replies.RPL_MYINFO().data(), replies.RPL_MYINFO().size(), 0);
+	send(client.getSocket(), replies.RPL_MOTDSTART().data(), replies.RPL_MOTDSTART().size(), 0);
 	// send(client.getSocket(), replies.RPL_MOTD("372").data(), replies.RPL_MOTD("372").size(), 0);
 	replies.sendMotd(client.getSocket());
-	send(client.getSocket(), replies.RPL_ENDOFMOTD("376").data(), replies.RPL_ENDOFMOTD("376").size(), 0);
-	send(client.getSocket(), replies.RPL_UMODEIS("221").data(), replies.RPL_UMODEIS("221").size(), 0); // displays client's privileges
+	send(client.getSocket(), replies.RPL_ENDOFMOTD().data(), replies.RPL_ENDOFMOTD().size(), 0);
+	send(client.getSocket(), replies.RPL_UMODEIS().data(), replies.RPL_UMODEIS().size(), 0); // displays client's privileges
 	// else deal with client registration issue
 	this->getClients()[newpollfd.fd] = client;
 }
