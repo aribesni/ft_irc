@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_irc.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
+/*   By: rliu <rliu@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 18:13:49 by guillemette       #+#    #+#             */
-/*   Updated: 2023/03/23 18:28:46 by guillemette      ###   ########.fr       */
+/*   Updated: 2023/03/24 18:45:54 by rliu             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,16 +51,17 @@ void    ft_loop(Server server)
 int main(int argc, char **argv)
 {
 	// Check for correct usage
-	if (argc != 2)
-	{
-		std::cout << "Port number needed." << std::endl;
-		return (-1);
-	}
+    if (argc != 3)
+    {
+        std::cout << "Port number and password needed." << std::endl;
+        return (-1);
+    }
+	
 	long port = std::strtol(argv[1], NULL, 10);
 
 	// Create a server object
 	Server  server(argv[0]);
-
+	server.setPassword(argv[2]);
 	// Create server socket
 	server.createSocket();
 

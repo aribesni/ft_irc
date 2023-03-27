@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+         #
+#    By: rliu <rliu@student.42.fr>                  +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/03/22 18:38:46 by gduchate          #+#    #+#              #
-#    Updated: 2023/03/23 18:04:39 by guillemette      ###   ########.fr        #
+#    Updated: 2023/03/24 18:46:29 by rliu             ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -24,7 +24,7 @@ CC = c++
 
 FLAGS = -Wall -Wextra -Werror -std=c++98
 
-%.o : %.cpp
+%.o : %.cpp ${HEADER}
 	${CC} ${FLAGS} -c $<
 
 all : ${NAME}

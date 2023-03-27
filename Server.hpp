@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
+/*   By: rliu <rliu@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 18:14:04 by guillemette       #+#    #+#             */
-/*   Updated: 2023/03/23 18:46:13 by guillemette      ###   ########.fr       */
+/*   Updated: 2023/03/24 18:44:54 by rliu             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,7 @@ class Server {
 		void						_accept(Client & client);
 		void						_listen(void);
 		std::vector<Message>		bufferParser(char* buf, Client & client);
+		void                        msg_replace(std::string &message, char find, char replace);
 		void						execMultiMsg(std::vector<Message> msgList);
 		void						acceptNewClient();
 		void						handleClientRequest(Client & client);
@@ -59,7 +60,8 @@ class Server {
 		std::vector<struct pollfd>	_pollfds;
 		// Client &        getClientWithFd(int fd);
 		std::map<std::string, Channel>	_channels; /* channelName, Channel object*/
-
+		void setPassword(char * password);
+		
 	private :
 		std::string						_password;
 		int								_socket;

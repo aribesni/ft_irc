@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
+/*   By: rliu <rliu@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 18:12:51 by guillemette       #+#    #+#             */
-/*   Updated: 2023/03/23 18:28:25 by guillemette      ###   ########.fr       */
+/*   Updated: 2023/03/24 19:52:35 by rliu             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@ class Client {
 
 		// GETTERS
 		int			getSocket(void) const;
+		std::string getPass(void) const;
 		std::string	getNick(void) const;
 		std::string	getUser(void) const;
 		std::string	getPrefix(void) const;

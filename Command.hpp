@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Command.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gduchate <gduchate@student.42.fr>          +#+  +:+       +#+        */
+/*   By: rliu <rliu@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 17:43:58 by rliu              #+#    #+#             */
-/*   Updated: 2023/03/24 15:19:02 by gduchate         ###   ########.fr       */
+/*   Updated: 2023/03/24 18:37:58 by rliu             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,12 @@
 # define COMMAND_HPP
 #include <map>
 #include <iostream>
+#include <sstream>
 #include <vector>
 #include "Message.hpp"
 #include "Channel.hpp"
+#include <string>
+
 class Client;
 
 class Command
