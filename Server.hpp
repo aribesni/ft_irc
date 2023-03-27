@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gduchate <gduchate@student.42.fr>          +#+  +:+       +#+        */
+/*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 18:14:04 by guillemette       #+#    #+#             */
-/*   Updated: 2023/03/24 18:00:20 by gduchate         ###   ########.fr       */
+/*   Updated: 2023/03/23 18:46:13 by guillemette      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 

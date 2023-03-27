@@ -29,6 +29,8 @@ class Client {
 		std::string	getNick(void) const;
 		std::string	getUser(void) const;
 		std::string	getPrefix(void) const;
+        std::string getMode(void) const;
+        std::string getHostName(void) const;
 		bool		getRegistrationStatus (void) const;
 
 		// SETTERS
@@ -39,6 +41,7 @@ class Client {
 		void		setHostname(std::string &hostname);
 		void		setAsRegistered(void);
 		void		setPrefix(void);
+        void        setMode(std::string mode);
 
 		sockaddr_in _sockaddr;
 		socklen_t   _socklen;
@@ -54,6 +57,7 @@ class Client {
 		std::string	_nick;
 		std::string	_pass;
 		std::string	_msgWelcome;
+        std::string _mode;
 };
 
 #endif

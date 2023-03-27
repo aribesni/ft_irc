@@ -43,11 +43,11 @@ void						Message::execCmd()
 {
 	if(g_cmd._cmdMap.find(_cmd) != g_cmd._cmdMap.end())
 	{
-		std::cout << "[Client] (" << _client->getSocket() << ") Command " << _cmd << " is being processed." << std::endl;
+		// std::cout << "[Client] (" << _client->getSocket() << ") Command " << _cmd << " is being processed." << std::endl;
 		g_cmd._cmdMap[_cmd](this);
 	}
-	else
-		std::cout << "[Client] (" << _client->getSocket() << ") Command " << _cmd << " not found." << std::endl;
+	// else
+		// std::cout << "[Client] (" << _client->getSocket() << ") Command " << _cmd << " not found." << std::endl;
 }
 
 /*

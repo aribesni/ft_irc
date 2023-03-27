@@ -6,7 +6,7 @@
 /*   By: gduchate <gduchate@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 18:14:02 by guillemette       #+#    #+#             */
-/*   Updated: 2023/03/24 18:00:12 by gduchate         ###   ########.fr       */
+/*   Updated: 2023/03/24 16:12:52 by gduchate         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,10 +88,10 @@ void	Server::acceptNewClient()
 	while (client.getRegistrationStatus() == false)
 	{
 		recv(client.getSocket(), buf, sizeof(buf), 0);
-		std::cout << "[Client] (" << client.getSocket() << ")" << " received buf: " << buf << std::endl;
+		// std::cout << "[Client] (" << client.getSocket() << ")" << " received buf: " << buf << std::endl;
 		std::vector<Message>  msgList = this->bufferParser(buf, client);
 		execMultiMsg(msgList);
-		std::cout << "[Client] (" << client.getSocket() << ")" << " is now registered" << std::endl;
+		// std::cout << "[Client] (" << client.getSocket() << ")" << " is now registered" << std::endl;
 	}
 	client.setPrefix();
 	Replies replies(client);
@@ -103,6 +103,7 @@ void	Server::acceptNewClient()
 	// send(client.getSocket(), replies.RPL_MOTD("372").data(), replies.RPL_MOTD("372").size(), 0);
 	replies.sendMotd(client.getSocket());
 	send(client.getSocket(), replies.RPL_ENDOFMOTD("376").data(), replies.RPL_ENDOFMOTD("376").size(), 0);
+	send(client.getSocket(), replies.RPL_UMODEIS("221").data(), replies.RPL_UMODEIS("221").size(), 0); // displays client's privileges
 	// else deal with client registration issue
 	this->getClients()[newpollfd.fd] = client;
 }
@@ -129,7 +130,7 @@ void	Server::handleClientRequest(Client & client)
 	{
 		// Handle buffer as a vector of messages
 		std::vector<Message>  msgList = this->bufferParser(buf, client);
-		std::cout << "[Client] (" << client.getSocket() << ")" << " received buf: " << buf << std::endl;
+		// std::cout << "[Client] (" << client.getSocket() << ")" << " received buf: " << buf << std::endl;
 		// Execute all messages that could be parsed
 		execMultiMsg(msgList);
 	}

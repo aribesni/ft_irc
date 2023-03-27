@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_irc.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gduchate <gduchate@student.42.fr>          +#+  +:+       +#+        */
+/*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 18:13:49 by guillemette       #+#    #+#             */
-/*   Updated: 2023/03/24 17:54:07 by gduchate         ###   ########.fr       */
+/*   Updated: 2023/03/23 18:28:46 by guillemette      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
