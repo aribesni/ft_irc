@@ -40,6 +40,7 @@ void Command::initCmdMap()
 	_cmdMap["PART"] = &cmd_part;
     _cmdMap["OPER"] = &cmd_oper;
     _cmdMap["wallops"] = &cmd_wallops;
+    _cmdMap["kill"] = &cmd_kill;
 }
 
 /*
@@ -47,7 +48,7 @@ void Command::initCmdMap()
 */
 
 void msgSender(Client &client, std::string cmd, std::string msg){
-    std::string msgSend = ":"+client.getPrefix() + " " + cmd + " " + msg + "/r/n";
+    std::string msgSend = ":" +client.getPrefix() + " " + cmd + " " + msg + "/r/n";
     send(client.getSocket(), msgSend.c_str(), msgSend.size(), 0);
 }
 
@@ -105,7 +106,6 @@ void cmd_user(Message * message)
 	message->getClient()->setUsr(message->getParams()[0]);
 	message->getClient()->setHostname(message->getParams()[2]);
 	// To be edited afterwards depending on registration checks and put in the acceptNewClient func
-	message->getClient()->setAsRegistered();
 }
 
 void cmd_ping(Message * message)
@@ -232,14 +232,14 @@ void    cmd_oper(Message * message) {
 
 void    cmd_wallops(Message * message) {
 
-    Client * client = message->getClient();
-	Server * server = message->getServer();
+    Client	*client = message->getClient();
+	Server	*server = message->getServer();
     Replies replies(*client);
-	size_t i = 0;
+	size_t	i = 0;
 
 	std::string wallop = ":" + client->getPrefix() + " WALLOPS " + message->getParams()[0] + "\r\n";
 
-    if (client->getMode() != "wio") // check if user has operator privileges
+    if (client->getMode().find("o") != std::string::npos) // check if user has operator privileges
         send(client->getSocket(), replies.ERR_NOPRIVILEGES("Permission Denied- You're not an IRC operator").data(), replies.ERR_NOPRIVILEGES("Permission Denied- You're not an IRC operator").size(), 0);
 	else
 	{
@@ -250,6 +250,22 @@ void    cmd_wallops(Message * message) {
 			i++;
 		}
 	}
+}
+
+void    cmd_kill(Message * message) {
+
+	// ERR_NOPRIVILEGES
+	// ERR_NEEDMOREPARAMS
+	// ERR_NOSUCHNICK
+	// ERR_CANTKILLSERVER
+
+    Client	*client = message->getClient();
+    Replies	replies(*client);
+
+	std::cout << "HERE" << std::endl;
+
+	// if (client->getMode().find("o") != std::string::npos)
+        // send(client->getSocket(), replies.ERR_NOPRIVILEGES("Permission Denied- You're not an IRC operator").data(), replies.ERR_NOPRIVILEGES("Permission Denied- You're not an IRC operator").size(), 0);
 }
 
 /* ************************************************************************** */

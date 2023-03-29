@@ -96,10 +96,10 @@ void	Server::acceptNewClient()
 		{
 			std::cout << "pollserver: socket " << client.getSocket() << " hung up" << std::endl;
 			close(client.getSocket()); // Bye!
-			this->getClients().erase(client.getSocket());
-			break;
+			// this->getClients().erase(client.getSocket());
+			return ;
 		}
-		
+		client.setAsRegistered();
 	}
 	
 	client.setPrefix();
