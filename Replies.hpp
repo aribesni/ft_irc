@@ -148,7 +148,7 @@
 			/* "393" */ std::string RPL_USERS() { return (":" + this->_prefix + " 393 " + this->_nickname + " " + ":<username> <ttyline> <hostname>" + "\r\n"); };
 			/* "394" */ std::string RPL_ENDOFUSERS() { return (":" + this->_prefix + " 394 " + this->_nickname + " " + ":<info>" + "\r\n"); };
 			/* "395" */ std::string RPL_NOUSERS() { return (":" + this->_prefix + " 395 " + this->_nickname + " " + ":<info>" + "\r\n"); };
-			/* "401" */ std::string ERR_NOSUCHNICK() { return (":" + this->_prefix + " 401 " + this->_nickname + " " + this->_nickname + " :<reason>" + "\r\n"); };
+			/* "401" */ std::string ERR_NOSUCHNICK() { return (":" + this->_prefix + " 401 " + this->_nickname + " " + this->_nickname + " No such nick" + "\r\n"); };
 			/* "402" */ std::string ERR_NOSUCHSERVER() { return (":" + this->_prefix + " 402 " + this->_nickname + " " + this->_server + " :<reason>" + "\r\n"); };
 			/* "403" */ std::string ERR_NOSUCHCHANNEL() { return (":" + this->_prefix + " 403 " + this->_nickname + " " + this->_channel + " :<reason>" + "\r\n"); };
 			/* "404" */ std::string ERR_CANNOTSENDTOCHAN() { return (":" + this->_prefix + " 404 " + this->_nickname + " " + this->_channel + " :<reason>" + "\r\n"); };
