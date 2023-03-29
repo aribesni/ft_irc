@@ -82,7 +82,7 @@ void cmd_nick(Message * message)
 	std::string nick = message->getParams()[0];
     if (nick.size() > 9 || nick.empty()){
         nick = creatNickname(*(message->getClient()));
-        send(message->getClient()->getSocket(),reply.ERR_ERRONEUSNICKNAME("432").c_str(), reply.ERR_ERRONEUSNICKNAME("432").size(), 0);
+        send(message->getClient()->getSocket(),reply.ERR_ERRONEUSNICKNAME().c_str(), reply.ERR_ERRONEUSNICKNAME().size(), 0);
     }
 	
     std::map<int, Client>::iterator     it;
@@ -92,7 +92,7 @@ void cmd_nick(Message * message)
             continue ;
         if (nick == it->second.getNick()){
             nick = creatNickname(*(message->getClient()));
-            send(message->getClient()->getSocket(),reply.ERR_NICKNAMEINUSE("433").c_str(), reply.ERR_NICKNAMEINUSE("433").size(), 0);
+            send(message->getClient()->getSocket(),reply.ERR_NICKNAMEINUSE().c_str(), reply.ERR_NICKNAMEINUSE().size(), 0);
         }
     }
    	message->getClient()->setNick(message->getParams()[0]);
