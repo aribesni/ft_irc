@@ -6,7 +6,7 @@
 /*   By: rliu <rliu@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 17:43:49 by rliu              #+#    #+#             */
-/*   Updated: 2023/03/27 16:56:44 by rliu             ###   ########.fr       */
+/*   Updated: 2023/03/29 10:37:04 by rliu             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,7 +105,6 @@ void cmd_user(Message * message)
 	message->getClient()->setUsr(message->getParams()[0]);
 	message->getClient()->setHostname(message->getParams()[2]);
 	// To be edited afterwards depending on registration checks and put in the acceptNewClient func
-	message->getClient()->setAsRegistered();
 }
 
 void cmd_ping(Message * message)
