@@ -235,37 +235,66 @@ void    cmd_wallops(Message * message) {
     Client	*client = message->getClient();
 	Server	*server = message->getServer();
     Replies replies(*client);
-	size_t	i = 0;
+
 
 	std::string wallop = ":" + client->getPrefix() + " WALLOPS " + message->getParams()[0] + "\r\n";
 
-    if (client->getMode().find("o") != std::string::npos) // check if user has operator privileges
+    if (client->getMode().find("o") == std::string::npos) // check if user has operator privileges
         send(client->getSocket(), replies.ERR_NOPRIVILEGES("Permission Denied- You're not an IRC operator").data(), replies.ERR_NOPRIVILEGES("Permission Denied- You're not an IRC operator").size(), 0);
 	else
 	{
-		while (i < server->getClients().size())
+		for (size_t i = 0; i < server->getClients().size(); i++)
 		{
 			if (server->getClients()[i].getMode().find("w") != std::string::npos) // check if client has "w" mode
 				send(server->getClients()[i].getSocket(), wallop.data(), wallop.size(), 0); // sends message to all clients with "w" mode including the sender
-			i++;
 		}
 	}
 }
 
 void    cmd_kill(Message * message) {
 
-	// ERR_NOPRIVILEGES
-	// ERR_NEEDMOREPARAMS
-	// ERR_NOSUCHNICK
-	// ERR_CANTKILLSERVER
-
     Client	*client = message->getClient();
+	Server	*server = message->getServer();
     Replies	replies(*client);
+	size_t	i = 2;
+	bool	nick = false;
 
-	std::cout << "HERE" << std::endl;
+	std::string	full_params = message->getParams()[1];
 
-	// if (client->getMode().find("o") != std::string::npos)
-        // send(client->getSocket(), replies.ERR_NOPRIVILEGES("Permission Denied- You're not an IRC operator").data(), replies.ERR_NOPRIVILEGES("Permission Denied- You're not an IRC operator").size(), 0);
+	while (i < message->getParams().size())
+	{
+		full_params = full_params + " " + message->getParams()[i];
+		i++;
+	}
+
+	i = 0;
+
+	std::string kill = ":" + client->getPrefix() + " KILL " + full_params + "\r\n";
+	std::string quit = ":" + client->getPrefix() + " QUIT " + full_params + "\r\n";
+
+	if (message->getParams().size() < 3 && message->getParams()[1] == ":") // check if both <name> and <reason> are entered
+        send(client->getSocket(), replies.ERR_NEEDMOREPARAMS("KILL").data(), replies.ERR_NEEDMOREPARAMS("KILL").size(), 0);
+	else if (client->getMode().find("o") == std::string::npos)
+		send(client->getSocket(), replies.ERR_NOPRIVILEGES("Permission Denied- You're not an IRC operator").data(), replies.ERR_NOPRIVILEGES("Permission Denied- You're not an IRC operator").size(), 0);
+	else
+	{
+		while (i < server->getClients().size())
+		{
+			if (server->getClients()[i].getNick() == message->getParams()[0])
+			{
+				send(server->getClients()[i].getSocket(), kill.data(), kill.size(), 0);
+				send(server->getClients()[i].getSocket(), quit.data(), quit.size(), 0);
+				std::cout << "pollserver: socket " << server->getClients()[i].getSocket() << " hung up" << std::endl;
+				close(server->getClients()[i].getSocket());
+				server->getClients().erase(server->getClients()[i].getSocket());
+				nick = true;
+				break;
+			}
+			i++;
+		}
+		if (nick == false)
+			send(client->getSocket(), replies.ERR_NOSUCHNICK().data(), replies.ERR_NOSUCHNICK().size(), 0);
+	}
 }
 
 /* ************************************************************************** */

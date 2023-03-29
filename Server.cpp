@@ -101,7 +101,7 @@ void	Server::acceptNewClient()
 		}
 		client.setAsRegistered();
 	}
-	
+
 	client.setPrefix();
 	Replies replies(client);
 	send(client.getSocket(), replies.RPL_WELCOME().data(), replies.RPL_WELCOME().size(), 0);
