@@ -175,7 +175,7 @@ std::vector<std::string>	msg_split(std::string str, std::string delimiter)
 void Server::msg_replace(std::string &message, char find, char replace){
 
     for(size_t i= 0; i < message.size(); i++){
-        if(message[i]== find)
+        if(message[i] == find)
             message.replace(i, 1, 1, replace);
     }
 }
@@ -194,9 +194,14 @@ std::vector<Message>	Server::bufferParser(char* buf, Client &client){
 	msgSize = lines.size();
 	for (size_t i = 0; i < msgSize; i++)
 	{
-		tokens.push_back(msg_split(lines[i], " "));
-		Message msg(tokens[i], &client, this, lines[i]);
-		msgList.push_back(msg);
+		std::vector<std::string> res = msg_split(lines[i], " ");
+		if (res.size())
+		{
+			tokens.push_back(res);
+			Message msg(tokens[i], &client, this, lines[i]);
+			msgList.push_back(msg);
+		}
+		else break;
 	}
 	return (msgList);
 }

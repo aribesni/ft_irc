@@ -222,7 +222,7 @@ void    cmd_oper(Message * message) {
     else if (message->getParams()[0] == "operator" && message->getParams()[1] == "password") // checks if <name> is set as "operator" and <password> as "password"
     {
         send(client->getSocket(), replies.RPL_YOUREOPER().data(), replies.RPL_YOUREOPER().size(), 0);
-        client->setMode("wio"); // sets client's privileged to operator
+        client->setIRCMode("wio"); // sets client's privileged to operator
         replies.setVariables(client); // updates client's new info
         send(client->getSocket(), replies.RPL_UMODEIS().data(), replies.RPL_UMODEIS().size(), 0); // displays new privileges
     }
@@ -239,13 +239,13 @@ void    cmd_wallops(Message * message) {
 
 	std::string wallop = ":" + client->getPrefix() + " WALLOPS " + message->getParams()[0] + "\r\n";
 
-    if (client->getMode().find("o") == std::string::npos) // check if user has operator privileges
+    if (client->getIRCMode().find("o") == std::string::npos) // check if user has operator privileges
         send(client->getSocket(), replies.ERR_NOPRIVILEGES("Permission Denied- You're not an IRC operator").data(), replies.ERR_NOPRIVILEGES("Permission Denied- You're not an IRC operator").size(), 0);
 	else
 	{
 		for (size_t i = 0; i < server->getClients().size(); i++)
 		{
-			if (server->getClients()[i].getMode().find("w") != std::string::npos) // check if client has "w" mode
+			if (server->getClients()[i].getIRCMode().find("w") != std::string::npos) // check if client has "w" mode
 				send(server->getClients()[i].getSocket(), wallop.data(), wallop.size(), 0); // sends message to all clients with "w" mode including the sender
 		}
 	}
@@ -274,7 +274,7 @@ void    cmd_kill(Message * message) {
 
 	if (message->getParams().size() < 3 && message->getParams()[1] == ":") // check if both <name> and <reason> are entered
         send(client->getSocket(), replies.ERR_NEEDMOREPARAMS("KILL").data(), replies.ERR_NEEDMOREPARAMS("KILL").size(), 0);
-	else if (client->getMode().find("o") == std::string::npos)
+	else if (client->getIRCMode().find("o") == std::string::npos)
 		send(client->getSocket(), replies.ERR_NOPRIVILEGES("Permission Denied- You're not an IRC operator").data(), replies.ERR_NOPRIVILEGES("Permission Denied- You're not an IRC operator").size(), 0);
 	else
 	{

@@ -46,10 +46,9 @@ std::string	Client::getNick(void) const{return (this->_nick);}
 
 std::string	Client::getUser(void) const {return (this->_user);}
 
-std::string Client::getMode(void) const {
+std::string Client::getIRCMode(void) const {return (this->_irc_mode);}
 
-    return (this->_mode);
-}
+std::string Client::getChanMode(void) const {return (this->_chan_mode);}
 
 std::string Client::getHostName(void) const {
 
@@ -87,7 +86,7 @@ void  Client::setNick(std::string &nickname)
 
 void  Client::setAsRegistered(void){
     _isRegistered = true;
-    this->setMode("wi");
+    this->setIRCMode("wi");
 }
 
 void  Client::setUsr(std::string &usrname)
@@ -107,7 +106,12 @@ void  Client::setHostname(std::string &hostname){
     //std::cout << "test_pass: " << _hostname << std::endl;
 }
 
-void    Client::setMode(std::string mode) {
+void    Client::setIRCMode(std::string mode) {
 
-    this->_mode = mode;
+    this->_irc_mode = mode;
+}
+
+void    Client::setChanMode(std::string mode) {
+
+    this->_chan_mode = mode;
 }
