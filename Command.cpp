@@ -129,8 +129,8 @@ void cmd_join(Message * message)
 		std::cout << "Channel " << chanName << " does not exist" << std::endl;
 		Channel mychan(chanName, client);
 		server->_channels[chanName] = mychan;
-		// TO DO: First client is chan operator
 		std::cout << "Channel " << chanName << " created and added to server list. User added to channel." << std::endl;
+		client->setChanMode("o"); // set first client as chan operator
 	}
 	else
 	{
