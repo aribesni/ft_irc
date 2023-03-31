@@ -30,7 +30,8 @@ class Client {
 		std::string	getNick(void) const;
 		std::string	getUser(void) const;
 		std::string	getPrefix(void) const;
-        std::string getMode(void) const;
+        std::string getIRCMode(void) const;
+        std::string getChanMode(void) const;
         std::string getHostName(void) const;
 		bool		getRegistrationStatus (void) const;
 
@@ -42,7 +43,8 @@ class Client {
 		void		setHostname(std::string &hostname);
 		void		setAsRegistered(void);
 		void		setPrefix(void);
-        void        setMode(std::string mode);
+        void        setIRCMode(std::string mode);
+        void        setChanMode(std::string mode);
 
 		sockaddr_in _sockaddr;
 		socklen_t   _socklen;
@@ -58,7 +60,8 @@ class Client {
 		std::string	_nick;
 		std::string	_pass;
 		std::string	_msgWelcome;
-        std::string _mode;
+        std::string _irc_mode;
+        std::string _chan_mode;
 };
 
 #endif

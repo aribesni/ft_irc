@@ -36,7 +36,7 @@
 				this->_channel = "<channel>";
 				this->_date_time = "Tue March 14 at 12:05";
 				this->_version = "1.0";
-				this->_mode = client->getMode();
+				this->_irc_mode = client->getIRCMode();
 				this->_prefix = client->getPrefix();
 			}
 			
@@ -80,7 +80,7 @@
 			/* "216" */ std::string RPL_STATSKLINE() { return (":" + this->_prefix + " 216 " + this->_nickname + " " + "K " + this->_host + " * <username> <port> <class>" + "\r\n"); };
 			/* "218" */ std::string RPL_STATSYLINE() { return (":" + this->_prefix + " 218 " + this->_nickname + " " + "Y <class> <ping_freq> <connect_freq> <max_sendq>" + "\r\n"); };
 			/* "219" */ std::string RPL_ENDOFSTATS() { return (":" + this->_prefix + " 219 " + this->_nickname + " " + "<query> :<info>" + "\r\n"); };
-			/* "221" */ std::string RPL_UMODEIS() { return (":" + this->_prefix + " 221 " + this->_nickname + " " + "+" + this->_mode + "\r\n"); };
+			/* "221" */ std::string RPL_UMODEIS() { return (":" + this->_prefix + " 221 " + this->_nickname + " " + "+" + this->_irc_mode + "\r\n"); };
 			/* "234" */ std::string RPL_SERVLIST() { return (":" + this->_prefix + " 234 " + this->_nickname + " " + "<name> " + this->_server + " <mask> <type> <hopcount> <info>" + "\r\n"); };
 			/* "235" */ std::string RPL_SERVLISTEND() { return (":" + this->_prefix + " 235 " + this->_nickname + " " + "<mask> <type> :<info>" + "\r\n"); };
 			/* "241" */ std::string RPL_STATSLLINE() { return (":" + this->_prefix + " 241 " + this->_nickname + " " + "L <hostmask> * " + this->_server + " <maxdepth>" + "\r\n"); };
@@ -212,7 +212,7 @@
 				std::string	_channel;
 				std::string	_date_time;
 				std::string	_version;
-				std::string	_mode;
+				std::string	_irc_mode;
 				std::string	_prefix;
 	};
 
