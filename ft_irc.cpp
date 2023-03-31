@@ -12,24 +12,47 @@
 
 #include <poll.h>
 #include <vector>
+#include <signal.h>
 #include "Server.hpp"
 #include "Client.hpp"
 #include "Replies.hpp"
 
+bool sig = false;
+
+void	sigHandler(int signum) { 
+
+	(void)signum;
+	// std::cout << std::endl << "SIGNAL " << signum << " CAUGHT" << std::endl;	
+	sig = true;
+}
+
+void	closeFds(Server server) {
+
+	for (size_t i = 0; i < server.getClients().size(); i++)
+	{
+		close(server.getClients()[i].getSocket());
+		std::cout << "Socket " << i << " closed" << std::endl;
+	}
+	close(server.getSocket());
+	std::cout << std::endl << "Server socket closed" << std::endl;
+}
+
 void    ft_loop(Server server)
 {
-	while (true)
+	signal(SIGINT, sigHandler);
+	while (sig == false)
 	{
 		// Watch pollfds and get number of open fds
 		// #1: address of pollfds to watch, #2: number of pollfds to watch,
 		// #3: timeout in ms. negative means infinite delay
-		int open_fds = poll(&server._pollfds[0], server._pollfds.size(), -1);
+		// int open_fds = poll(&server._pollfds[0], server._pollfds.size(), -1);
+		poll(&server._pollfds[0], server._pollfds.size(), -1);
 		// Handle poll error
-		if (open_fds == -1)
-		{
-			perror("poll");
-			exit(1);
-		}
+		// if (open_fds == -1)
+		// {
+		// 	perror("poll");
+		// 	exit(1);
+		// }
 		// Run through the pollfds looking for data to read
 		for (size_t i = 0; i < server._pollfds.size(); i++)
 		{
@@ -46,6 +69,7 @@ void    ft_loop(Server server)
 			}
 		}
 	}
+	closeFds(server);
 }
 
 int main(int argc, char **argv)
