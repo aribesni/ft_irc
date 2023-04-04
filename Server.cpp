@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rliu <rliu@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: gduchate <gduchate@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 18:14:02 by guillemette       #+#    #+#             */
-/*   Updated: 2023/03/29 10:38:03 by rliu             ###   ########.fr       */
+/*   Updated: 2023/04/04 16:35:28 by gduchate         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -213,6 +213,19 @@ void					Server::execMultiMsg(std::vector<Message> msgList)
 {
 	for (size_t i=0; i < msgList.size(); ++i)
 		msgList[i].execCmd();
+}
+
+int						Server::getFdWithNick(std::string nick)
+{
+	std::map<int, Client> clients = this->getClients();
+	std::map<int, Client>::iterator it;
+
+	for (it = clients.begin(); it != clients.end(); it++)
+	{
+		if (it->second.getNick() == nick)
+			return (it->second.getSocket());
+	}
+	return (-1);
 }
 
 /*

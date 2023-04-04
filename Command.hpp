@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Command.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rliu <rliu@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: gduchate <gduchate@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 17:43:58 by rliu              #+#    #+#             */
-/*   Updated: 2023/03/24 18:37:58 by rliu             ###   ########.fr       */
+/*   Updated: 2023/04/04 14:46:38 by gduchate         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,8 +41,9 @@ class Command
 	void	cmd_join(Message* message);
 	void	cmd_privmsg(Message* message);
 	void	cmd_part(Message* message);
-    void    cmd_oper(Message* message);
-    void    cmd_wallops(Message* message);
-	void    cmd_kill(Message * message);
+	void	cmd_oper(Message* message);
+	void	cmd_wallops(Message* message);
+	void	cmd_kill(Message * message);
+	void	cmd_notice(Message * message);
 
 #endif

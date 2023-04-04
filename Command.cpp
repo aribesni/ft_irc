@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Command.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
+/*   By: gduchate <gduchate@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 17:43:49 by rliu              #+#    #+#             */
-/*   Updated: 2023/04/04 11:48:14 by guillemette      ###   ########.fr       */
+/*   Updated: 2023/04/04 17:52:49 by gduchate         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,13 @@ void Command::initCmdMap()
     _cmdMap["OPER"] = &cmd_oper;
     _cmdMap["wallops"] = &cmd_wallops;
     _cmdMap["kill"] = &cmd_kill;
+    _cmdMap["NOTICE"] = &cmd_notice;
+	// INVITE
+	// KICK
+	// MODE
+	// WHOIS
+	// finir tous les messages d'erreurs
+	// Memory management
 }
 
 /*
@@ -198,32 +205,87 @@ void cmd_privmsg(Message * message)
 	if (message->getParams().size() == 0)
 	{
 		Replies reply(*client);
-		reply.ERR_NORECIPIENT(message->getCMD());
+		send(client->getSocket(), reply.ERR_NORECIPIENT(message->getCMD()).data(), reply.ERR_NORECIPIENT(message->getCMD()).size(), 0);
+		std::cout << "No recipient" << std::endl;
 		return ;
 	}
 	std::string msgtarget = message->getParams()[0];
-
-	if (msgtarget[0] == '#')
+	std::vector<std::string>* vecttarget = msgtargetToVecttarget(msgtarget);
+	std::string fullMsg = ":" + client->getPrefix() + " " + message->getFullMsg() + "\r\n";
+	for (size_t i = 0; i < vecttarget->size(); i++)
 	{
-		std::string fullMsg = ":" + client->getPrefix() + " " + message->getFullMsg() + "\r\n";
-		std::cout << "Message sent to a channel" << std::endl;
-		std::vector<Client*> listOfClients = server->_channels[msgtarget].getListOfClients();
-		for (size_t i = 0; i < listOfClients.size(); i++)
+		if ((*vecttarget)[i][0] == '#')
 		{
-			if (listOfClients[i]->getSocket() != client->getSocket())
+			std::cout << "Message sent to a channel" << std::endl;
+			std::vector<Client*> listOfClients = server->_channels[(*vecttarget)[i]].getListOfClients();
+			for (size_t j = 0; j < listOfClients.size(); j++)
 			{
-				std::cout << "This client is in the chan: " << listOfClients[i]->getSocket() <<std::endl;
-				std::cout << "This message is being sent: " << fullMsg << " to client " << listOfClients[i]->getSocket() << std::endl;
-				send(listOfClients[i]->getSocket(), fullMsg.c_str(), fullMsg.size(), 0);
+				if (listOfClients[j]->getSocket() != client->getSocket())
+				{
+					std::cout << "This client is in the chan: " << listOfClients[j]->getSocket() <<std::endl;
+					std::cout << "This message is being sent: " << fullMsg << " to client " << listOfClients[j]->getSocket() << std::endl;
+					send(listOfClients[j]->getSocket(), fullMsg.c_str(), fullMsg.size(), 0);
+				}
 			}
 		}
+		else
+		{
+			std::cout << "Message sent to a user" << std::endl;
+			send(server->getFdWithNick((*vecttarget)[i]), fullMsg.c_str(), fullMsg.size(), 0);
+		}
 	}
+	delete vecttarget;
 	// if msgtarget starts with #>> it is a channel
 	// 		search for client list in server
 	// 		send to everyone expect oneself
 
 	// if msgtarget does not start with #>> it is a user
-	(void)message;
+	// 		search for client fd with nick
+	// 		send to nick
+}
+
+void cmd_notice(Message * message)
+{
+	Server * server = message->getServer();
+	Client * client = message->getClient();
+
+	if (message->getParams().size() == 0)
+	{
+		Replies reply(*client);
+		reply.ERR_NORECIPIENT(message->getCMD());
+		return ;
+	}
+	std::string msgtarget = message->getParams()[0];
+	std::vector<std::string>* vecttarget = msgtargetToVecttarget(msgtarget);
+	std::string fullMsg = ":" + client->getPrefix() + " " + message->getFullMsg() + "\r\n";
+	for (size_t i = 0; i < vecttarget->size(); i++)
+	{
+		if ((*vecttarget)[i][0] == '#')
+		{
+			std::cout << "Message sent to a channel" << std::endl;
+			std::vector<Client*> listOfClients = server->_channels[(*vecttarget)[i]].getListOfClients();
+			for (size_t j = 0; j < listOfClients.size(); j++)
+			{
+				if (listOfClients[j]->getSocket() != client->getSocket())
+				{
+					std::cout << "This client is in the chan: " << listOfClients[j]->getSocket() <<std::endl;
+					std::cout << "This message is being sent: " << fullMsg << " to client " << listOfClients[j]->getSocket() << std::endl;
+					send(listOfClients[j]->getSocket(), fullMsg.c_str(), fullMsg.size(), 0);
+				}
+			}
+		}
+		else
+		{
+			std::cout << "Message sent to a user" << std::endl;
+			send(server->getFdWithNick((*vecttarget)[i]), fullMsg.c_str(), fullMsg.size(), 0);
+		}
+	}
+	delete vecttarget;
+	// if msgtarget starts with #>> it is a channel
+	// 		search for client list in server
+	// 		send to everyone expect oneself
+
+	// if msgtarget does not start with #>> it is a user
 }
 
 void    cmd_oper(Message * message) {
