@@ -26,21 +26,11 @@ void	sigHandler(int signum) {
 	sig = true;
 }
 
-void	closeFds(Server server) {
-
-	for (size_t i = 0; i < server.getClients().size(); i++)
-	{
-		close(server.getClients()[i].getSocket());
-		std::cout << "Socket " << i << " closed" << std::endl;
-	}
-	close(server.getSocket());
-	std::cout << std::endl << "Server socket closed" << std::endl;
-}
-
 void    ft_loop(Server server)
 {
-	signal(SIGINT, sigHandler);
-	while (sig == false)
+	// signal(SIGINT, sigHandler);
+	// while (sig == false)
+	while (true)
 	{
 		// Watch pollfds and get number of open fds
 		// #1: address of pollfds to watch, #2: number of pollfds to watch,
@@ -69,7 +59,6 @@ void    ft_loop(Server server)
 			}
 		}
 	}
-	closeFds(server);
 }
 
 int main(int argc, char **argv)
