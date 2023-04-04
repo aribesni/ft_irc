@@ -50,7 +50,7 @@ void	Server::createSocket(void) {
 void	Server::_bind(sockaddr_in hint) {
 
 	int yes = 1;
-	setsockopt(this->_socket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));
+	setsockopt(this->_socket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)); // remove the already in use port error
 	if (bind(this->_socket, (sockaddr*)&hint, sizeof(hint)) == -1)
 		std::cerr << "Can't bind to IP/port." << std::endl;
 }
