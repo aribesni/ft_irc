@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Command.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rliu <rliu@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 17:43:49 by rliu              #+#    #+#             */
-/*   Updated: 2023/03/29 10:37:04 by rliu             ###   ########.fr       */
+/*   Updated: 2023/04/04 11:48:14 by guillemette      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ void msgSender(Client &client, std::string cmd, std::string msg){
 std::string creatNickname(Client &client){
     std::ostringstream oOStrStream;
     oOStrStream << client.getSocket();
-    
+
     std::string name = "Guest" + oOStrStream.str();
     return(name);
 }
@@ -67,14 +67,14 @@ std::string creatNickname(Client &client){
 void cmd_pass(Message * message)
 {
 	if (message->getServer()->getPassword() != message->getParams()[0]){
-		std::cout << "wrong password\n"; 
+		std::cout << "wrong password\n";
 		return;
 		// close(message->getServer()->getSocket()); // Bye!
-		// message->getServer()->clients.erase(message->getServer()->getSocket()); 
+		// message->getServer()->clients.erase(message->getServer()->getSocket());
     }
-	else 
+	else
 		message->getClient()->setPass( message->getParams()[0]);
-       
+
 }
 
 void cmd_nick(Message * message)
@@ -85,7 +85,7 @@ void cmd_nick(Message * message)
         nick = creatNickname(*(message->getClient()));
         send(message->getClient()->getSocket(),reply.ERR_ERRONEUSNICKNAME().c_str(), reply.ERR_ERRONEUSNICKNAME().size(), 0);
     }
-	
+
     std::map<int, Client>::iterator     it;
     for (it = message->getServer()->getClients().begin(); it != message->getServer()->getClients().end(); it++)
     {
@@ -148,6 +148,9 @@ void cmd_part(Message * message)
 	std::string chanName = message->getParams()[0];
 	Server * server = message->getServer();
 	Client * client = message->getClient();
+	std::string fullMsg = ":" + client->getPrefix() + " " + message->getFullMsg() + "\r\n";
+	std::string msgtarget = message->getParams()[0];
+	std::vector<Client*> listOfClients = server->_channels[msgtarget].getListOfClients();
 	// if channel does not exist, don't do anything
 	if (server->_channels.find(chanName) == server->_channels.end())
 	{
@@ -156,12 +159,15 @@ void cmd_part(Message * message)
 	else
 	{
 		std::cout << "Channel " << chanName << " already exist" << std::endl;
+		for (size_t i = 0; i < listOfClients.size(); i++)
+		{
+			send(listOfClients[i]->getSocket(), fullMsg.c_str(), fullMsg.size(), 0);
+		}
 		server->_channels[chanName].removeClient(client);
 		std::cout << "User removed from channel." << std::endl;
 	}
 }
 
-// sendTo(irc::User &toUser, std::string message) { toUser.write(":" + this->getPrefix() + " " + message); }
 
 void cmd_privmsg(Message * message)
 {
