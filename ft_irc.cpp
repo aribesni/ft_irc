@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_irc.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rliu <rliu@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: gduchate <gduchate@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 18:13:49 by guillemette       #+#    #+#             */
-/*   Updated: 2023/03/24 18:45:54 by rliu             ###   ########.fr       */
+/*   Updated: 2023/04/04 14:47:41 by gduchate         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,10 +19,10 @@
 
 bool sig = false;
 
-void	sigHandler(int signum) { 
+void	sigHandler(int signum) {
 
 	(void)signum;
-	// std::cout << std::endl << "SIGNAL " << signum << " CAUGHT" << std::endl;	
+	// std::cout << std::endl << "SIGNAL " << signum << " CAUGHT" << std::endl;
 	sig = true;
 }
 
@@ -80,7 +80,7 @@ int main(int argc, char **argv)
         std::cout << "Port number and password needed." << std::endl;
         return (-1);
     }
-	
+
 	long port = std::strtol(argv[1], NULL, 10);
 
 	// Create a server object
