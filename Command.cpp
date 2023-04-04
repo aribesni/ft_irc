@@ -74,7 +74,6 @@ void cmd_pass(Message * message)
     }
 	else
 		message->getClient()->setPass( message->getParams()[0]);
-
 }
 
 void cmd_nick(Message * message)
@@ -123,20 +122,32 @@ void cmd_join(Message * message)
 	std::string chanName = message->getParams()[0];
 	Server * server = message->getServer();
 	Client * client = message->getClient();
+	Replies reply(*client);
+	std::string fullMsg = ":" + client->getPrefix() + " " + message->getFullMsg() + "\r\n";
 	// if channel does not exist, create a Channel object, put it in the channel list and put client as chan op
 	if (server->_channels.find(chanName) == server->_channels.end())
 	{
 		std::cout << "Channel " << chanName << " does not exist" << std::endl;
 		Channel mychan(chanName, client);
 		server->_channels[chanName] = mychan;
+		std::vector<Client*> listOfClients = server->_channels[chanName].getListOfClients();
 		std::cout << "Channel " << chanName << " created and added to server list. User added to channel." << std::endl;
 		client->setChanMode("o"); // set first client as chan operator
+		for (size_t i = 0; i < listOfClients.size(); i++)
+			send(listOfClients[i]->getSocket(), fullMsg.c_str(), fullMsg.size(), 0); // JOIN message from server
+		send(client->getSocket(), reply.RPL_NAMREPLY(chanName, "=", "@").c_str(), reply.RPL_NAMREPLY(chanName, "=", "@").size(), 0); // list of members in the channel
+		send(client->getSocket(), reply.RPL_ENDOFNAMES(chanName).c_str(), reply.RPL_ENDOFNAMES(chanName).size(), 0); // end of member list
 	}
 	else
 	{
-		std::cout << "Channel " << chanName << " already exist" << std::endl;
+		std::cout << "Channel " << chanName << " already exists" << std::endl;
 		server->_channels[chanName].addClient(client);
+		std::vector<Client*> listOfClients = server->_channels[chanName].getListOfClients();
 		std::cout << "User added to channel." << std::endl;
+		for (size_t i = 0; i < listOfClients.size(); i++)
+			send(listOfClients[i]->getSocket(), fullMsg.c_str(), fullMsg.size(), 0); // JOIN message from server
+		send(client->getSocket(), reply.RPL_NAMREPLY(chanName, "=", "@").c_str(), reply.RPL_NAMREPLY(chanName, "=", "@").size(), 0); // list of members in the channel
+		send(client->getSocket(), reply.RPL_ENDOFNAMES(chanName).c_str(), reply.RPL_ENDOFNAMES(chanName).size(), 0); // end of member list
 	}
 }
 
@@ -158,16 +169,13 @@ void cmd_part(Message * message)
 	}
 	else
 	{
-		std::cout << "Channel " << chanName << " already exist" << std::endl;
+		std::cout << "Channel " << chanName << " already exists" << std::endl;
 		for (size_t i = 0; i < listOfClients.size(); i++)
-		{
 			send(listOfClients[i]->getSocket(), fullMsg.c_str(), fullMsg.size(), 0);
-		}
 		server->_channels[chanName].removeClient(client);
 		std::cout << "User removed from channel." << std::endl;
 	}
 }
-
 
 void cmd_privmsg(Message * message)
 {

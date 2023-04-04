@@ -35,14 +35,14 @@ void    ft_loop(Server server)
 		// Watch pollfds and get number of open fds
 		// #1: address of pollfds to watch, #2: number of pollfds to watch,
 		// #3: timeout in ms. negative means infinite delay
-		// int open_fds = poll(&server._pollfds[0], server._pollfds.size(), -1);
-		poll(&server._pollfds[0], server._pollfds.size(), -1);
+		int open_fds = poll(&server._pollfds[0], server._pollfds.size(), -1);
+		// poll(&server._pollfds[0], server._pollfds.size(), -1);
 		// Handle poll error
-		// if (open_fds == -1)
-		// {
-		// 	perror("poll");
-		// 	exit(1);
-		// }
+		if (open_fds == -1)
+		{
+			perror("poll");
+			exit(1);
+		}
 		// Run through the pollfds looking for data to read
 		for (size_t i = 0; i < server._pollfds.size(); i++)
 		{
