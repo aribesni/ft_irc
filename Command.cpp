@@ -6,7 +6,7 @@
 /*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 17:43:49 by rliu              #+#    #+#             */
-/*   Updated: 2023/04/06 20:31:44 by guillemette      ###   ########.fr       */
+/*   Updated: 2023/04/06 20:37:45 by guillemette      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -191,7 +191,7 @@ void cmd_part(Message * message)
 		}
 		for (size_t i = 0; i < listOfClients.size(); i++)
 			send(listOfClients[i]->getSocket(), fullMsg.c_str(), fullMsg.size(), 0); // send /PART message to all clients on channel
-		server->_channels[chanName].removeClient(client); // remove client from our list of clients in channel 
+		server->_channels[chanName].removeClient(client); // remove client from our list of clients in channel
 		// std::cout << "User removed from channel." << std::endl;
 	}
 }
@@ -383,7 +383,8 @@ void    cmd_kill(Message * message) {
 	}
 }
 
-void	cmd_whois(Message * message) {
+void	cmd_whois(Message * message)
+{
 	Server * server = message->getServer();
 	Client * client = message->getClient();
 
@@ -420,6 +421,8 @@ void	cmd_whois(Message * message) {
 			}
 		}
 		return ;
+	}
+}
 
 void    cmd_kick(Message * message) {
 
