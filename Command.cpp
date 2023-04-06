@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Command.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gduchate <gduchate@student.42.fr>          +#+  +:+       +#+        */
+/*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 17:43:49 by rliu              #+#    #+#             */
-/*   Updated: 2023/04/04 17:52:49 by gduchate         ###   ########.fr       */
+/*   Updated: 2023/04/06 12:47:20 by guillemette      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,10 +42,11 @@ void Command::initCmdMap()
     _cmdMap["wallops"] = &cmd_wallops;
     _cmdMap["kill"] = &cmd_kill;
     _cmdMap["NOTICE"] = &cmd_notice;
+    _cmdMap["WHOIS"] = &cmd_whois;
 	// INVITE
 	// KICK
 	// MODE
-	// WHOIS
+
 	// finir tous les messages d'erreurs
 	// Memory management
 }
@@ -370,6 +371,37 @@ void    cmd_kill(Message * message) {
 		}
 		if (nick == false)
 			send(client->getSocket(), replies.ERR_NOSUCHNICK().data(), replies.ERR_NOSUCHNICK().size(), 0);
+	}
+}
+
+void	cmd_whois(Message * message) {
+	Server * server = message->getServer();
+	Client * client = message->getClient();
+
+	if (message->getParams().size() == 0)
+	{
+		// ERR_NO_RECIPIENT to handle
+		return ;
+	}
+	else
+	{
+		std::string msgtarget = message->getParams()[0];
+		std::vector<std::string>* vecttarget = msgtargetToVecttarget(msgtarget);
+		for (size_t i = 0; i < vecttarget->size(); i++)
+		{
+			if ((*vecttarget)[i][0] == '#')
+				continue;
+			else
+			{
+				Client * targetclient = server->getClientWithNick((*vecttarget)[i]);
+				if (!targetclient)
+					continue;
+				Replies replies(*targetclient);
+				send(client->getSocket(), replies.RPL_WHOISUSER().data(), replies.RPL_WHOISUSER().size(), 0);
+			}
+		}
+		delete vecttarget;
+		return ;
 	}
 }
 

@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: gduchate <gduchate@student.42.fr>          +#+  +:+       +#+         #
+#    By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/03/22 18:38:46 by gduchate          #+#    #+#              #
-#    Updated: 2023/04/04 17:52:26 by gduchate         ###   ########.fr        #
+#    Updated: 2023/04/06 12:43:36 by guillemette      ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -22,7 +22,7 @@ HEADER = Replies.hpp Client.hpp Server.hpp \
 
 CC = c++
 
-FLAGS = -Wall -Wextra -Werror -std=c++98 -g
+FLAGS = -Wall -Wextra -Werror -D DEBUG -std=c++98 -g
 
 %.o : %.cpp ${HEADER}
 	${CC} ${FLAGS} -c $<
