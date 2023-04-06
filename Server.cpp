@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gduchate <gduchate@student.42.fr>          +#+  +:+       +#+        */
+/*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 18:14:02 by guillemette       #+#    #+#             */
-/*   Updated: 2023/04/04 16:35:28 by gduchate         ###   ########.fr       */
+/*   Updated: 2023/04/06 12:12:38 by guillemette      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,10 +90,12 @@ void	Server::acceptNewClient()
 	{
 		memset(buf,0, BUFFER_SIZE);
 		recv(client.getSocket(), buf, sizeof(buf), 0);
-		// std::cout << "[Client] (" << client.getSocket() << ")" << " received buf: " << buf << std::endl;
+		if (DEBUG)
+			std::cout << "[Client] (" << client.getSocket() << ")" << " received buf: " << buf << std::endl;
 		std::vector<Message>  msgList = this->bufferParser(buf, client);
 		execMultiMsg(msgList);
-		// std::cout << "[Client] (" << client.getSocket() << ")" << " is now registered" << std::endl;
+		if (DEBUG)
+			std::cout << "[Client] (" << client.getSocket() << ")" << " is now registered" << std::endl;
 		if(this->_password != client.getPass())
 		{
 			std::cout << "pollserver: socket " << client.getSocket() << " hung up" << std::endl;
@@ -121,10 +123,6 @@ void	Server::acceptNewClient()
 
 void	Server::handleClientRequest(Client & client)
 {
-	// Handle other requests
-	// WIP
-
-	// PRIVATE MESSAGES BETWEEN CLIENTS
 	char buf[BUFFER_SIZE];
 	int nbytes = recv(client.getSocket(), buf, sizeof(buf), 0);
 	if (nbytes <= 0)
@@ -141,7 +139,8 @@ void	Server::handleClientRequest(Client & client)
 	{
 		// Handle buffer as a vector of messages
 		std::vector<Message>  msgList = this->bufferParser(buf, client);
-		// std::cout << "[Client] (" << client.getSocket() << ")" << " received buf: " << buf << std::endl;
+		if (DEBUG)
+			std::cout << "[Client] (" << client.getSocket() << ")" << " received buf: " << buf << std::endl;
 		// Execute all messages that could be parsed
 		execMultiMsg(msgList);
 	}
@@ -149,18 +148,6 @@ void	Server::handleClientRequest(Client & client)
 
 std::vector<std::string>	msg_split(std::string str, std::string delimiter)
 {
-	// std::vector<std::string> tokens = std::vector<std::string>();
-
-	// size_t end;
-	// while ((end = str.find(delimiter)) != std::string::npos || str == "\n")
-	// {
-	// 	tokens.push_back(str.substr(0, end));
-	// 	str = str.substr(end + delimiter.size());
-	// }
-	// if (str != "")
-	//     tokens.push_back(str);
-	// return tokens;
-
 	std::vector<std::string> tokens = std::vector<std::string>();
 
 	int end;
@@ -226,6 +213,19 @@ int						Server::getFdWithNick(std::string nick)
 			return (it->second.getSocket());
 	}
 	return (-1);
+}
+
+Client *						Server::getClientWithNick(std::string nick)
+{
+	std::map<int, Client> clients = this->getClients();
+	std::map<int, Client>::iterator it;
+
+	for (it = clients.begin(); it != clients.end(); it++)
+	{
+		if (it->second.getNick() == nick)
+			return (&it->second);
+	}
+	return (NULL);
 }
 
 /*

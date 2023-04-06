@@ -3,16 +3,19 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gduchate <gduchate@student.42.fr>          +#+  +:+       +#+        */
+/*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 18:14:04 by guillemette       #+#    #+#             */
-/*   Updated: 2023/04/04 17:51:22 by gduchate         ###   ########.fr       */
+/*   Updated: 2023/04/06 12:09:18 by guillemette      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef SERVER_H
 # define SERVER_H
 # define BUFFER_SIZE 4096
+# ifndef DEBUG
+#  define DEBUG false
+# endif
 # include <unistd.h>
 # include <string.h>
 # include <stdlib.h>
@@ -57,7 +60,7 @@ class Server {
 		void						acceptNewClient();
 		void						handleClientRequest(Client & client);
 		int							getFdWithNick(std::string nick);
-
+		Client *					getClientWithNick(std::string nick);
 		std::vector<struct pollfd>	_pollfds;
 		// Client &        getClientWithFd(int fd);
 		std::map<std::string, Channel>	_channels; /* channelName, Channel object*/
