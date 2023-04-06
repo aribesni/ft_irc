@@ -41,10 +41,10 @@ void Command::initCmdMap()
     _cmdMap["OPER"] = &cmd_oper;
     _cmdMap["wallops"] = &cmd_wallops;
     _cmdMap["kill"] = &cmd_kill;
+    _cmdMap["KICK"] = &cmd_kick;
     _cmdMap["NOTICE"] = &cmd_notice;
     _cmdMap["WHOIS"] = &cmd_whois;
 	// INVITE
-	// KICK
 	// MODE
 
 	// finir tous les messages d'erreurs
@@ -67,6 +67,7 @@ std::string creatNickname(Client &client){
     std::string name = "Guest" + oOStrStream.str();
     return(name);
 }
+
 /*
 ** --------------------------------- COMMANDS ---------------------------------
 */
@@ -127,7 +128,7 @@ void cmd_ping(Message * message)
 void cmd_join(Message * message)
 {
 	// TO DO: handle channel password
-	std::string chanName = message->getParams()[0];
+	std::string chanName = message->getParams()[0]; // get channel name
 	Server * server = message->getServer();
 	Client * client = message->getClient();
 	Replies reply(*client);
@@ -161,27 +162,37 @@ void cmd_join(Message * message)
 
 void cmd_part(Message * message)
 {
-	// Errors to be handled:
-	// ERR_NEEDMOREPARAMS              ERR_NOSUCHCHANNEL
-    // ERR_NOTONCHANNEL
-	std::string chanName = message->getParams()[0];
+	std::string chanName = message->getParams()[0]; // get channel name
 	Server * server = message->getServer();
 	Client * client = message->getClient();
+	Replies replies(*client);
 	std::string fullMsg = ":" + client->getPrefix() + " " + message->getFullMsg() + "\r\n";
 	std::string msgtarget = message->getParams()[0];
-	std::vector<Client*> listOfClients = server->_channels[msgtarget].getListOfClients();
-	// if channel does not exist, don't do anything
-	if (server->_channels.find(chanName) == server->_channels.end())
+	if (server->_channels.find(chanName) == server->_channels.end()) // check if channel exists
 	{
-		std::cout << "Channel " << chanName << " does not exist" << std::endl;
+		// std::cout << "Channel " << chanName << " does not exist" << std::endl;
+        send(client->getSocket(), replies.ERR_NOSUCHCHANNEL(chanName).data(), replies.ERR_NOSUCHCHANNEL(chanName).size(), 0); // channel does not exist
 	}
 	else
 	{
-		std::cout << "Channel " << chanName << " already exists" << std::endl;
+		std::vector<Client*> listOfClients = server->_channels[msgtarget].getListOfClients();
+		// std::cout << "Channel " << chanName << " already exists" << std::endl;
+		size_t j = 0;
+		while (j < listOfClients.size())
+		{
+			if (client->getSocket() == listOfClients[j]->getSocket()) // check if client in channel
+				break;
+			j++;
+		}
+		if (j == listOfClients.size())
+		{
+			send(client->getSocket(), replies.ERR_NOTONCHANNEL(chanName, " :You're not on that channel").data(), replies.ERR_NOTONCHANNEL(chanName, " :You're not on that channel").size(), 0); // channel exists but client not in it
+			return ;
+		}
 		for (size_t i = 0; i < listOfClients.size(); i++)
-			send(listOfClients[i]->getSocket(), fullMsg.c_str(), fullMsg.size(), 0);
-		server->_channels[chanName].removeClient(client);
-		std::cout << "User removed from channel." << std::endl;
+			send(listOfClients[i]->getSocket(), fullMsg.c_str(), fullMsg.size(), 0); // send /PART message to all clients on channel
+		server->_channels[chanName].removeClient(client); // remove client from our list of clients in channel 
+		// std::cout << "User removed from channel." << std::endl;
 	}
 }
 
@@ -314,7 +325,7 @@ void    cmd_wallops(Message * message) {
 
 	std::string wallop = ":" + client->getPrefix() + " WALLOPS " + message->getParams()[0] + "\r\n";
 
-    if (client->getIRCMode().find("o") == std::string::npos) // check if user has operator privileges
+    if (client->getIRCMode().find("o") == std::string::npos) // check if user has IRC operator privileges
         send(client->getSocket(), replies.ERR_NOPRIVILEGES("Permission Denied- You're not an IRC operator").data(), replies.ERR_NOPRIVILEGES("Permission Denied- You're not an IRC operator").size(), 0);
 	else
 	{
@@ -338,7 +349,7 @@ void    cmd_kill(Message * message) {
 
 	while (i < message->getParams().size())
 	{
-		full_params = full_params + " " + message->getParams()[i];
+		full_params = full_params + " " + message->getParams()[i]; // get all the params in one string
 		i++;
 	}
 
@@ -349,7 +360,7 @@ void    cmd_kill(Message * message) {
 
 	if (message->getParams().size() < 3 && message->getParams()[1] == ":") // check if both <name> and <reason> are entered
         send(client->getSocket(), replies.ERR_NEEDMOREPARAMS("KILL").data(), replies.ERR_NEEDMOREPARAMS("KILL").size(), 0);
-	else if (client->getIRCMode().find("o") == std::string::npos)
+	else if (client->getIRCMode().find("o") == std::string::npos) // check if client has the IRC operator privilege
 		send(client->getSocket(), replies.ERR_NOPRIVILEGES("Permission Denied- You're not an IRC operator").data(), replies.ERR_NOPRIVILEGES("Permission Denied- You're not an IRC operator").size(), 0);
 	else
 	{
@@ -357,11 +368,11 @@ void    cmd_kill(Message * message) {
 		{
 			if (server->getClients()[i].getNick() == message->getParams()[0])
 			{
-				send(server->getClients()[i].getSocket(), kill.data(), kill.size(), 0);
-				send(server->getClients()[i].getSocket(), quit.data(), quit.size(), 0);
+				send(server->getClients()[i].getSocket(), kill.data(), kill.size(), 0); // send /KILL message to target client
+				send(server->getClients()[i].getSocket(), quit.data(), quit.size(), 0); // send /QUIT message to target client
 				std::cout << "pollserver: socket " << server->getClients()[i].getSocket() << " hung up" << std::endl;
-				close(server->getClients()[i].getSocket());
-				server->getClients().erase(server->getClients()[i].getSocket());
+				close(server->getClients()[i].getSocket()); // close target client fd
+				server->getClients().erase(server->getClients()[i].getSocket()); // erase client from our list
 				nick = true;
 				break;
 			}
@@ -409,6 +420,45 @@ void	cmd_whois(Message * message) {
 			}
 		}
 		return ;
+
+void    cmd_kick(Message * message) {
+
+	std::string chanName = message->getParams()[0];
+	std::string targetName = message->getParams()[1];
+	Server * server = message->getServer();
+	Client * client = message->getClient();
+	Replies replies(*client);
+	std::string fullMsg = ":" + client->getPrefix() + " " + message->getFullMsg() + "\r\n";
+	std::string msgtarget = message->getParams()[0];
+	if (server->_channels.find(chanName) == server->_channels.end()) // check if channel exists
+	{
+		// std::cout << "Channel " << chanName << " does not exist" << std::endl;
+        send(client->getSocket(), replies.ERR_NOSUCHCHANNEL(chanName).data(), replies.ERR_NOSUCHCHANNEL(chanName).size(), 0);
+	}
+	else if (client->getChanMode().find("o") == std::string::npos) // check if client has channel operator privilege
+        send(client->getSocket(), replies.ERR_CHANOPRIVSNEEDED(chanName).data(), replies.ERR_CHANOPRIVSNEEDED(chanName).size(), 0);
+	else
+	{
+		std::vector<Client*> listOfClients = server->_channels[msgtarget].getListOfClients();
+		// std::cout << "Channel " << chanName << " already exists" << std::endl;
+		size_t j = 0;
+		while (j < listOfClients.size())
+		{
+			if (targetName == listOfClients[j]->getNick()) // check if target client is in channel
+				break;
+			j++;
+		}
+		if (j == listOfClients.size()) // if target client is not in channel
+		{
+			chanName += " ";
+			chanName += targetName;
+			send(client->getSocket(), replies.ERR_NOTONCHANNEL(chanName, " :They are not on that channel").data(), replies.ERR_NOTONCHANNEL(chanName, " :They are not on that channel").size(), 0);
+			return ;
+		}
+		for (size_t i = 0; i < listOfClients.size(); i++)
+			send(listOfClients[i]->getSocket(), fullMsg.c_str(), fullMsg.size(), 0);
+		server->_channels[chanName].removeClient(listOfClients[j]); // remove target client from our list
+		// std::cout << "User removed from channel." << std::endl;
 	}
 }
 
