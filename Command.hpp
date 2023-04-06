@@ -44,5 +44,6 @@ class Command
     void    cmd_oper(Message* message);
     void    cmd_wallops(Message* message);
 	void    cmd_kill(Message * message);
+	void    cmd_kick(Message * message);
 
 #endif
