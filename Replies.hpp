@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Replies.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rliu <rliu@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 18:14:00 by guillemette       #+#    #+#             */
-/*   Updated: 2023/03/27 16:41:13 by rliu             ###   ########.fr       */
+/*   Updated: 2023/04/06 19:37:30 by guillemette      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@
 				this->_irc_mode = client->getIRCMode();
 				this->_prefix = client->getPrefix();
 			}
-			
+
 			void	sendMotd(int client_socket) {
 
 				std::string motd1 = "Welcome to our Ircserv IRC Network !\r\n";

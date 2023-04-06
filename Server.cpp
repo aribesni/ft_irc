@@ -6,7 +6,7 @@
 /*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 18:14:02 by guillemette       #+#    #+#             */
-/*   Updated: 2023/04/06 12:12:38 by guillemette      ###   ########.fr       */
+/*   Updated: 2023/04/06 19:25:54 by guillemette      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -215,7 +215,7 @@ int						Server::getFdWithNick(std::string nick)
 	return (-1);
 }
 
-Client *						Server::getClientWithNick(std::string nick)
+Client &						Server::getClientWithNick(std::string nick)
 {
 	std::map<int, Client> clients = this->getClients();
 	std::map<int, Client>::iterator it;
@@ -223,9 +223,12 @@ Client *						Server::getClientWithNick(std::string nick)
 	for (it = clients.begin(); it != clients.end(); it++)
 	{
 		if (it->second.getNick() == nick)
-			return (&it->second);
+		{
+			std::cout << "Nick found" << std::endl;
+			return (it->second);
+		}
 	}
-	return (NULL);
+	throw (Server::NickNotFound());
 }
 
 /*
@@ -248,5 +251,19 @@ std::map<int, Client>&	Server::getClients(void)
 	return (this->_clients);
 }
 
-/* *************************setter************************************************* */
+/*
+** --------------------------------- EXCEPTIONS ----------------------------------
+*/
+
+const char*				Server::NickNotFound::what() const throw()
+{
+	return ("Nick does not exist");
+}
+
+/*
+** --------------------------------- SETTERS ----------------------------------
+*/
+
 void Server::setPassword(char * password){_password = password;}
+
+/* *************************setter************************************************* */

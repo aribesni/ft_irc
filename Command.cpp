@@ -6,7 +6,7 @@
 /*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 17:43:49 by rliu              #+#    #+#             */
-/*   Updated: 2023/04/06 12:47:20 by guillemette      ###   ########.fr       */
+/*   Updated: 2023/04/06 19:42:56 by guillemette      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -211,14 +211,14 @@ void cmd_privmsg(Message * message)
 		return ;
 	}
 	std::string msgtarget = message->getParams()[0];
-	std::vector<std::string>* vecttarget = msgtargetToVecttarget(msgtarget);
+	std::vector<std::string> targets = message->getTargets();
 	std::string fullMsg = ":" + client->getPrefix() + " " + message->getFullMsg() + "\r\n";
-	for (size_t i = 0; i < vecttarget->size(); i++)
+	for (size_t i = 0; i < targets.size(); i++)
 	{
-		if ((*vecttarget)[i][0] == '#')
+		if (targets[i][0] == '#')
 		{
 			std::cout << "Message sent to a channel" << std::endl;
-			std::vector<Client*> listOfClients = server->_channels[(*vecttarget)[i]].getListOfClients();
+			std::vector<Client*> listOfClients = server->_channels[targets[i]].getListOfClients();
 			for (size_t j = 0; j < listOfClients.size(); j++)
 			{
 				if (listOfClients[j]->getSocket() != client->getSocket())
@@ -232,10 +232,10 @@ void cmd_privmsg(Message * message)
 		else
 		{
 			std::cout << "Message sent to a user" << std::endl;
-			send(server->getFdWithNick((*vecttarget)[i]), fullMsg.c_str(), fullMsg.size(), 0);
+			send(server->getFdWithNick(targets[i]), fullMsg.c_str(), fullMsg.size(), 0);
 		}
+		return ;
 	}
-	delete vecttarget;
 	// if msgtarget starts with #>> it is a channel
 	// 		search for client list in server
 	// 		send to everyone expect oneself
@@ -257,14 +257,14 @@ void cmd_notice(Message * message)
 		return ;
 	}
 	std::string msgtarget = message->getParams()[0];
-	std::vector<std::string>* vecttarget = msgtargetToVecttarget(msgtarget);
+	std::vector<std::string> targets = message->getTargets();
 	std::string fullMsg = ":" + client->getPrefix() + " " + message->getFullMsg() + "\r\n";
-	for (size_t i = 0; i < vecttarget->size(); i++)
+	for (size_t i = 0; i < targets.size(); i++)
 	{
-		if ((*vecttarget)[i][0] == '#')
+		if (targets[i][0] == '#')
 		{
 			std::cout << "Message sent to a channel" << std::endl;
-			std::vector<Client*> listOfClients = server->_channels[(*vecttarget)[i]].getListOfClients();
+			std::vector<Client*> listOfClients = server->_channels[targets[i]].getListOfClients();
 			for (size_t j = 0; j < listOfClients.size(); j++)
 			{
 				if (listOfClients[j]->getSocket() != client->getSocket())
@@ -278,11 +278,9 @@ void cmd_notice(Message * message)
 		else
 		{
 			std::cout << "Message sent to a user" << std::endl;
-			send(server->getFdWithNick((*vecttarget)[i]), fullMsg.c_str(), fullMsg.size(), 0);
+			send(server->getFdWithNick(targets[i]), fullMsg.c_str(), fullMsg.size(), 0);
 		}
-	}
-	delete vecttarget;
-	// if msgtarget starts with #>> it is a channel
+	}	// if msgtarget starts with #>> it is a channel
 	// 		search for client list in server
 	// 		send to everyone expect oneself
 
@@ -386,21 +384,30 @@ void	cmd_whois(Message * message) {
 	else
 	{
 		std::string msgtarget = message->getParams()[0];
-		std::vector<std::string>* vecttarget = msgtargetToVecttarget(msgtarget);
-		for (size_t i = 0; i < vecttarget->size(); i++)
+		std::vector<std::string> targets = message->getTargets();
+		std::cout << "target size: " << targets.size() << std::endl;
+		for (size_t i = 0; i < targets.size(); i++)
 		{
-			if ((*vecttarget)[i][0] == '#')
+			if (targets[i][0] == '#')
 				continue;
 			else
 			{
-				Client * targetclient = server->getClientWithNick((*vecttarget)[i]);
-				if (!targetclient)
-					continue;
-				Replies replies(*targetclient);
-				send(client->getSocket(), replies.RPL_WHOISUSER().data(), replies.RPL_WHOISUSER().size(), 0);
+				try
+				{
+					Client & targetclient = server->getClientWithNick(targets[i]);
+					Replies reply(targetclient);
+					std::cout << "Target client is: " << targetclient.getNick() << std::endl ;
+					std::cout << "Reply content: " << reply.RPL_WHOISUSER() << std::endl;
+					send(client->getSocket(), reply.RPL_WHOISUSER().c_str(), reply.RPL_WHOISUSER().size(), 0);
+				}
+				catch(const std::exception& e)
+				{
+					Replies reply(*client);
+					send(client->getSocket(), reply.ERR_NOSUCHNICK().c_str(), reply.ERR_NOSUCHNICK().size(), 0);
+				}
+
 			}
 		}
-		delete vecttarget;
 		return ;
 	}
 }

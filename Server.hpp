@@ -6,7 +6,7 @@
 /*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 18:14:04 by guillemette       #+#    #+#             */
-/*   Updated: 2023/04/06 12:09:18 by guillemette      ###   ########.fr       */
+/*   Updated: 2023/04/06 19:07:02 by guillemette      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@
 # include "Message.hpp"
 # include "Channel.hpp"
 # include "Replies.hpp"
-# include "utils.hpp"
+# include <exception>
 
 class Message;
 
@@ -60,12 +60,17 @@ class Server {
 		void						acceptNewClient();
 		void						handleClientRequest(Client & client);
 		int							getFdWithNick(std::string nick);
-		Client *					getClientWithNick(std::string nick);
+		Client &					getClientWithNick(std::string nick);
 		std::vector<struct pollfd>	_pollfds;
 		// Client &        getClientWithFd(int fd);
 		std::map<std::string, Channel>	_channels; /* channelName, Channel object*/
 		void setPassword(char * password);
 
+		// EXCEPTIONS
+		class NickNotFound : public std::exception {
+			public:
+				const char* what() const throw();
+		};
 	private :
 		std::string						_password;
 		int								_socket;
