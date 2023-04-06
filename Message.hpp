@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Message.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gduchate <gduchate@student.42.fr>          +#+  +:+       +#+        */
+/*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 18:13:57 by guillemette       #+#    #+#             */
-/*   Updated: 2023/03/24 16:11:57 by gduchate         ###   ########.fr       */
+/*   Updated: 2023/04/06 18:27:26 by guillemette      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,10 +36,11 @@ class Message
 		std::vector<std::string>	getParams(void) const;
 		Server*						getServer(void) const;
 		Client*						getClient(void) const;
+		std::vector<std::string>	getTargets(void) const;
 
 		// METHODS
 		void						execCmd();
-
+		void						setTargets(std::string msgtarget);
 	private:
 		std::string					_fullMsg;
 		std::string					_prefix;
@@ -47,6 +48,7 @@ class Message
 		std::vector<std::string>	_params;
 		Client*						_client;
 		Server*						_server;
+		std::vector<std::string>	_targets;
 };
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 17:43:49 by rliu              #+#    #+#             */
-/*   Updated: 2023/04/04 11:48:14 by guillemette      ###   ########.fr       */
+/*   Updated: 2023/04/06 20:31:44 by guillemette      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,13 @@ void Command::initCmdMap()
     _cmdMap["wallops"] = &cmd_wallops;
     _cmdMap["kill"] = &cmd_kill;
     _cmdMap["KICK"] = &cmd_kick;
+    _cmdMap["NOTICE"] = &cmd_notice;
+    _cmdMap["WHOIS"] = &cmd_whois;
+	// INVITE
+	// MODE
+
+	// finir tous les messages d'erreurs
+	// Memory management
 }
 
 /*
@@ -210,32 +217,85 @@ void cmd_privmsg(Message * message)
 	if (message->getParams().size() == 0)
 	{
 		Replies reply(*client);
-		reply.ERR_NORECIPIENT(message->getCMD());
+		send(client->getSocket(), reply.ERR_NORECIPIENT(message->getCMD()).data(), reply.ERR_NORECIPIENT(message->getCMD()).size(), 0);
+		std::cout << "No recipient" << std::endl;
 		return ;
 	}
 	std::string msgtarget = message->getParams()[0];
-
-	if (msgtarget[0] == '#')
+	std::vector<std::string> targets = message->getTargets();
+	std::string fullMsg = ":" + client->getPrefix() + " " + message->getFullMsg() + "\r\n";
+	for (size_t i = 0; i < targets.size(); i++)
 	{
-		std::string fullMsg = ":" + client->getPrefix() + " " + message->getFullMsg() + "\r\n";
-		std::cout << "Message sent to a channel" << std::endl;
-		std::vector<Client*> listOfClients = server->_channels[msgtarget].getListOfClients();
-		for (size_t i = 0; i < listOfClients.size(); i++)
+		if (targets[i][0] == '#')
 		{
-			if (listOfClients[i]->getSocket() != client->getSocket())
+			std::cout << "Message sent to a channel" << std::endl;
+			std::vector<Client*> listOfClients = server->_channels[targets[i]].getListOfClients();
+			for (size_t j = 0; j < listOfClients.size(); j++)
 			{
-				std::cout << "This client is in the chan: " << listOfClients[i]->getSocket() <<std::endl;
-				std::cout << "This message is being sent: " << fullMsg << " to client " << listOfClients[i]->getSocket() << std::endl;
-				send(listOfClients[i]->getSocket(), fullMsg.c_str(), fullMsg.size(), 0);
+				if (listOfClients[j]->getSocket() != client->getSocket())
+				{
+					std::cout << "This client is in the chan: " << listOfClients[j]->getSocket() <<std::endl;
+					std::cout << "This message is being sent: " << fullMsg << " to client " << listOfClients[j]->getSocket() << std::endl;
+					send(listOfClients[j]->getSocket(), fullMsg.c_str(), fullMsg.size(), 0);
+				}
 			}
 		}
+		else
+		{
+			std::cout << "Message sent to a user" << std::endl;
+			send(server->getFdWithNick(targets[i]), fullMsg.c_str(), fullMsg.size(), 0);
+		}
+		return ;
 	}
 	// if msgtarget starts with #>> it is a channel
 	// 		search for client list in server
 	// 		send to everyone expect oneself
 
 	// if msgtarget does not start with #>> it is a user
-	(void)message;
+	// 		search for client fd with nick
+	// 		send to nick
+}
+
+void cmd_notice(Message * message)
+{
+	Server * server = message->getServer();
+	Client * client = message->getClient();
+
+	if (message->getParams().size() == 0)
+	{
+		Replies reply(*client);
+		reply.ERR_NORECIPIENT(message->getCMD());
+		return ;
+	}
+	std::string msgtarget = message->getParams()[0];
+	std::vector<std::string> targets = message->getTargets();
+	std::string fullMsg = ":" + client->getPrefix() + " " + message->getFullMsg() + "\r\n";
+	for (size_t i = 0; i < targets.size(); i++)
+	{
+		if (targets[i][0] == '#')
+		{
+			std::cout << "Message sent to a channel" << std::endl;
+			std::vector<Client*> listOfClients = server->_channels[targets[i]].getListOfClients();
+			for (size_t j = 0; j < listOfClients.size(); j++)
+			{
+				if (listOfClients[j]->getSocket() != client->getSocket())
+				{
+					std::cout << "This client is in the chan: " << listOfClients[j]->getSocket() <<std::endl;
+					std::cout << "This message is being sent: " << fullMsg << " to client " << listOfClients[j]->getSocket() << std::endl;
+					send(listOfClients[j]->getSocket(), fullMsg.c_str(), fullMsg.size(), 0);
+				}
+			}
+		}
+		else
+		{
+			std::cout << "Message sent to a user" << std::endl;
+			send(server->getFdWithNick(targets[i]), fullMsg.c_str(), fullMsg.size(), 0);
+		}
+	}	// if msgtarget starts with #>> it is a channel
+	// 		search for client list in server
+	// 		send to everyone expect oneself
+
+	// if msgtarget does not start with #>> it is a user
 }
 
 void    cmd_oper(Message * message) {
@@ -322,6 +382,44 @@ void    cmd_kill(Message * message) {
 			send(client->getSocket(), replies.ERR_NOSUCHNICK().data(), replies.ERR_NOSUCHNICK().size(), 0);
 	}
 }
+
+void	cmd_whois(Message * message) {
+	Server * server = message->getServer();
+	Client * client = message->getClient();
+
+	if (message->getParams().size() == 0)
+	{
+		// ERR_NO_RECIPIENT to handle
+		return ;
+	}
+	else
+	{
+		std::string msgtarget = message->getParams()[0];
+		std::vector<std::string> targets = message->getTargets();
+		std::cout << "target size: " << targets.size() << std::endl;
+		for (size_t i = 0; i < targets.size(); i++)
+		{
+			if (targets[i][0] == '#')
+				continue;
+			else
+			{
+				try
+				{
+					Client & targetclient = server->getClientWithNick(targets[i]);
+					Replies reply(targetclient);
+					std::cout << "Target client is: " << targetclient.getNick() << std::endl ;
+					std::cout << "Reply content: " << reply.RPL_WHOISUSER() << std::endl;
+					send(client->getSocket(), reply.RPL_WHOISUSER().c_str(), reply.RPL_WHOISUSER().size(), 0);
+				}
+				catch(const std::exception& e)
+				{
+					Replies reply(*client);
+					send(client->getSocket(), reply.ERR_NOSUCHNICK().c_str(), reply.ERR_NOSUCHNICK().size(), 0);
+				}
+
+			}
+		}
+		return ;
 
 void    cmd_kick(Message * message) {
 

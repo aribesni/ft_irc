@@ -3,16 +3,19 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rliu <rliu@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 18:14:04 by guillemette       #+#    #+#             */
-/*   Updated: 2023/03/24 18:44:54 by rliu             ###   ########.fr       */
+/*   Updated: 2023/04/06 20:30:42 by guillemette      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef SERVER_H
 # define SERVER_H
 # define BUFFER_SIZE 4096
+# ifndef DEBUG
+#  define DEBUG false
+# endif
 # include <unistd.h>
 # include <string.h>
 # include <stdlib.h>
@@ -28,6 +31,7 @@
 # include "Message.hpp"
 # include "Channel.hpp"
 # include "Replies.hpp"
+# include <exception>
 
 class Message;
 
@@ -55,13 +59,18 @@ class Server {
 		void						execMultiMsg(std::vector<Message> msgList);
 		void						acceptNewClient();
 		void						handleClientRequest(Client & client);
-
-
+		int							getFdWithNick(std::string nick);
+		Client &					getClientWithNick(std::string nick);
 		std::vector<struct pollfd>	_pollfds;
 		// Client &        getClientWithFd(int fd);
 		std::map<std::string, Channel>	_channels; /* channelName, Channel object*/
 		void setPassword(char * password);
-		
+
+		// EXCEPTIONS
+		class NickNotFound : public std::exception {
+			public:
+				const char* what() const throw();
+		};
 	private :
 		std::string						_password;
 		int								_socket;
