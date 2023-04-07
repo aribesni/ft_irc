@@ -6,7 +6,7 @@
 /*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 17:43:49 by rliu              #+#    #+#             */
-/*   Updated: 2023/04/06 20:37:45 by guillemette      ###   ########.fr       */
+/*   Updated: 2023/04/07 09:00:24 by guillemette      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -218,7 +218,8 @@ void cmd_privmsg(Message * message)
 	{
 		Replies reply(*client);
 		send(client->getSocket(), reply.ERR_NORECIPIENT(message->getCMD()).data(), reply.ERR_NORECIPIENT(message->getCMD()).size(), 0);
-		std::cout << "No recipient" << std::endl;
+		if (DEBUG)
+			std::cout << "No recipient" << std::endl;
 		return ;
 	}
 	std::string msgtarget = message->getParams()[0];
@@ -228,32 +229,44 @@ void cmd_privmsg(Message * message)
 	{
 		if (targets[i][0] == '#')
 		{
-			std::cout << "Message sent to a channel" << std::endl;
-			std::vector<Client*> listOfClients = server->_channels[targets[i]].getListOfClients();
-			for (size_t j = 0; j < listOfClients.size(); j++)
+			// CHECK THAT CHANNEL EXISTS
+			if (server->_channels.find(targets[i]) == server->_channels.end())
 			{
-				if (listOfClients[j]->getSocket() != client->getSocket())
+				Replies reply(*client);
+				std::cout << "Unknown channel" << std::endl;
+				send(client->getSocket(), reply.ERR_NOSUCHNICK().data(), reply.ERR_NOSUCHNICK().size(), 0);
+			}
+			else
+			{
+				std::vector<Client*> listOfClients = server->_channels[targets[i]].getListOfClients();
+				for (size_t j = 0; j < listOfClients.size(); j++)
 				{
-					std::cout << "This client is in the chan: " << listOfClients[j]->getSocket() <<std::endl;
-					std::cout << "This message is being sent: " << fullMsg << " to client " << listOfClients[j]->getSocket() << std::endl;
-					send(listOfClients[j]->getSocket(), fullMsg.c_str(), fullMsg.size(), 0);
+					if (listOfClients[j]->getSocket() != client->getSocket())
+						send(listOfClients[j]->getSocket(), fullMsg.c_str(), fullMsg.size(), 0);
 				}
+				if (DEBUG)
+					std::cout << "Message sent to a channel" << std::endl;
 			}
 		}
 		else
 		{
-			std::cout << "Message sent to a user" << std::endl;
-			send(server->getFdWithNick(targets[i]), fullMsg.c_str(), fullMsg.size(), 0);
+			int targetfd = server->getFdWithNick(targets[i]);
+			if (targetfd == -1)
+			{
+				Replies reply(*client);
+				send(client->getSocket(), reply.ERR_NOSUCHNICK().data(), reply.ERR_NOSUCHNICK().size(), 0);
+				if (DEBUG)
+					std::cout << "Wrong recipient" << std::endl;
+			}
+			else
+			{
+				if (DEBUG)
+					std::cout << "Message sent to a user" << std::endl;
+				send(server->getFdWithNick(targets[i]), fullMsg.c_str(), fullMsg.size(), 0);
+			}
 		}
 		return ;
 	}
-	// if msgtarget starts with #>> it is a channel
-	// 		search for client list in server
-	// 		send to everyone expect oneself
-
-	// if msgtarget does not start with #>> it is a user
-	// 		search for client fd with nick
-	// 		send to nick
 }
 
 void cmd_notice(Message * message)
