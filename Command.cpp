@@ -44,7 +44,7 @@ void Command::initCmdMap()
     _cmdMap["KICK"] = &cmd_kick;
     _cmdMap["NOTICE"] = &cmd_notice;
     _cmdMap["WHOIS"] = &cmd_whois;
-	// INVITE
+    _cmdMap["INVITE"] = &cmd_invite;
 	// MODE
 
 	// finir tous les messages d'erreurs
@@ -186,7 +186,7 @@ void cmd_part(Message * message)
 		}
 		if (j == listOfClients.size())
 		{
-			send(client->getSocket(), replies.ERR_NOTONCHANNEL(chanName, " :You're not on that channel").data(), replies.ERR_NOTONCHANNEL(chanName, " :You're not on that channel").size(), 0); // channel exists but client not in it
+			send(client->getSocket(), replies.ERR_NOTONCHANNEL(chanName).data(), replies.ERR_NOTONCHANNEL(chanName).size(), 0); // channel exists but client not in it
 			return ;
 		}
 		for (size_t i = 0; i < listOfClients.size(); i++)
@@ -234,7 +234,7 @@ void cmd_privmsg(Message * message)
 			{
 				Replies reply(*client);
 				std::cout << "Unknown channel" << std::endl;
-				send(client->getSocket(), reply.ERR_NOSUCHNICK().data(), reply.ERR_NOSUCHNICK().size(), 0);
+				send(client->getSocket(), reply.ERR_NOSUCHNICK(client->getNick()).data(), reply.ERR_NOSUCHNICK(client->getNick()).size(), 0);
 			}
 			else
 			{
@@ -254,7 +254,7 @@ void cmd_privmsg(Message * message)
 			if (targetfd == -1)
 			{
 				Replies reply(*client);
-				send(client->getSocket(), reply.ERR_NOSUCHNICK().data(), reply.ERR_NOSUCHNICK().size(), 0);
+				send(client->getSocket(), reply.ERR_NOSUCHNICK(client->getNick()).data(), reply.ERR_NOSUCHNICK(client->getNick()).size(), 0);
 				if (DEBUG)
 					std::cout << "Wrong recipient" << std::endl;
 			}
@@ -392,7 +392,7 @@ void    cmd_kill(Message * message) {
 			i++;
 		}
 		if (nick == false)
-			send(client->getSocket(), replies.ERR_NOSUCHNICK().data(), replies.ERR_NOSUCHNICK().size(), 0);
+			send(client->getSocket(), replies.ERR_NOSUCHNICK(client->getNick()).data(), replies.ERR_NOSUCHNICK(client->getNick()).size(), 0);
 	}
 }
 
@@ -428,9 +428,8 @@ void	cmd_whois(Message * message)
 				catch(const std::exception& e)
 				{
 					Replies reply(*client);
-					send(client->getSocket(), reply.ERR_NOSUCHNICK().c_str(), reply.ERR_NOSUCHNICK().size(), 0);
+					send(client->getSocket(), reply.ERR_NOSUCHNICK(client->getNick()).c_str(), reply.ERR_NOSUCHNICK(client->getNick()).size(), 0);
 				}
-
 			}
 		}
 		return ;
@@ -468,13 +467,54 @@ void    cmd_kick(Message * message) {
 		{
 			chanName += " ";
 			chanName += targetName;
-			send(client->getSocket(), replies.ERR_NOTONCHANNEL(chanName, " :They are not on that channel").data(), replies.ERR_NOTONCHANNEL(chanName, " :They are not on that channel").size(), 0);
+			send(client->getSocket(), replies.ERR_USERNOTINCHANNEL(chanName).data(), replies.ERR_USERNOTINCHANNEL(chanName).size(), 0);
 			return ;
 		}
 		for (size_t i = 0; i < listOfClients.size(); i++)
 			send(listOfClients[i]->getSocket(), fullMsg.c_str(), fullMsg.size(), 0);
 		server->_channels[chanName].removeClient(listOfClients[j]); // remove target client from our list
 		// std::cout << "User removed from channel." << std::endl;
+	}
+}
+
+void    cmd_invite(Message * message) {
+
+	std::string chanName = message->getParams()[1];
+	std::string targetName = message->getParams()[0];
+	Server * server = message->getServer();
+	Client * client = message->getClient();
+	Replies replies(*client);
+	std::string fullMsg = ":" + client->getPrefix() + " " + message->getFullMsg() + "\r\n";
+	if (server->_channels.find(chanName) != server->_channels.end()) // check if channel exists
+	{
+		// std::cout << "Channel " << chanName << " does not exist" << std::endl;
+		std::vector<Client*> listOfClients = server->_channels[chanName].getListOfClients();
+		size_t i = 0;
+		while (i < listOfClients.size())
+		{
+			if (targetName == listOfClients[i]->getNick()) // check if client is in channel in order to invite
+				break;
+			i++;
+		}
+		if (i == listOfClients.size())
+		{
+			send(client->getSocket(), replies.ERR_NOTONCHANNEL(chanName).data(), replies.ERR_NOTONCHANNEL(chanName).size(), 0); // channel exists but client inviting not in it
+			return ;
+		}
+	}
+	size_t i = 0;
+	while (i < server->getClients().size())
+	{
+		if (targetName == server->getClients()[i].getNick())
+			break;
+		i++;
+	}
+	if (i == server->getClients().size())
+		send(client->getSocket(), replies.ERR_NOSUCHNICK(targetName).data(), replies.ERR_NOSUCHNICK(targetName).size(), 0); // check if target client exists
+	else
+	{
+		send(client->getSocket(), replies.RPL_INVITING(targetName, chanName).data(), replies.RPL_INVITING(targetName, chanName).size(), 0); // send RPL to client inviting
+		send(server->getClients()[i].getSocket(), fullMsg.data(), fullMsg.size(), 0); // send /INVITE msg to target client
 	}
 }
 
