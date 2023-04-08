@@ -6,7 +6,7 @@
 /*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 17:43:58 by rliu              #+#    #+#             */
-/*   Updated: 2023/04/06 11:12:44 by guillemette      ###   ########.fr       */
+/*   Updated: 2023/04/08 11:10:42 by guillemette      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,6 @@ class Command
 	void	cmd_notice(Message * message);
 	void	cmd_whois(Message * message);
 	void	cmd_invite(Message * message);
-
+	void	cmd_mode(Message * message);
 
 #endif

@@ -13,9 +13,9 @@ Channel::Channel(Channel const & src)
 	*this = src;
 }
 
-Channel::Channel(std::string chanName, Client * client) : _name(chanName)
+Channel::Channel(std::string chanName, Client * client, std::string chanmode) : _name(chanName)
 {
-	_listOfClients.push_back(client);
+	_clientsMap[client] = chanmode;
 }
 
 /*
@@ -31,27 +31,19 @@ Channel::~Channel()
 ** --------------------------------- OVERLOAD ---------------------------------
 */
 
-Channel &		Channel::operator=( Channel const & rhs )
-{
-	_listOfClients = rhs.getListOfClients();
-	_name = rhs.getName();
-	return *this;
-}
 
 /*
 ** --------------------------------- METHODS ----------------------------------
 */
 
-void	Channel::addClient(Client * client)
+void	Channel::addClient(Client * client, std::string chanmode)
 {
-	_listOfClients.push_back(client);
+	_clientsMap[client] = chanmode;
 }
 
 void	Channel::removeClient(Client * client)
 {
-	std::vector<Client *>::iterator it;
-	it = std::find(_listOfClients.begin(),_listOfClients.end(), client);
-	_listOfClients.erase(it);
+	_clientsMap.erase(client);
 }
 
 /*
@@ -64,9 +56,9 @@ void	Channel::removeClient(Client * client)
 ** --------------------------------- GETTERS ---------------------------------
 */
 
-std::vector<Client*>	Channel::getListOfClients(void) const
+std::map<Client*, std::string>&	Channel::getClientsMap(void)
 {
-	return (_listOfClients);
+	return (_clientsMap);
 }
 
 std::string				Channel::getName(void) const
