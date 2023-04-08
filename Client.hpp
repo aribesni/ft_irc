@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rliu <rliu@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 18:12:51 by guillemette       #+#    #+#             */
-/*   Updated: 2023/03/24 19:52:35 by rliu             ###   ########.fr       */
+/*   Updated: 2023/04/08 11:12:17 by guillemette      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,6 @@ class Client {
 		std::string	getUser(void) const;
 		std::string	getPrefix(void) const;
         std::string getIRCMode(void) const;
-        std::string getChanMode(void) const;
         std::string getHostName(void) const;
 		bool		getRegistrationStatus (void) const;
 
@@ -44,7 +43,6 @@ class Client {
 		void		setAsRegistered(void);
 		void		setPrefix(void);
         void        setIRCMode(std::string mode);
-        void        setChanMode(std::string mode);
 
 		sockaddr_in _sockaddr;
 		socklen_t   _socklen;
@@ -60,8 +58,12 @@ class Client {
 		std::string	_nick;
 		std::string	_pass;
 		std::string	_msgWelcome;
-        std::string _irc_mode;
-        std::string _chan_mode;
+		std::string _irc_mode;
 };
+
+// irc mode (user mode)
+// i: When enabled, other users will not be able to see you on a WHO output unless they are in the channel themselves.
+// w: When enabled, you will receive WALLOP messages from IRC operators.
+// s: When enabled, you will receive special notices or debug messages from the server.
 
 #endif

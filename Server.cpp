@@ -6,7 +6,7 @@
 /*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 18:14:02 by guillemette       #+#    #+#             */
-/*   Updated: 2023/04/06 20:30:25 by guillemette      ###   ########.fr       */
+/*   Updated: 2023/04/08 12:42:32 by guillemette      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -223,10 +223,7 @@ Client &						Server::getClientWithNick(std::string nick)
 	for (it = clients.begin(); it != clients.end(); it++)
 	{
 		if (it->second.getNick() == nick)
-		{
-			std::cout << "Nick found" << std::endl;
 			return (it->second);
-		}
 	}
 	throw (Server::NickNotFound());
 }

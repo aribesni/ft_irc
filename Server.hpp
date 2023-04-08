@@ -6,7 +6,7 @@
 /*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 18:14:04 by guillemette       #+#    #+#             */
-/*   Updated: 2023/04/06 20:30:42 by guillemette      ###   ########.fr       */
+/*   Updated: 2023/04/08 12:05:40 by guillemette      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ class Server {
 		void						_accept(Client & client);
 		void						_listen(void);
 		std::vector<Message>		bufferParser(char* buf, Client & client);
-		void                        msg_replace(std::string &message, char find, char replace);
+		void						msg_replace(std::string &message, char find, char replace);
 		void						execMultiMsg(std::vector<Message> msgList);
 		void						acceptNewClient();
 		void						handleClientRequest(Client & client);

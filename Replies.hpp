@@ -6,7 +6,7 @@
 /*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 18:14:00 by guillemette       #+#    #+#             */
-/*   Updated: 2023/04/06 19:37:30 by guillemette      ###   ########.fr       */
+/*   Updated: 2023/04/08 12:47:23 by guillemette      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,24 +20,24 @@
 
 		public :
 
-			Replies(Client &client)
+			Replies(Client & client)
 			{
-				setVariables(&client);
+				setVariables(client);
 			}
 			~Replies(void) {};
 
-			void	setVariables(Client *client) {
+			void	setVariables(Client client) {
 
 				this->_network = "Internet Relay";
-				this->_nickname = client->getNick();
-				this->_user = client->getUser();
-				this->_host = client->getHostName() ;
+				this->_nickname = client.getNick();
+				this->_user = client.getUser();
+				this->_host = client.getHostName() ;
 				this->_server = "Ircserv";
 				this->_channel = "<channel>";
 				this->_date_time = "Tue March 14 at 12:05";
 				this->_version = "1.0";
-				this->_irc_mode = client->getIRCMode();
-				this->_prefix = client->getPrefix();
+				this->_irc_mode = client.getIRCMode();
+				this->_prefix = client.getPrefix();
 			}
 
 			void	sendMotd(int client_socket) {
