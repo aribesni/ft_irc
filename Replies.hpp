@@ -6,7 +6,7 @@
 /*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 18:14:00 by guillemette       #+#    #+#             */
-/*   Updated: 2023/04/08 12:47:23 by guillemette      ###   ########.fr       */
+/*   Updated: 2023/04/08 15:32:19 by guillemette      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,12 +19,11 @@
 	class Replies {
 
 		public :
-
-			Replies(Client & client)
-			{
-				setVariables(client);
-			}
-			~Replies(void) {};
+			Replies(){};
+			Replies(Client client) : _network("Internet Relay"), _nickname(client.getNick()), _user(client.getUser()), _host(client.getHostName()),\
+									_server("Ircserv"), _channel("<channel>"), _date_time("Tue March 14 at 12:05"), _version("1.0"), \
+									_irc_mode(client.getIRCMode()), _prefix(client.getPrefix()){};
+			~Replies() {};
 
 			void	setVariables(Client client) {
 
@@ -104,7 +103,7 @@
 			/* "303" */ std::string RPL_ISON() { return (":" + this->_prefix + " 303 " + this->_nickname + " " + ":*1" + this->_nickname + " *( ' ' " + this->_nickname + " )" + "\r\n"); };
 			/* "305" */ std::string RPL_UNAWAY() { return (":" + this->_prefix + " 305 " + this->_nickname + " " + ":<info>" + "\r\n"); };
 			/* "306" */ std::string RPL_NOWAWAY() { return (":" + this->_prefix + " 306 " + this->_nickname + " " + ":<info>" + "\r\n"); };
-			/* "311" */ std::string RPL_WHOISUSER() { return (":" + this->_prefix + " 311 " + this->_nickname + " " + this->_nickname + this->_user + " " + this->_host + " * :<real_name>" + "\r\n"); };
+			/* "311" */ std::string RPL_WHOISUSER() { return (":" + this->_prefix + " 311 " + this->_nickname + " " + this->_nickname + this->_user + " " + this->_host + "\r\n"); };
 			/* "312" */ std::string RPL_WHOISSERVER() { return (":" + this->_prefix + " 312 " + this->_nickname + " " + this->_nickname +  " " + this->_server + " :<server_info>" + "\r\n"); };
 			/* "313" */ std::string RPL_WHOISOPERATOR() { return (":" + this->_prefix + " 313 " + this->_nickname + " " + this->_nickname + " :<privileges>" + "\r\n"); };
 			/* "314" */ std::string RPL_WHOWASUSER() { return (":" + this->_prefix + " 314 " + this->_nickname + " " + this->_nickname + this->_user + " " + this->_host + " * :<real_name>" + "\r\n"); };

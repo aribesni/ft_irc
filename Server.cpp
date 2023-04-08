@@ -6,7 +6,7 @@
 /*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 18:14:02 by guillemette       #+#    #+#             */
-/*   Updated: 2023/04/08 12:42:32 by guillemette      ###   ########.fr       */
+/*   Updated: 2023/04/08 15:50:15 by guillemette      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,12 +79,6 @@ void	Server::acceptNewClient()
 	newpollfd.fd = client.getSocket();
 	newpollfd.events = POLLIN;
 	this->_pollfds.push_back(newpollfd);
-	// 1. Parse registration messages and get client nick, user and password
-		// 1.1 Loop on buffer. When buffer finds \r\n>> create Message, handles Message, then empty buffer and go on with loop
-		// 1.1.1 PASS > check if password is correct. if not skip the rest
-		// 1.1.2 USER > check if user format is correct. if not skip the rest
-		// 1.1.3 NICK > check if nick format is correct and if nick is not already used (ERR_NICKNAMEINUSE). If it is, register user (isRegistered = true). If not ???
-	// 2- If correct registration, server sends block of welcome message
 	char buf[BUFFER_SIZE];
 	while (client.getRegistrationStatus() == false)
 	{
@@ -119,6 +113,7 @@ void	Server::acceptNewClient()
 	send(client.getSocket(), replies.RPL_UMODEIS().data(), replies.RPL_UMODEIS().size(), 0); // displays client's privileges
 	// else deal with client registration issue
 	this->getClients()[newpollfd.fd] = client;
+	std::cout << "prefix: " << this->getClients()[newpollfd.fd].getPrefix() << std::endl;
 }
 
 void	Server::handleClientRequest(Client & client)
@@ -215,12 +210,11 @@ int						Server::getFdWithNick(std::string nick)
 	return (-1);
 }
 
-Client &						Server::getClientWithNick(std::string nick)
+Client						Server::getClientWithNick(std::string nick) const
 {
-	std::map<int, Client> clients = this->getClients();
-	std::map<int, Client>::iterator it;
+	std::map<int, Client>::const_iterator it;
 
-	for (it = clients.begin(); it != clients.end(); it++)
+	for (it = _clients.begin(); it != _clients.end(); it++)
 	{
 		if (it->second.getNick() == nick)
 			return (it->second);

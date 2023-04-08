@@ -6,7 +6,7 @@
 /*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 18:14:04 by guillemette       #+#    #+#             */
-/*   Updated: 2023/04/08 12:05:40 by guillemette      ###   ########.fr       */
+/*   Updated: 2023/04/08 15:49:14 by guillemette      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ class Server {
 		void						acceptNewClient();
 		void						handleClientRequest(Client & client);
 		int							getFdWithNick(std::string nick);
-		Client &					getClientWithNick(std::string nick);
+		Client						getClientWithNick(std::string nick) const;
 		std::vector<struct pollfd>	_pollfds;
 		// Client &        getClientWithFd(int fd);
 		std::map<std::string, Channel>	_channels; /* channelName, Channel object*/

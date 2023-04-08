@@ -6,7 +6,7 @@
 /*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 18:12:21 by guillemette       #+#    #+#             */
-/*   Updated: 2023/04/08 11:09:09 by guillemette      ###   ########.fr       */
+/*   Updated: 2023/04/08 15:42:22 by guillemette      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,7 @@ void  Client::setPrefix(void)
 {
 		_prefix = _nick + "!" + _user + "@" + _hostname;
 //      _msgWelcome = ":" + _prefix + " 001 " + _nick + " :Welcome to the IRC__ Network, " + _prefix + "\n";
-	   // std::cout << "test_setprefic: "<<_prefix << std::endl;
+	   std::cout << "test_setprefic: "<<_prefix << std::endl;
  }
 
 void  Client::setNick(std::string &nickname)
