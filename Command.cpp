@@ -6,7 +6,7 @@
 /*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 17:43:49 by rliu              #+#    #+#             */
-/*   Updated: 2023/04/08 12:55:23 by guillemette      ###   ########.fr       */
+/*   Updated: 2023/04/08 15:49:19 by guillemette      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -410,7 +410,6 @@ void	cmd_whois(Message * message)
 	{
 		std::string msgtarget = message->getParams()[0];
 		std::vector<std::string> targets = message->getTargets();
-		std::cout << "target size: " << targets.size() << std::endl;
 		for (size_t i = 0; i < targets.size(); i++)
 		{
 			if (targets[i][0] == '#')
@@ -419,17 +418,18 @@ void	cmd_whois(Message * message)
 			{
 				try
 				{
-					Client & targetclient = server->getClientWithNick(targets[i]);
-					// Replies reply(targetclient);
-					std::cout << "Target client is: " << targetclient.getNick() << std::endl ;
-					// std::cout << "Reply content: " << reply.RPL_WHOISUSER() << std::endl;
-					send(client->getSocket(), "WHO IS TEST \r\n", 15, 0);
-					// send(client->getSocket(), reply.RPL_WHOISUSER().c_str(), reply.RPL_WHOISUSER().size(), 0);
+					Client targetclient = server->getClientWithNick(targets[i]);
+					Replies reply(targetclient);
+					std::cout << "Target client is: " << targetclient.getNick() << std::endl;
+					std::cout << "Target client prefix is: " << targetclient.getPrefix() << std::endl;
+					std::cout << "Reply content: " << reply.RPL_WHOISUSER() << std::endl;
+					// send(client->getSocket(), "WHO IS TEST \r\n", 15, 0);
+					send(client->getSocket(), reply.RPL_WHOISUSER().data(), reply.RPL_WHOISUSER().size(), 0);
 				}
 				catch(const std::exception& e)
 				{
 					Replies reply(*client);
-					send(client->getSocket(), reply.ERR_NOSUCHNICK(client->getNick()).c_str(), reply.ERR_NOSUCHNICK(client->getNick()).size(), 0);
+					send(client->getSocket(), reply.ERR_NOSUCHNICK(client->getNick()).data(), reply.ERR_NOSUCHNICK(client->getNick()).size(), 0);
 				}
 			}
 		}
