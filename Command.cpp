@@ -6,7 +6,7 @@
 /*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 17:43:49 by rliu              #+#    #+#             */
-/*   Updated: 2023/04/08 15:49:19 by guillemette      ###   ########.fr       */
+/*   Updated: 2023/04/09 12:05:09 by guillemette      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,8 @@ void Command::initCmdMap()
 	_cmdMap["JOIN"] = &cmd_join;
 	_cmdMap["PRIVMSG"] = &cmd_privmsg;
 	_cmdMap["PART"] = &cmd_part;
-    _cmdMap["OPER"] = &cmd_oper;
+    _cmdMap["OPER"] = &cmd_oper; /* grants the IRC operator status*/
+    // _cmdMap["OP"] = &cmd_op; /* TO DO: grants the channel operator status*/
     _cmdMap["WALLOPS"] = &cmd_wallops;
     _cmdMap["KILL"] = &cmd_kill;
     _cmdMap["KICK"] = &cmd_kick;
@@ -47,7 +48,19 @@ void Command::initCmdMap()
     _cmdMap["INVITE"] = &cmd_invite;
     _cmdMap["MODE"] = &cmd_mode;
 	// finir tous les messages d'erreurs
-	// Memory management
+	// Check memory management
+
+
+// Channel vs IRC operators
+
+	// 1  The commands which may only be used by channel operators (user mode has "o" for given channel) are:
+	//         KICK    - Eject a client from the channel
+	//         MODE    - Change the channel's mode
+	//         INVITE  - Invite a client to an invite-only channel (mode +i)
+	//         TOPIC   - Change the channel topic in a mode +t channel
+
+
+	// 2 KILL: only irc operator
 }
 
 /*
@@ -59,7 +72,7 @@ void msgSender(Client &client, std::string cmd, std::string msg){
     send(client.getSocket(), msgSend.c_str(), msgSend.size(), 0);
 }
 
-std::string creatNickname(Client &client){
+std::string createNickname(Client &client){
     std::ostringstream oOStrStream;
     oOStrStream << client.getSocket();
 
@@ -74,11 +87,10 @@ std::string creatNickname(Client &client){
 
 void cmd_pass(Message * message)
 {
+	// TO DO: ERR_NEEDMOREPARAMS              ERR_ALREADYREGISTRED
 	if (message->getServer()->getPassword() != message->getParams()[0]){
 		std::cout << "wrong password\n";
 		return;
-		// close(message->getServer()->getSocket()); // Bye!
-		// message->getServer()->clients.erase(message->getServer()->getSocket());
     }
 	else
 		message->getClient()->setPass( message->getParams()[0]);
@@ -86,10 +98,11 @@ void cmd_pass(Message * message)
 
 void cmd_nick(Message * message)
 {
+	//TO DO:    ERR_NONICKNAMEGIVEN      ERR_NICKCOLLISION
 	Replies reply(*(message->getClient()));
 	std::string nick = message->getParams()[0];
     if (nick.size() > 9 || nick.empty()){
-        nick = creatNickname(*(message->getClient()));
+        nick = createNickname(*(message->getClient()));
         send(message->getClient()->getSocket(),reply.ERR_ERRONEUSNICKNAME().c_str(), reply.ERR_ERRONEUSNICKNAME().size(), 0);
     }
 
@@ -99,7 +112,7 @@ void cmd_nick(Message * message)
         if (it->first == message->getClient()->getSocket()) // don't send message to client's own fd
             continue ;
         if (nick == it->second.getNick()){
-            nick = creatNickname(*(message->getClient()));
+            nick = createNickname(*(message->getClient()));
             send(message->getClient()->getSocket(),reply.ERR_NICKNAMEINUSE().c_str(), reply.ERR_NICKNAMEINUSE().size(), 0);
         }
     }
@@ -110,6 +123,7 @@ void cmd_nick(Message * message)
 
 void cmd_user(Message * message)
 {
+	// TO DO ERR_NEEDMOREPARAMS              ERR_ALREADYREGISTRED
 	message->getClient()->setUsr(message->getParams()[0]);
 	message->getClient()->setHostname(message->getParams()[2]);
 }
@@ -126,6 +140,8 @@ void cmd_ping(Message * message)
 void cmd_join(Message * message)
 {
 	// TO DO: handle channel password
+	// User must provide a password if channel is key protected (k mode)
+	// to set a password: channel operator must do command: MODE #name_of_channel +k
 	std::string chanName = message->getParams()[0]; // get channel name
 	Server * server = message->getServer();
 	Client * client = message->getClient();
@@ -160,6 +176,8 @@ void cmd_join(Message * message)
 
 void cmd_part(Message * message)
 {
+	// TO DO: handle error if no given channel ERR_NEEDMOREPARAMS
+	// TO DO: handle multiple channels split with ,
 	std::string chanName = message->getParams()[0]; // get channel name
 	Server * server = message->getServer();
 	Client * client = message->getClient();
@@ -173,7 +191,6 @@ void cmd_part(Message * message)
 	else
 	{
 		std::map<Client*, std::string>& mapOfClients = server->_channels[chanName].getClientsMap();
-		// std::cout << "Channel " << chanName << " already exists" << std::endl;
 		std::map<Client*, std::string>::iterator it;
 		for (it = mapOfClients.begin(); it != mapOfClients.end(); it++)
 		{
@@ -286,9 +303,10 @@ void cmd_notice(Message * message)
 	{
 		if (targets[i][0] == '#')
 		{
+			// TO  DO: check that channel exists
 			std::cout << "Message sent to a channel" << std::endl;
 			std::map<Client*, std::string> mapOfClients = server->_channels[targets[i]].getClientsMap();
-			for (std::map<Client*, std::string>::iterator it = mapOfClients.begin();\
+			for (std::map<Client*, std::string>::iterator it = mapOfClients.begin();
 				it != mapOfClients.end(); it++)
 			{
 				if (it->first->getSocket() != client->getSocket())
@@ -301,14 +319,11 @@ void cmd_notice(Message * message)
 		}
 		else
 		{
+			// TO DO: check that user exists
 			std::cout << "Message sent to a user" << std::endl;
 			send(server->getFdWithNick(targets[i]), fullMsg.c_str(), fullMsg.size(), 0);
 		}
-	}	// if msgtarget starts with #>> it is a channel
-	// 		search for client list in server
-	// 		send to everyone expect oneself
-
-	// if msgtarget does not start with #>> it is a user
+	}
 }
 
 void    cmd_oper(Message * message) {
@@ -403,7 +418,7 @@ void	cmd_whois(Message * message)
 
 	if (message->getParams().size() == 0)
 	{
-		// ERR_NO_RECIPIENT to handle
+		// TO DO: ERR_NO_RECIPIENT to handle
 		return ;
 	}
 	else
@@ -420,10 +435,6 @@ void	cmd_whois(Message * message)
 				{
 					Client targetclient = server->getClientWithNick(targets[i]);
 					Replies reply(targetclient);
-					std::cout << "Target client is: " << targetclient.getNick() << std::endl;
-					std::cout << "Target client prefix is: " << targetclient.getPrefix() << std::endl;
-					std::cout << "Reply content: " << reply.RPL_WHOISUSER() << std::endl;
-					// send(client->getSocket(), "WHO IS TEST \r\n", 15, 0);
 					send(client->getSocket(), reply.RPL_WHOISUSER().data(), reply.RPL_WHOISUSER().size(), 0);
 				}
 				catch(const std::exception& e)
