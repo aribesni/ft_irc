@@ -113,7 +113,7 @@ void	Server::acceptNewClient()
 	send(client.getSocket(), replies.RPL_UMODEIS().data(), replies.RPL_UMODEIS().size(), 0); // displays client's privileges
 	// else deal with client registration issue
 	this->getClients()[newpollfd.fd] = client;
-	std::cout << "prefix: " << this->getClients()[newpollfd.fd].getPrefix() << std::endl;
+	// std::cout << "prefix: " << this->getClients()[newpollfd.fd].getPrefix() << std::endl;
 }
 
 void	Server::handleClientRequest(Client & client)
@@ -141,7 +141,7 @@ void	Server::handleClientRequest(Client & client)
 	}
 }
 
-std::vector<std::string>	msg_split(std::string str, std::string delimiter)
+std::vector<std::string>	Server::msg_split(std::string str, std::string delimiter)
 {
 	std::vector<std::string> tokens = std::vector<std::string>();
 
