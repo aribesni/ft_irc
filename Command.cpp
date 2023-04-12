@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Command.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
+/*   By: rliu <rliu@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 17:43:49 by rliu              #+#    #+#             */
-/*   Updated: 2023/04/09 12:05:09 by guillemette      ###   ########.fr       */
+/*   Updated: 2023/04/12 13:33:19 by rliu             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,48 +84,107 @@ std::string createNickname(Client &client){
 ** --------------------------------- COMMANDS ---------------------------------
 */
 
-
 void cmd_pass(Message * message)
 {
-	// TO DO: ERR_NEEDMOREPARAMS              ERR_ALREADYREGISTRED
-	if (message->getServer()->getPassword() != message->getParams()[0]){
-		std::cout << "wrong password\n";
-		return;
-    }
-	else
+	// TO DO: ERR_NEEDMOREPARAMS              ERR_ALREADYREGISTRED _ fixed
+	Server * server = message->getServer();
+	Client * client = message->getClient();
+	Replies reply(*client);
+	std::string rplErr;
+	if (client->getPassStatus()){
+		rplErr=reply.ERR_ALREADYREGISTRED();
+		send(client->getSocket(),rplErr.c_str(), rplErr.size(), 0);
+	}
+	else if (message->getParams().size() < 1 || message->getParams().empty()){
+		std::string rplErr = reply.ERR_NEEDMOREPARAMS("PASS");
+		//send(client->getSocket(),rplErr.c_str(), rplErr.size(), 0);
+	}
+	else if (server->getPassword() != message->getParams()[0]){
+		std::string reason = "password is wrong";
+		std::string rplErr = reply.ERR_NEEDMOREPARAMS("PASS");
+		std::cout << reason << std::endl;
+		send(client->getSocket(),rplErr.c_str(), rplErr.size(), 0);
+	}
+	else{
 		message->getClient()->setPass( message->getParams()[0]);
+		client->setPassRegistered();
+	}
 }
 
 void cmd_nick(Message * message)
 {
-	//TO DO:    ERR_NONICKNAMEGIVEN      ERR_NICKCOLLISION
-	Replies reply(*(message->getClient()));
-	std::string nick = message->getParams()[0];
-    if (nick.size() > 9 || nick.empty()){
-        nick = createNickname(*(message->getClient()));
-        send(message->getClient()->getSocket(),reply.ERR_ERRONEUSNICKNAME().c_str(), reply.ERR_ERRONEUSNICKNAME().size(), 0);
-    }
-
-    std::map<int, Client>::iterator     it;
-    for (it = message->getServer()->getClients().begin(); it != message->getServer()->getClients().end(); it++)
-    {
-        if (it->first == message->getClient()->getSocket()) // don't send message to client's own fd
-            continue ;
-        if (nick == it->second.getNick()){
-            nick = createNickname(*(message->getClient()));
-            send(message->getClient()->getSocket(),reply.ERR_NICKNAMEINUSE().c_str(), reply.ERR_NICKNAMEINUSE().size(), 0);
-        }
-    }
-   	message->getClient()->setNick(message->getParams()[0]);
-	if(nick != message->getParams()[0])
-		msgSender(*(message->getClient()), "NICK", nick);
+	//TO DO:    ERR_NONICKNAMEGIVEN(fixed)     ERR_NICKCOLLISION(this is for multiservers we don't need)
+	Server * server = message->getServer();
+	Client * client = message->getClient();
+	Replies reply(*client);
+	std::string rplErr;
+	//ERR_NONICKNAMEGIVEN
+	if (message->getParams().size()< 1 || message->getParams()[0].empty())
+	{
+		rplErr = reply.ERR_NONICKNAMEGIVEN();
+		send(client->getSocket(),rplErr.c_str(), rplErr.size(), 0);
+		return;
+	}
+	else{	
+		std::string nick = message->getParams()[0];
+    	if (nick.size() > 9){
+        	nick.resize(9);
+		}
+		//ERRONEUSNICKNAME
+		for (size_t i = 0; i < nick.size(); i++)
+		{
+			if (isdigit(nick[0]) || !isprint(nick[i])){
+				rplErr = reply.ERR_ERRONEUSNICKNAME(nick, "Erroneous nickname");
+				send(client->getSocket(),rplErr.c_str(), rplErr.size(), 0);
+				return;
+			}
+		}
+		std::map<int, Client>::iterator     it;
+		for (it = server->getClients().begin(); it != server->getClients().end(); it++)
+		{
+			if (it->first == client->getSocket()) // don't send message to client's own fd
+				continue ;
+			if (nick == it->second.getNick()){
+				std::string rplNickInUse;
+				rplNickInUse = reply.ERR_NICKNAMEINUSE(nick, "this nickname is in use!");
+				send(client->getSocket(),rplNickInUse.c_str(), rplNickInUse.size(), 0);
+				return;
+			}
+    	}
+		client->setNick(nick);
+		client->setNickRegistered();
+		if (client->getRegistrationStatus())
+			client->setPrefix();
+	}		
 }
 
 void cmd_user(Message * message)
 {
 	// TO DO ERR_NEEDMOREPARAMS              ERR_ALREADYREGISTRED
-	message->getClient()->setUsr(message->getParams()[0]);
-	message->getClient()->setHostname(message->getParams()[2]);
+	Client * client = message->getClient();
+	Replies reply(*client);
+	std::string rplErr;
+	if (client->getRegistrationStatus()){
+		rplErr = reply.ERR_ALREADYREGISTRED();
+		send(client->getSocket(),rplErr.c_str(), rplErr.size(), 0);
+		return;
+	 }
+	//ERR_NONICKNAMEGIVEN
+	if (message->getParams().size()< 4 || message->getParams()[0].empty())
+	{
+		rplErr = reply.ERR_NONICKNAMEGIVEN();
+		send(client->getSocket(),rplErr.c_str(), rplErr.size(), 0);
+		return;
+	}
+	 else{
+		client->setUsr(message->getParams()[0]);
+		client->setHostname(message->getParams()[2]);
+		std::string realName(message->getParams()[3], 1, message->getParams()[3].size()-1);
+		for (size_t i = 4; i < message->getParams().size(); i++)
+			realName += " " + message->getParams()[i];
+		client->setRealname(realName);
+		client->setUsrRegistered();
+	 }
 }
 
 void cmd_ping(Message * message)

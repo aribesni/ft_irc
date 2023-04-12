@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
+/*   By: rliu <rliu@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 18:14:04 by guillemette       #+#    #+#             */
-/*   Updated: 2023/04/08 15:49:14 by guillemette      ###   ########.fr       */
+/*   Updated: 2023/04/12 13:38:26 by rliu             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,6 +65,7 @@ class Server {
 		// Client &        getClientWithFd(int fd);
 		std::map<std::string, Channel>	_channels; /* channelName, Channel object*/
 		void setPassword(char * password);
+		void welcome_msg(Client &client);
 
 		// EXCEPTIONS
 		class NickNotFound : public std::exception {
