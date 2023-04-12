@@ -6,7 +6,7 @@
 /*   By: rliu <rliu@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 18:14:00 by guillemette       #+#    #+#             */
-/*   Updated: 2023/04/12 13:36:15 by rliu             ###   ########.fr       */
+/*   Updated: 2023/04/12 15:35:06 by rliu             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -193,7 +193,7 @@
 			/* "446" */ std::string ERR_USERSDISABLED() { return (":" + this->_prefix + " 446 " + this->_nickname + " " + ":<reason>" + "\r\n"); };
 			/* "451" */ std::string ERR_NOTREGISTERED() { return (":" + this->_prefix + " 451 " + this->_nickname + " " + ":<reason>" + "\r\n"); };
 			/* "461" */ std::string ERR_NEEDMOREPARAMS(std::string command) { return (":" + this->_prefix + " 461 " + this->_nickname + " " + command + " :Not enough parameters" + "\r\n"); };
-			/* "462" */ std::string ERR_ALREADYREGISTRED() { return (":" + this->_prefix + " 462 " + this->_nickname + " " + ":<reason>" + "\r\n"); };
+			/* "462" */ std::string ERR_ALREADYREGISTRED(std::string reason) { return (":" + this->_prefix + " 462 " + this->_nickname + " " + ":" + reason + "\r\n"); };
 			/* "463" */ std::string ERR_NOPERMFORHOST() { return (":" + this->_prefix + " 463 " + this->_nickname + " " + ":<reason>" + "\r\n"); };
 			/* "464" */ std::string ERR_PASSWDMISMATCH() { return (":" + this->_prefix + " 464 " + this->_nickname + " " + ":Password incorrect" + "\r\n"); };
 			/* "465" */ std::string ERR_YOUREBANNEDCREEP() { return (":" + this->_prefix + " 465 " + this->_nickname + " " + ":<reason>" + "\r\n"); };

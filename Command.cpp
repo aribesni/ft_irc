@@ -6,7 +6,7 @@
 /*   By: rliu <rliu@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 17:43:49 by rliu              #+#    #+#             */
-/*   Updated: 2023/04/12 13:33:19 by rliu             ###   ########.fr       */
+/*   Updated: 2023/04/12 19:20:22 by rliu             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,23 +64,6 @@ void Command::initCmdMap()
 }
 
 /*
-** --------------------------------- utils---------------------------------
-*/
-
-void msgSender(Client &client, std::string cmd, std::string msg){
-    std::string msgSend = ":" +client.getPrefix() + " " + cmd + " " + msg + "/r/n";
-    send(client.getSocket(), msgSend.c_str(), msgSend.size(), 0);
-}
-
-std::string createNickname(Client &client){
-    std::ostringstream oOStrStream;
-    oOStrStream << client.getSocket();
-
-    std::string name = "Guest" + oOStrStream.str();
-    return(name);
-}
-
-/*
 ** --------------------------------- COMMANDS ---------------------------------
 */
 
@@ -92,7 +75,7 @@ void cmd_pass(Message * message)
 	Replies reply(*client);
 	std::string rplErr;
 	if (client->getPassStatus()){
-		rplErr=reply.ERR_ALREADYREGISTRED();
+		rplErr=reply.ERR_ALREADYREGISTRED("PASS");
 		send(client->getSocket(),rplErr.c_str(), rplErr.size(), 0);
 	}
 	else if (message->getParams().size() < 1 || message->getParams().empty()){
@@ -154,7 +137,12 @@ void cmd_nick(Message * message)
 		client->setNick(nick);
 		client->setNickRegistered();
 		if (client->getRegistrationStatus())
+		{
+			std::string msg = ":" + client->getPrefix() + " " + message->getFullMsg() + "\r\n";
+			send(client->getSocket(), msg.c_str(), msg.size(), 0);
 			client->setPrefix();
+		}
+			
 	}		
 }
 
@@ -164,19 +152,20 @@ void cmd_user(Message * message)
 	Client * client = message->getClient();
 	Replies reply(*client);
 	std::string rplErr;
-	if (client->getRegistrationStatus()){
-		rplErr = reply.ERR_ALREADYREGISTRED();
+	if (client->getUsrStatus()){
+		rplErr = reply.ERR_ALREADYREGISTRED("USER is already registered");
+		std::cout << "test usr" << message->getFullMsg() << std::endl;
 		send(client->getSocket(),rplErr.c_str(), rplErr.size(), 0);
 		return;
 	 }
-	//ERR_NONICKNAMEGIVEN
+	//ERR_NEEDMOREPARAMS 
 	if (message->getParams().size()< 4 || message->getParams()[0].empty())
 	{
 		rplErr = reply.ERR_NONICKNAMEGIVEN();
 		send(client->getSocket(),rplErr.c_str(), rplErr.size(), 0);
 		return;
 	}
-	 else{
+	else{
 		client->setUsr(message->getParams()[0]);
 		client->setHostname(message->getParams()[2]);
 		std::string realName(message->getParams()[3], 1, message->getParams()[3].size()-1);
@@ -299,9 +288,12 @@ void cmd_privmsg(Message * message)
 	std::string msgtarget = message->getParams()[0];
 	std::vector<std::string> targets = message->getTargets();
 	std::string fullMsg = ":" + client->getPrefix() + " " + message->getFullMsg() + "\r\n";
+	
 	for (size_t i = 0; i < targets.size(); i++)
 	{
-		if (targets[i][0] == '#')
+		if (targets[i] == "#bot")
+			botReply(message);	
+		else if (targets[i][0] == '#')
 		{
 			if (server->_channels.find(targets[i]) == server->_channels.end()) /* channel does not exist*/
 			{

@@ -6,7 +6,7 @@
 /*   By: rliu <rliu@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 18:14:02 by guillemette       #+#    #+#             */
-/*   Updated: 2023/04/12 13:40:29 by rliu             ###   ########.fr       */
+/*   Updated: 2023/04/12 16:32:57 by rliu             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,6 +120,7 @@ void	Server::acceptNewClient()
 void	Server::handleClientRequest(Client & client)
 {
 	char buf[BUFFER_SIZE];
+	memset(buf, 0, BUFFER_SIZE);
 	int nbytes = recv(client.getSocket(), buf, sizeof(buf), 0);
 	if (nbytes <= 0)
 	{
@@ -141,6 +142,7 @@ void	Server::handleClientRequest(Client & client)
 		execMultiMsg(msgList);
 		if (!client.getRegistrationStatus())
 			welcome_msg(client);
+		msgList.clear();
 	}
 }
 

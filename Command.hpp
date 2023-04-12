@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Command.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
+/*   By: rliu <rliu@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 17:43:58 by rliu              #+#    #+#             */
-/*   Updated: 2023/04/08 11:10:42 by guillemette      ###   ########.fr       */
+/*   Updated: 2023/04/12 19:09:40 by rliu             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,8 @@
 #include "Message.hpp"
 #include "Channel.hpp"
 #include <string>
+#include <cstdlib>
+#include <ctime>
 
 class Client;
 
@@ -49,5 +51,8 @@ class Command
 	void	cmd_whois(Message * message);
 	void	cmd_invite(Message * message);
 	void	cmd_mode(Message * message);
+	
+	void	botReply(Message *message);
+	
 
 #endif
