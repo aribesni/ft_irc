@@ -187,7 +187,7 @@
 			/* "437" */ std::string ERR_UNAVAILRESOURCE() { return (":" + this->_prefix + " 437 " + this->_nickname + " " + "<nick/channel/service> :<reason>" + "\r\n"); };
 			/* "441" */ std::string ERR_USERNOTINCHANNEL(std::string channel) { return (":" + this->_prefix + " 441 " + this->_nickname + " " + this->_nickname + " " + channel + " :They are not on that channel" + "\r\n"); };
 			/* "442" */ std::string ERR_NOTONCHANNEL(std::string channel) { return (":" + this->_prefix + " 442 " + this->_nickname + " " + channel + " :You're not on that channel" + "\r\n"); };
-			/* "443" */ std::string ERR_USERONCHANNEL() { return (":" + this->_prefix + " 443 " + this->_nickname + " " + this->_nickname + this->_channel + " [:<reason>]" + "\r\n"); };
+			/* "443" */ std::string ERR_USERONCHANNEL(std::string channel) { return (":" + this->_prefix + " 443 " + this->_nickname + " " + this->_nickname + channel + " [:<reason>]" + "\r\n"); };
 			/* "444" */ std::string ERR_NOLOGIN() { return (":" + this->_prefix + " 444 " + this->_nickname + " " + this->_user + " :<reason>" + "\r\n"); };
 			/* "445" */ std::string ERR_SUMMONDISABLED() { return (":" + this->_prefix + " 445 " + this->_nickname + " " + ":<reason>" + "\r\n"); };
 			/* "446" */ std::string ERR_USERSDISABLED() { return (":" + this->_prefix + " 446 " + this->_nickname + " " + ":<reason>" + "\r\n"); };

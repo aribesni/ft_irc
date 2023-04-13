@@ -108,7 +108,8 @@ void cmd_nick(Message * message)
 		send(client->getSocket(),rplErr.c_str(), rplErr.size(), 0);
 		return;
 	}
-	else{	
+	else
+	{	
 		std::string nick = message->getParams()[0];
     	if (nick.size() > 9){
         	nick.resize(9);
@@ -520,6 +521,11 @@ void    cmd_kick(Message * message) {
 	Server * server = message->getServer();
 	Client * client = message->getClient();
 	Replies replies(*client);
+	if (message->getParams().size() < 2)
+	{
+		send(client->getSocket(), replies.ERR_NEEDMOREPARAMS(message->getCMD()).data(), replies.ERR_NEEDMOREPARAMS(message->getCMD()).size(), 0);
+		return ;
+	}
 	std::string fullMsg = ":" + client->getPrefix() + " " + message->getFullMsg() + "\r\n";
 	std::string msgtarget = message->getParams()[0];
 	std::map<Client*, std::string> mapOfClients = server->_channels[chanName].getClientsMap();
@@ -529,8 +535,24 @@ void    cmd_kick(Message * message) {
 		send(client->getSocket(), replies.ERR_CHANOPRIVSNEEDED(chanName).data(), replies.ERR_CHANOPRIVSNEEDED(chanName).size(), 0);
 	else
 	{
+		// check if client client kicking is in channel
 		std::map<Client*, std::string> mapOfClients = server->_channels[msgtarget].getClientsMap();
 		std::map<Client*, std::string>::iterator it;
+		for (it = mapOfClients.begin(); it != mapOfClients.end(); it++)
+		{
+			if (client->getNick() == it->first->getNick())
+				break;
+		}
+		if (it == mapOfClients.end()) // if client kicking is not in channel
+		{
+			std::cout << "YOU'RE NOT IN CHANNEL" << std::endl;
+			chanName += " ";
+			chanName += targetName;
+			send(client->getSocket(), replies.ERR_NOTONCHANNEL(chanName).data(), replies.ERR_NOTONCHANNEL(chanName).size(), 0);
+			return ;
+		}
+
+		// check if target client is in channel
 		for (it = mapOfClients.begin(); it != mapOfClients.end(); it++)
 		{
 			if (targetName == it->first->getNick()) // check if target client is in channel
@@ -557,6 +579,11 @@ void    cmd_invite(Message * message) {
 	Server * server = message->getServer();
 	Client * client = message->getClient();
 	Replies replies(*client);
+	if (message->getParams().size() < 2)
+	{
+		send(client->getSocket(), replies.ERR_NEEDMOREPARAMS(message->getCMD()).data(), replies.ERR_NEEDMOREPARAMS(message->getCMD()).size(), 0);
+		return ;
+	}
 	std::string fullMsg = ":" + client->getPrefix() + " " + message->getFullMsg() + "\r\n";
 	if (server->_channels.find(chanName) != server->_channels.end()) // check if channel exists
 	{
@@ -565,7 +592,7 @@ void    cmd_invite(Message * message) {
 		std::map<Client*, std::string>::iterator it;
 		for (it = mapOfClients.begin(); it != mapOfClients.end(); it++)
 		{
-			if (targetName == it->first->getNick()) // check if client is in channel in order to invite
+			if (client->getNick() == it->first->getNick()) // check if client is in channel in order to invite
 				break;
 		}
 		if (it == mapOfClients.end())
@@ -573,6 +600,22 @@ void    cmd_invite(Message * message) {
 			send(client->getSocket(), replies.ERR_NOTONCHANNEL(chanName).data(), replies.ERR_NOTONCHANNEL(chanName).size(), 0); // channel exists but client inviting not in it
 			return ;
 		}
+
+		// check if target client is in channel
+		for (it = mapOfClients.begin(); it != mapOfClients.end(); it++)
+		{
+			if (targetName == it->first->getNick()) // check if target client is in channel
+				break;
+		}
+		if (it != mapOfClients.end()) // if target client is already in channel
+		{
+			chanName += " ";
+			chanName += targetName;
+			send(client->getSocket(), replies.ERR_USERONCHANNEL(chanName).data(), replies.ERR_USERONCHANNEL(chanName).size(), 0);
+			return ;
+		}
+		for (std::map<Client*, std::string>::iterator it = mapOfClients.begin(); it != mapOfClients.end(); it++)
+			send(it->first->getSocket(), fullMsg.c_str(), fullMsg.size(), 0);
 	}
 	size_t i = 0;
 	while (i < server->getClients().size())
