@@ -75,7 +75,7 @@ void  Client::setPrefix(void)
 {
 		_prefix = _nick + "!" + _user + "@" + _hostname;
 //      _msgWelcome = ":" + _prefix + " 001 " + _nick + " :Welcome to the IRC__ Network, " + _prefix + "\n";
-	   std::cout << "test_setprefic: "<<_prefix << std::endl;
+	//    std::cout << "test_setprefic: "<<_prefix << std::endl;
  }
 
 void  Client::setNick(std::string &nickname)
