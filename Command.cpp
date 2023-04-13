@@ -140,12 +140,16 @@ void cmd_ping(Message * message)
 void cmd_join(Message * message)
 {
 	// TO DO: handle channel password
-	// TO DO: handle multiple channels split with ,
 	// User must provide a password if channel is key protected (k mode)
 	// to set a password: channel operator must do command: MODE #name_of_channel +k
 	Server * server = message->getServer();
 	Client * client = message->getClient();
 	Replies reply(*client);
+	if (message->getParams().size() < 1)
+	{
+		send(client->getSocket(), reply.ERR_NEEDMOREPARAMS(message->getCMD()).data(), reply.ERR_NEEDMOREPARAMS(message->getCMD()).size(), 0);
+		return ;
+	}
 	std::vector<std::string>	channels = server->msg_split(message->getParams()[0], ",");
 	// if channel does not exist, create a Channel object, put it in the channel list and put client as chan op
 	for (size_t i = 0; i < channels.size(); i++)
@@ -181,18 +185,15 @@ void cmd_join(Message * message)
 
 void cmd_part(Message * message)
 {
-	// TO DO: handle multiple channels split with ,
-	// std::string chanName = message->getParams()[0]; // get channel name
 	Server * server = message->getServer();
 	Client * client = message->getClient();
 	Replies replies(*client);
-	// std::string fullMsg = ":" + client->getPrefix() + " " + message->getFullMsg() + "\r\n";
-	std::vector<std::string>	channels = server->msg_split(message->getParams()[0], ",");
 	if (message->getParams().size() < 1)
 	{
 		send(client->getSocket(), replies.ERR_NEEDMOREPARAMS(message->getCMD()).data(), replies.ERR_NEEDMOREPARAMS(message->getCMD()).size(), 0);
 		return ;
 	}
+	std::vector<std::string>	channels = server->msg_split(message->getParams()[0], ",");
 	for (size_t i = 0; i < channels.size(); i++)
 	{
 		std::string chanName = channels[i].data(); // get channel name
