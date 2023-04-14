@@ -6,7 +6,7 @@
 /*   By: rliu <rliu@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 18:12:51 by guillemette       #+#    #+#             */
-/*   Updated: 2023/04/12 13:27:39 by rliu             ###   ########.fr       */
+/*   Updated: 2023/04/14 17:23:01 by rliu             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ class Client {
 		std::string	getPrefix(void) const;
         std::string getIRCMode(void) const;
         std::string getHostName(void) const;
-		bool		getRegistrationStatus (void) const;
+		bool		getRegistrationStatus (void);
 		std::string getRealName(void) const;
 		bool		getNickStatus (void) const;
 		bool		getUsrStatus (void) const;

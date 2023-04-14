@@ -6,7 +6,7 @@
 /*   By: rliu <rliu@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 18:12:21 by guillemette       #+#    #+#             */
-/*   Updated: 2023/04/12 13:29:59 by rliu             ###   ########.fr       */
+/*   Updated: 2023/04/14 17:22:51 by rliu             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ std::string Client::getIRCMode(void) const {return (this->_irc_mode);}
 
 std::string Client::getHostName(void) const {return (this->_hostname);}
 
-bool		Client::getRegistrationStatus(void) const {return (this->_isRegistered);}
+bool		Client::getRegistrationStatus(void) {return (this->_isRegistered);}
 
 std::string	Client::getPrefix(void) const {return (this->_prefix);}
 

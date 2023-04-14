@@ -6,7 +6,7 @@
 /*   By: rliu <rliu@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 17:43:49 by rliu              #+#    #+#             */
-/*   Updated: 2023/04/12 19:20:22 by rliu             ###   ########.fr       */
+/*   Updated: 2023/04/14 17:13:40 by rliu             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,7 @@ void Command::initCmdMap()
     _cmdMap["WHOIS"] = &cmd_whois;
     _cmdMap["INVITE"] = &cmd_invite;
     _cmdMap["MODE"] = &cmd_mode;
+	_cmdMap["QUIT"] = &cmd_quit;
 	// finir tous les messages d'erreurs
 	// Check memory management
 
@@ -180,6 +181,8 @@ void cmd_ping(Message * message)
 {
 	// As a result of server correctly responding "PONG", the irssi client interface does not
 	// show [LAG] message anymore
+	if (message->getClient()->getSocket() < 4)
+		return;
 	std::cout << "[Server] sending PONG to client (" <<message->getClient()->getSocket() << ")" << std::endl;
 	std::string answer = "PONG " + message->getParams()[0] + "\r\n";
 	send(message->getClient()->getSocket(), answer.c_str(), answer.size(), 0);
@@ -581,4 +584,19 @@ void		cmd_mode(Message * message)
 	(void)message;
 }
 
+void cmd_quit(Message *message){
+	Client *client = message->getClient();
+	Server *server = message->getServer();
+	std::string msg = message->getFullMsg();
+	int sfd = client->getSocket();
+	close(sfd);
+	for (size_t i = 0; i < server->_pollfds.size(); i++)
+		if(server->_pollfds[i].fd == sfd)
+			server->_pollfds.erase(server->_pollfds.begin() + i);
+	std::cout << "Client " << client->getNick() << "(" << sfd  << ") "  << msg + "\n";
+	if (server->getClients().find(sfd) != server->getClients().end() )
+		server->getClients().erase(sfd);
+
+
+}
 /* ************************************************************************** */
