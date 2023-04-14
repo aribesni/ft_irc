@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Replies.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rliu <rliu@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 18:14:00 by guillemette       #+#    #+#             */
-/*   Updated: 2023/04/13 17:44:36 by guillemette      ###   ########.fr       */
+/*   Updated: 2023/04/14 20:16:10 by guillemette      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,8 +21,8 @@
 		public :
 			Replies(){};
 			Replies(Client client) : _network("Internet Relay"), _nickname(client.getNick()), _user(client.getUser()), _host(client.getHostName()),\
-									_server("Ircserv"), _channel("<channel>"), _date_time("Tue March 14 at 12:05"), _version("1.0"), \
-									_irc_mode(client.getIRCMode()), _prefix(client.getPrefix()){};
+									_server("ircserv"), _date_time("Tue March 14 at 12:05"), _version("1.0"), \
+									_irc_mode(client.getIRCMode()), _prefix(client.getPrefix()), _realname(client.getRealName()){};
 			~Replies() {};
 
 			void	setVariables(Client client) {
@@ -31,12 +31,12 @@
 					this->_nickname = client.getNick();
 					this->_user = client.getUser();
 					this->_host = client.getHostName() ;
-					this->_server = "Ircserv";
-					this->_channel = "<channel>";
+					this->_server = "ircserv";
 					this->_date_time = "Tue March 14 at 12:05";
 					this->_version = "1.0";
 					this->_irc_mode = client.getIRCMode();
 					this->_prefix = client.getPrefix();
+					this->_realname = client.getRealName();
 				}
 				else
 				{
@@ -44,12 +44,12 @@
 					this->_nickname = "*";
 					this->_user = "*";
 					this->_host = "*" ;
-					this->_server = "Ircserv";
-					this->_channel = "<channel>";
+					this->_server = "ircserv";
 					this->_date_time = "Tue March 14 at 12:05";
 					this->_version = "1.0";
 					this->_irc_mode = "*";
 					this->_prefix = "*";
+					this->_realname = "*";
 				}
 			}
 
@@ -117,7 +117,8 @@
 			/* "303" */ std::string RPL_ISON() { return (":" + this->_prefix + " 303 " + this->_nickname + " " + ":*1" + this->_nickname + " *( ' ' " + this->_nickname + " )" + "\r\n"); };
 			/* "305" */ std::string RPL_UNAWAY() { return (":" + this->_prefix + " 305 " + this->_nickname + " " + ":<info>" + "\r\n"); };
 			/* "306" */ std::string RPL_NOWAWAY() { return (":" + this->_prefix + " 306 " + this->_nickname + " " + ":<info>" + "\r\n"); };
-			/* "311" */ std::string RPL_WHOISUSER() { return (":" + this->_prefix + " 311 " + this->_nickname + " " + this->_nickname + this->_user + " " + this->_host + "\r\n"); };
+			// /* "311" */ std::string RPL_WHOISUSER() { return (":" + this->_prefix + " 311 " + this->_nickname + " " + this->_user + " " + this->_host + " * :" + this->_realname + "\r\n"); };
+			/* "311" */ std::string RPL_WHOISUSER(std::string nick, std::string user, std::string host, std::string realname) { return (":" + this->_prefix + " 311 " + this->_nickname + " " + nick + " " + user + " " + host + " * :" + realname + "\r\n"); };
 			/* "312" */ std::string RPL_WHOISSERVER() { return (":" + this->_prefix + " 312 " + this->_nickname + " " + this->_nickname +  " " + this->_server + " :<server_info>" + "\r\n"); };
 			/* "313" */ std::string RPL_WHOISOPERATOR() { return (":" + this->_prefix + " 313 " + this->_nickname + " " + this->_nickname + " :<privileges>" + "\r\n"); };
 			/* "314" */ std::string RPL_WHOWASUSER() { return (":" + this->_prefix + " 314 " + this->_nickname + " " + this->_nickname + this->_user + " " + this->_host + " * :<real_name>" + "\r\n"); };
@@ -128,7 +129,7 @@
 			/* "321" */ std::string RPL_LISTSTART() { return (":" + this->_prefix + " 321 " + this->_nickname + " " + "Channels :Clients Name" + "\r\n"); };
 			/* "322" */ std::string RPL_LIST() { return (":" + this->_prefix + " 322 " + this->_nickname + " " + this->_channel + " <#_visible> :<topic>" + "\r\n"); };
 			/* "323" */ std::string RPL_LISTEND() { return (":" + this->_prefix + " 323 " + this->_nickname + " " + ":<info>" + "\r\n"); };
-			/* "324" */ std::string RPL_CHANNELMODEIS(std::string channel, std::string mode, std::string mode_params) { return (":" + this->_prefix + " 324 " + this->_nickname + " " + channel + " " + mode + " " +  mode_params + " " + "\r\n"); };
+			/* "324" */ std::string RPL_CHANNELMODEIS(std::string channel, std::string mode, std::string mode_params) { return (":" + this->_prefix + " 324 " + this->_nickname + " " + channel + " +" + mode + " " +  mode_params + " \r\n"); };
 			/* "325" */ std::string RPL_UNIQOPIS() { return (":" + this->_prefix + " 325 " + this->_nickname + " " + this->_channel + " <nickname>" + "\r\n"); };
 			/* "331" */ std::string RPL_NOTOPIC() { return (":" + this->_prefix + " 331 " + this->_nickname + " " + this->_channel + " :<info>" + "\r\n"); };
 			/* "332" */ std::string RPL_TOPIC() { return (":" + this->_prefix + " 332 " + this->_nickname + " " + this->_channel + " :<topic>" + "\r\n"); };
@@ -227,6 +228,7 @@
 				std::string	_version;
 				std::string	_irc_mode;
 				std::string	_prefix;
+				std::string	_realname;
 	};
 
 	#endif
