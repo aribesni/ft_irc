@@ -6,7 +6,7 @@
 /*   By: rliu <rliu@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 17:43:58 by rliu              #+#    #+#             */
-/*   Updated: 2023/04/13 13:20:01 by rliu             ###   ########.fr       */
+/*   Updated: 2023/04/14 18:28:55 by rliu             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,16 @@
 #include <string>
 #include <cstdlib>
 #include <ctime>
+
+#define USERMODEFLAGS "iswo"
+#define CHANMODEFLAGS "oitnk"
+
+struct modes {
+	std::string	raw;
+	char		sign;
+	std::string	match;
+	std::string	ret;
+};
 
 class Client;
 

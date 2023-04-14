@@ -6,7 +6,7 @@
 /*   By: rliu <rliu@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 18:12:51 by guillemette       #+#    #+#             */
-/*   Updated: 2023/04/14 17:23:01 by rliu             ###   ########.fr       */
+/*   Updated: 2023/04/14 18:20:20 by rliu             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ class Client {
 		void		setHostname(std::string &hostname);
 		void		setAsRegistered(void);
 		void		setPrefix(void);
-        void        setIRCMode(std::string mode);
+    void    setIRCMode(std::string mode);
 		void		setRealname(std::string &realname);
 		void		setNickRegistered(void);
 		void		setUsrRegistered(void);

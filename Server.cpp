@@ -152,7 +152,7 @@ void	Server::handleClientRequest(Client & client)
 	}
 }
 
-std::vector<std::string>	msg_split(std::string str, std::string delimiter)
+std::vector<std::string>	Server::msg_split(std::string str, std::string delimiter)
 {
 	std::vector<std::string> tokens = std::vector<std::string>();
 

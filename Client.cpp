@@ -6,7 +6,7 @@
 /*   By: rliu <rliu@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 18:12:21 by guillemette       #+#    #+#             */
-/*   Updated: 2023/04/14 17:22:51 by rliu             ###   ########.fr       */
+/*   Updated: 2023/04/14 18:19:41 by rliu             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,7 @@ void  Client::setPrefix(void)
 {
 		_prefix = _nick + "!" + _user + "@" + _hostname;
 //      _msgWelcome = ":" + _prefix + " 001 " + _nick + " :Welcome to the IRC__ Network, " + _prefix + "\n";
-	   std::cout << "test_setprefic: "<<_prefix << std::endl;
+	//    std::cout << "test_setprefic: "<<_prefix << std::endl;
  }
 
 void  Client::setNick(std::string &nickname)
@@ -83,9 +83,9 @@ void  Client::setNick(std::string &nickname)
 	_nick = nickname;
 }
 
-void  Client::setAsRegistered(void){
-    _isRegistered = true;
-    this->setIRCMode("wi");
+void 	Client::setAsRegistered(void)
+{
+	_isRegistered = true;
 }
 
 void  Client::setUsr(std::string &usrname)
