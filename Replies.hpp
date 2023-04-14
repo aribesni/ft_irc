@@ -6,7 +6,7 @@
 /*   By: rliu <rliu@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 18:14:00 by guillemette       #+#    #+#             */
-/*   Updated: 2023/04/12 15:35:06 by rliu             ###   ########.fr       */
+/*   Updated: 2023/04/13 17:44:36 by guillemette      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,7 +128,7 @@
 			/* "321" */ std::string RPL_LISTSTART() { return (":" + this->_prefix + " 321 " + this->_nickname + " " + "Channels :Clients Name" + "\r\n"); };
 			/* "322" */ std::string RPL_LIST() { return (":" + this->_prefix + " 322 " + this->_nickname + " " + this->_channel + " <#_visible> :<topic>" + "\r\n"); };
 			/* "323" */ std::string RPL_LISTEND() { return (":" + this->_prefix + " 323 " + this->_nickname + " " + ":<info>" + "\r\n"); };
-			/* "324" */ std::string RPL_CHANNELMODEIS() { return (":" + this->_prefix + " 324 " + this->_nickname + " " + this->_channel + " <mode> <mode_params>" + "\r\n"); };
+			/* "324" */ std::string RPL_CHANNELMODEIS(std::string channel, std::string mode, std::string mode_params) { return (":" + this->_prefix + " 324 " + this->_nickname + " " + channel + " " + mode + " " +  mode_params + " " + "\r\n"); };
 			/* "325" */ std::string RPL_UNIQOPIS() { return (":" + this->_prefix + " 325 " + this->_nickname + " " + this->_channel + " <nickname>" + "\r\n"); };
 			/* "331" */ std::string RPL_NOTOPIC() { return (":" + this->_prefix + " 331 " + this->_nickname + " " + this->_channel + " :<info>" + "\r\n"); };
 			/* "332" */ std::string RPL_TOPIC() { return (":" + this->_prefix + " 332 " + this->_nickname + " " + this->_channel + " :<topic>" + "\r\n"); };
@@ -213,7 +213,7 @@
 			/* "485" */ std::string ERR_UNIQOPRIVSNEEDED() { return (":" + this->_prefix + " 485 " + this->_nickname + " " + ":<reason>" + "\r\n"); };
 			/* "491" */ std::string ERR_NOOPERHOST() { return (":" + this->_prefix + " 491 " + this->_nickname + " " + ":<reason>" + "\r\n"); };
 			/* "501" */ std::string ERR_UMODEUNKNOWNFLAG() { return (":" + this->_prefix + " 501 " + this->_nickname + " " + ":<reason>" + "\r\n"); };
-			/* "502" */ std::string ERR_USERSDONTMATCH() { return (":" + this->_prefix + " 502 " + this->_nickname + " " + ":<reason>" + "\r\n"); };
+			/* "502" */ std::string ERR_USERSDONTMATCH() { return (":" + this->_prefix + " 502 " + this->_nickname + " " + ":Can\'t change mode for other users" + "\r\n"); };
 
 			private :
 

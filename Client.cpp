@@ -6,7 +6,7 @@
 /*   By: rliu <rliu@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 18:12:21 by guillemette       #+#    #+#             */
-/*   Updated: 2023/04/12 13:29:59 by rliu             ###   ########.fr       */
+/*   Updated: 2023/04/14 11:53:56 by guillemette      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,9 +83,9 @@ void  Client::setNick(std::string &nickname)
 	_nick = nickname;
 }
 
-void  Client::setAsRegistered(void){
-    _isRegistered = true;
-    this->setIRCMode("wi");
+void 	Client::setAsRegistered(void)
+{
+	_isRegistered = true;
 }
 
 void  Client::setUsr(std::string &usrname)

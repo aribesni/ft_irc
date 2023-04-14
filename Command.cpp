@@ -6,7 +6,7 @@
 /*   By: rliu <rliu@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 17:43:49 by rliu              #+#    #+#             */
-/*   Updated: 2023/04/12 19:20:22 by rliu             ###   ########.fr       */
+/*   Updated: 2023/04/14 12:00:22 by guillemette      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,23 +31,22 @@ Command::~Command(void){}
 
 void Command::initCmdMap()
 {
-	_cmdMap["PASS"] = &cmd_pass;
-	_cmdMap["NICK"] = &cmd_nick;
-	_cmdMap["USER"] = &cmd_user;
+	_cmdMap["PASS"] = &cmd_pass; /*Ran*/
+	_cmdMap["NICK"] = &cmd_nick; /*Ran*/
+	_cmdMap["USER"] = &cmd_user; /*Ran*/
 	_cmdMap["PING"] = &cmd_ping;
-	_cmdMap["JOIN"] = &cmd_join;
-	_cmdMap["PRIVMSG"] = &cmd_privmsg;
-	_cmdMap["PART"] = &cmd_part;
-    _cmdMap["OPER"] = &cmd_oper; /* grants the IRC operator status*/
-    // _cmdMap["OP"] = &cmd_op; /* TO DO: grants the channel operator status*/
-    _cmdMap["WALLOPS"] = &cmd_wallops;
-    _cmdMap["KILL"] = &cmd_kill;
-    _cmdMap["KICK"] = &cmd_kick;
-    _cmdMap["NOTICE"] = &cmd_notice;
-    _cmdMap["WHOIS"] = &cmd_whois;
-    _cmdMap["INVITE"] = &cmd_invite;
-    _cmdMap["MODE"] = &cmd_mode;
-	// finir tous les messages d'erreurs
+	_cmdMap["JOIN"] = &cmd_join; /*Aristide*/
+	_cmdMap["PRIVMSG"] = &cmd_privmsg; /*Guillemette*/
+	_cmdMap["PART"] = &cmd_part; /*Guillemette*/
+    _cmdMap["OPER"] = &cmd_oper; /*Aristide*/
+    _cmdMap["WALLOPS"] = &cmd_wallops;/*Aristide*/
+    _cmdMap["KILL"] = &cmd_kill;/*Aristide*/
+    _cmdMap["KICK"] = &cmd_kick; /*Aristide*/
+    _cmdMap["NOTICE"] = &cmd_notice; /*Guillemette*/
+    _cmdMap["WHOIS"] = &cmd_whois; /*Guillemette*/
+    _cmdMap["INVITE"] = &cmd_invite; /*Aristide*/
+    _cmdMap["MODE"] = &cmd_mode; /*Guillemette*/
+	// Ctrl C signal handling Aristide/Ran
 	// Check memory management
 
 
@@ -290,7 +289,6 @@ void cmd_privmsg(Message * message)
         //    ERR_CANNOTSENDTOCHAN            ERR_NOTOPLEVEL
         //    ERR_WILDTOPLEVEL                ERR_TOOMANYTARGETS
         //    ERR_NOSUCHNICK
-        //    RPL_AWAY
 	Server * server = message->getServer();
 	Client * client = message->getClient();
 	if (message->getParams().size() == 0)
@@ -550,8 +548,8 @@ void    cmd_kick(Message * message) {
 	}
 }
 
-void    cmd_invite(Message * message) {
-
+void	cmd_invite(Message * message) {
+// TO DO: handle multiple targets
 	std::string chanName = message->getParams()[1];
 	std::string targetName = message->getParams()[0];
 	Server * server = message->getServer();
@@ -590,9 +588,229 @@ void    cmd_invite(Message * message) {
 	}
 }
 
+void		changeChanMode(modes & reqmode, Client * client, Channel * channel, std::vector<std::string> msg_params)
+{
+	(void)msg_params;
+	std::string change = "";
+	std::string currentmode = client->getIRCMode();
+	std::map<Client*, std::string> mapOfClients = channel->getClientsMap();
+	std::map<Client*, std::string>::iterator it;
+	if (reqmode.sign == '+')
+	{
+		for (size_t i = 0; i < reqmode.match.size(); i++)
+		{
+			// How to handle missing username for o
+			if (currentmode.find(reqmode.match[i]) == std::string::npos && reqmode.match[i] != 'o')
+				change.push_back(reqmode.match[i]);
+			else if (currentmode.find(reqmode.match[i]) == std::string::npos && reqmode.match[i] == 'o' && msg_params.size() > 2) /*if o option, check that nickname is in chan*/
+			{
+				// TO DO: check what happens if given nick is user's nick
+				for (it = mapOfClients.begin(); it != mapOfClients.end(); it++)
+				{
+					if (msg_params[2] == it->first->getNick())
+						break;
+				}
+				if (it != mapOfClients.end()) // if target client is in channel
+					change.push_back(reqmode.match[i]);
+			}
+		}
+	}
+	else
+	{
+		for (size_t i = 0; i < reqmode.match.size(); i++)
+		{
+			if (currentmode.find(reqmode.match[i]) != std::string::npos && reqmode.match[i] != 'o')
+				change.push_back(reqmode.match[i]);
+			else if (currentmode.find(reqmode.match[i]) != std::string::npos && reqmode.match[i] == 'o' && msg_params.size() > 2)
+			{
+				// TO DO: check what happens if given nick is user's nick
+				for (it = mapOfClients.begin(); it != mapOfClients.end(); it++)
+				{
+					if (msg_params[2] == it->first->getNick())
+						break;
+				}
+				if (it != mapOfClients.end()) // if target client is in channel
+					change.push_back(reqmode.match[i]);
+			}
+		}
+	}
+	if (change != "")
+	{
+		std::string fullMsg = ":" + client->getPrefix() + " " + "MODE " + client->getNick() + " " + reqmode.sign + change + "\r\n";
+		// Echo change to all clients in channel
+		for (it = mapOfClients.begin(); it != mapOfClients.end(); it++)
+			send(it->first->getSocket(), fullMsg.c_str(), fullMsg.size(), 0);
+		if (reqmode.sign == '+')
+			channel->setMode(currentmode + change);
+		else
+		{
+			for (size_t i = 0; i < change.size(); i++)
+				currentmode.erase(remove(currentmode.begin(), currentmode.end(), change[i]), currentmode.end());
+			client->setIRCMode(currentmode);
+		}
+		if (DEBUG)
+			std::cout << "New IRC mode: " << channel->getMode() << std::endl;
+	}
+}
+
+void		changeIRCMode(modes & reqmode, Client * client)
+{
+	std::string change = "";
+	std::string currentmode = client->getIRCMode();
+	if (reqmode.sign == '+')
+	{
+		for (size_t i = 0; i < reqmode.match.size(); i++)
+		{
+			if (currentmode.find(reqmode.match[i]) == std::string::npos && reqmode.match[i] != 'o')
+				change.push_back(reqmode.match[i]);
+		}
+	}
+	else
+	{
+		for (size_t i = 0; i < reqmode.match.size(); i++)
+		{
+			if (currentmode.find(reqmode.match[i]) != std::string::npos)
+				change.push_back(reqmode.match[i]);
+		}
+	}
+	if (change != "")
+	{
+		std::string fullMsg = ":" + client->getPrefix() + " " + "MODE " + client->getNick() + " " + reqmode.sign + change + "\r\n";
+		send(client->getSocket(), fullMsg.c_str(), fullMsg.size(), 0);
+		if (reqmode.sign == '+')
+			client->setIRCMode(currentmode + change);
+		else
+		{
+			for (size_t i = 0; i < change.size(); i++)
+				currentmode.erase(remove(currentmode.begin(), currentmode.end(), change[i]), currentmode.end());
+			client->setIRCMode(currentmode);
+		}
+		if (DEBUG)
+			std::cout << "New IRC mode: " << client->getIRCMode() << std::endl;
+	}
+}
+
+void		setModesAttributes(modes & reqmode, std::string raw, std::string flags)
+{
+	if (raw == "")
+		return;
+	if (raw[0] == '-' || raw[0] == '+')
+	{
+		reqmode.sign = 	raw[0];
+		reqmode.raw = raw.substr(1);
+	}
+	else
+	{
+		reqmode.sign = '+';
+		reqmode.raw = raw;
+	}
+	std::string match = "";
+	for (size_t i = 0; i < reqmode.raw.size(); i++)
+	{
+		if (flags.find(reqmode.raw[i]) != std::string::npos && match.find(reqmode.raw[i]) == std::string::npos)
+			match.push_back(reqmode.raw[i]);
+		else if (flags.find(reqmode.raw[i]) == std::string::npos)
+			reqmode.ret.push_back(reqmode.raw[i]);
+	}
+	reqmode.match = match;
+	if (DEBUG)
+		std::cout << "Match: " << reqmode.match << " and sign: " << reqmode.sign << " and ret: " << reqmode.ret << std::endl;
+}
+
 void		cmd_mode(Message * message)
 {
-	(void)message;
+	Server * server = message->getServer();
+	Client * client = message->getClient();
+	Replies reply(*client);
+
+	if (message->getParams().size() == 0)
+	{
+		send(client->getSocket(), reply.ERR_NEEDMOREPARAMS("MODE").data(), reply.ERR_NEEDMOREPARAMS("MODE").size(), 0);
+		return ;
+	}
+	std::string msgtarget = message->getParams()[0];
+	std::string mode = message->getParams()[1];
+	// Channel modes
+	if (msgtarget[0] == '#')
+	{
+		// Cannot find the channel
+		if (server->_channels.find(msgtarget) == server->_channels.end())
+		{
+			send(client->getSocket(), reply.ERR_NOSUCHCHANNEL(msgtarget).data(), reply.ERR_NOSUCHCHANNEL(msgtarget).size(), 0);
+			return ;
+		}
+		Channel * channel = &server->_channels[msgtarget];
+		// Channel found w/o other params >> for info only
+		if (message->getParams().size() == 1)
+		{
+			send(client->getSocket(), reply.RPL_CHANNELMODEIS(channel->getName(), channel->getMode(), "params").data(), reply.RPL_CHANNELMODEIS(channel->getName(), channel->getMode(), "params").size(), 0);
+			return ;
+		}
+		// Not a channel operator of the channel
+		std::map<Client*, std::string> mapOfClients = server->_channels[msgtarget].getClientsMap();
+		if (mapOfClients[client].find('o') == std::string::npos)
+		{
+			send(client->getSocket(), reply.ERR_CHANOPRIVSNEEDED(msgtarget).data(), reply.ERR_CHANOPRIVSNEEDED(msgtarget).size(), 0);
+			return ;
+		}
+		return ;
+		// Parse mode
+		modes reqmode;
+		setModesAttributes(reqmode, message->getParams()[1], CHANMODEFLAGS);
+		changeChanMode(reqmode, client, channel, message->getParams());
+	}
+	else
+	// User modes
+	{
+		if (msgtarget != client->getNick()) /* error- Can't change mode for other users */
+		{
+			send(client->getSocket(), reply.ERR_USERSDONTMATCH().data(), reply.ERR_USERSDONTMATCH().size(), 0);
+			return ;
+		}
+		else if (message->getParams().size() == 1) /* display user mode*/
+		{
+			send(client->getSocket(), reply.RPL_UMODEIS().data(), reply.RPL_UMODEIS().size(), 0);
+			return ;
+		}
+		else /* change user mode*/
+		{
+			modes reqmode;
+			setModesAttributes(reqmode, message->getParams()[1], USERMODEFLAGS);
+			changeIRCMode(reqmode, client);
+			if (reqmode.ret != "")
+			{
+				Replies reply(*client);
+				send(client->getSocket(), reply.ERR_UNKNOWNMODE().data(), reply.ERR_UNKNOWNMODE().size(), 0);
+			}
+			return ;
+		}
+	}
+
+//    The MODE command is provided so that user chan change their own mode
+//    i - marks a user as invisible;
+//    s - marks a user for receipt of server notices;
+//    w - user receives wallops;
+//    o - operator flag.
+
+
+//    The MODE command is provided so that channel operators may change the
+//    characteristics of `their' channel.  It is also required that servers
+//    be able to change channel modes so that channel operators may be
+//    created.
+
+//    The various modes available for channels are as follows:
+
+//  o - give/take channel operator privileges;
+//  (not handled) - private channel flag;
+//  (not handled) - secret channel flag;
+//  i - invite-only channel flag;
+//  t - topic settable by channel operator only flag;
+//  n - no messages to channel from clients on the outside;
+//  (not handled) - moderated channel;
+//  (not handled) l - set the user limit to channel;
+//  (not handled) b - set a ban mask to keep users out;
+//  (not handled) v - give/take the ability to speak on a moderated channel;
+//  (not handled) k - set a channel key (password).
 }
 
 /* ************************************************************************** */
