@@ -6,7 +6,7 @@
 /*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 17:43:58 by rliu              #+#    #+#             */
-/*   Updated: 2023/04/08 11:10:42 by guillemette      ###   ########.fr       */
+/*   Updated: 2023/04/13 12:44:37 by guillemette      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,16 @@
 #include "Message.hpp"
 #include "Channel.hpp"
 #include <string>
+
+#define USERMODEFLAGS "iswo"
+#define CHANMODEFLAGS "oitnk"
+
+struct modes {
+	std::string	raw;
+	char		sign;
+	std::string	match;
+	std::string	ret;
+};
 
 class Client;
 
