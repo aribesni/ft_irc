@@ -3,7 +3,7 @@
 /*                                                        :::      ::::::::   */
 /*   Command.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
+/*   By: rliu <rliu@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 17:43:49 by rliu              #+#    #+#             */
 /*   Updated: 2023/04/14 12:00:22 by guillemette      ###   ########.fr       */
@@ -63,68 +63,116 @@ void Command::initCmdMap()
 }
 
 /*
-** --------------------------------- utils---------------------------------
-*/
-
-void msgSender(Client &client, std::string cmd, std::string msg){
-    std::string msgSend = ":" +client.getPrefix() + " " + cmd + " " + msg + "/r/n";
-    send(client.getSocket(), msgSend.c_str(), msgSend.size(), 0);
-}
-
-std::string createNickname(Client &client){
-    std::ostringstream oOStrStream;
-    oOStrStream << client.getSocket();
-
-    std::string name = "Guest" + oOStrStream.str();
-    return(name);
-}
-
-/*
 ** --------------------------------- COMMANDS ---------------------------------
 */
 
-
 void cmd_pass(Message * message)
 {
-	// TO DO: ERR_NEEDMOREPARAMS              ERR_ALREADYREGISTRED
-	if (message->getServer()->getPassword() != message->getParams()[0]){
-		std::cout << "wrong password\n";
-		return;
-    }
-	else
+	// TO DO: ERR_NEEDMOREPARAMS              ERR_ALREADYREGISTRED _ fixed
+	Server * server = message->getServer();
+	Client * client = message->getClient();
+	Replies reply(*client);
+	std::string rplErr;
+	if (client->getPassStatus()){
+		rplErr=reply.ERR_ALREADYREGISTRED("PASS");
+		send(client->getSocket(),rplErr.c_str(), rplErr.size(), 0);
+	}
+	else if (message->getParams().size() < 1 || message->getParams().empty()){
+		std::string rplErr = reply.ERR_NEEDMOREPARAMS("PASS");
+		//send(client->getSocket(),rplErr.c_str(), rplErr.size(), 0);
+	}
+	else if (server->getPassword() != message->getParams()[0]){
+		std::string reason = "password is wrong";
+		std::string rplErr = reply.ERR_NEEDMOREPARAMS("PASS");
+		std::cout << reason << std::endl;
+		send(client->getSocket(),rplErr.c_str(), rplErr.size(), 0);
+	}
+	else{
 		message->getClient()->setPass( message->getParams()[0]);
+		client->setPassRegistered();
+	}
 }
 
 void cmd_nick(Message * message)
 {
-	//TO DO:    ERR_NONICKNAMEGIVEN      ERR_NICKCOLLISION
-	Replies reply(*(message->getClient()));
-	std::string nick = message->getParams()[0];
-    if (nick.size() > 9 || nick.empty()){
-        nick = createNickname(*(message->getClient()));
-        send(message->getClient()->getSocket(),reply.ERR_ERRONEUSNICKNAME().c_str(), reply.ERR_ERRONEUSNICKNAME().size(), 0);
-    }
-
-    std::map<int, Client>::iterator     it;
-    for (it = message->getServer()->getClients().begin(); it != message->getServer()->getClients().end(); it++)
-    {
-        if (it->first == message->getClient()->getSocket()) // don't send message to client's own fd
-            continue ;
-        if (nick == it->second.getNick()){
-            nick = createNickname(*(message->getClient()));
-            send(message->getClient()->getSocket(),reply.ERR_NICKNAMEINUSE().c_str(), reply.ERR_NICKNAMEINUSE().size(), 0);
-        }
-    }
-   	message->getClient()->setNick(message->getParams()[0]);
-	if(nick != message->getParams()[0])
-		msgSender(*(message->getClient()), "NICK", nick);
+	//TO DO:    ERR_NONICKNAMEGIVEN(fixed)     ERR_NICKCOLLISION(this is for multiservers we don't need)
+	Server * server = message->getServer();
+	Client * client = message->getClient();
+	Replies reply(*client);
+	std::string rplErr;
+	//ERR_NONICKNAMEGIVEN
+	if (message->getParams().size()< 1 || message->getParams()[0].empty())
+	{
+		rplErr = reply.ERR_NONICKNAMEGIVEN();
+		send(client->getSocket(),rplErr.c_str(), rplErr.size(), 0);
+		return;
+	}
+	else{	
+		std::string nick = message->getParams()[0];
+    	if (nick.size() > 9){
+        	nick.resize(9);
+		}
+		//ERRONEUSNICKNAME
+		for (size_t i = 0; i < nick.size(); i++)
+		{
+			if (isdigit(nick[0]) || !isprint(nick[i])){
+				rplErr = reply.ERR_ERRONEUSNICKNAME(nick, "Erroneous nickname");
+				send(client->getSocket(),rplErr.c_str(), rplErr.size(), 0);
+				return;
+			}
+		}
+		std::map<int, Client>::iterator     it;
+		for (it = server->getClients().begin(); it != server->getClients().end(); it++)
+		{
+			if (it->first == client->getSocket()) // don't send message to client's own fd
+				continue ;
+			if (nick == it->second.getNick()){
+				std::string rplNickInUse;
+				rplNickInUse = reply.ERR_NICKNAMEINUSE(nick, "this nickname is in use!");
+				send(client->getSocket(),rplNickInUse.c_str(), rplNickInUse.size(), 0);
+				return;
+			}
+    	}
+		client->setNick(nick);
+		client->setNickRegistered();
+		if (client->getRegistrationStatus())
+		{
+			std::string msg = ":" + client->getPrefix() + " " + message->getFullMsg() + "\r\n";
+			send(client->getSocket(), msg.c_str(), msg.size(), 0);
+			client->setPrefix();
+		}
+			
+	}		
 }
 
 void cmd_user(Message * message)
 {
 	// TO DO ERR_NEEDMOREPARAMS              ERR_ALREADYREGISTRED
-	message->getClient()->setUsr(message->getParams()[0]);
-	message->getClient()->setHostname(message->getParams()[2]);
+	Client * client = message->getClient();
+	Replies reply(*client);
+	std::string rplErr;
+	if (client->getUsrStatus()){
+		rplErr = reply.ERR_ALREADYREGISTRED("USER is already registered");
+		std::cout << "test usr" << message->getFullMsg() << std::endl;
+		send(client->getSocket(),rplErr.c_str(), rplErr.size(), 0);
+		return;
+	 }
+	//ERR_NEEDMOREPARAMS 
+	if (message->getParams().size()< 4 || message->getParams()[0].empty())
+	{
+		rplErr = reply.ERR_NONICKNAMEGIVEN();
+		send(client->getSocket(),rplErr.c_str(), rplErr.size(), 0);
+		return;
+	}
+	else{
+		client->setUsr(message->getParams()[0]);
+		client->setHostname(message->getParams()[2]);
+		std::string realName(message->getParams()[3], 1, message->getParams()[3].size()-1);
+		for (size_t i = 4; i < message->getParams().size(); i++)
+			realName += " " + message->getParams()[i];
+		client->setRealname(realName);
+		client->setUsrRegistered();
+	 }
 }
 
 void cmd_ping(Message * message)
@@ -141,72 +189,88 @@ void cmd_join(Message * message)
 	// TO DO: handle channel password
 	// User must provide a password if channel is key protected (k mode)
 	// to set a password: channel operator must do command: MODE #name_of_channel +k
-	std::string chanName = message->getParams()[0]; // get channel name
 	Server * server = message->getServer();
 	Client * client = message->getClient();
 	Replies reply(*client);
-	std::string fullMsg = ":" + client->getPrefix() + " " + message->getFullMsg() + "\r\n";
-	// if channel does not exist, create a Channel object, put it in the channel list and put client as chan op
-	if (server->_channels.find(chanName) == server->_channels.end())
+	if (message->getParams().size() < 1)
 	{
-		std::cout << "Channel " << chanName << " does not exist" << std::endl;
-		// Create channel and set first client as chan operator
-		Channel mychan(chanName, client, "o");
-		server->_channels[chanName] = mychan;
-		std::map<Client*, std::string> mapOfClients = server->_channels[chanName].getClientsMap();
-		std::cout << "Channel " << chanName << " created and added to server list. User added to channel." << std::endl;
-		for (std::map<Client*, std::string>::iterator it = mapOfClients.begin(); it != mapOfClients.end(); it++)
-			send(it->first->getSocket(), fullMsg.c_str(), fullMsg.size(), 0); // JOIN message from server
-		send(client->getSocket(), reply.RPL_NAMREPLY(chanName, "=", "@").c_str(), reply.RPL_NAMREPLY(chanName, "=", "@").size(), 0); // list of members in the channel
-		send(client->getSocket(), reply.RPL_ENDOFNAMES(chanName).c_str(), reply.RPL_ENDOFNAMES(chanName).size(), 0); // end of member list
+		send(client->getSocket(), reply.ERR_NEEDMOREPARAMS(message->getCMD()).data(), reply.ERR_NEEDMOREPARAMS(message->getCMD()).size(), 0);
+		return ;
 	}
-	else
+	std::vector<std::string>	channels = server->msg_split(message->getParams()[0], ",");
+	// if channel does not exist, create a Channel object, put it in the channel list and put client as chan op
+	for (size_t i = 0; i < channels.size(); i++)
 	{
-		std::cout << "Channel " << chanName << " already exists" << std::endl;
-		server->_channels[chanName].addClient(client, "");
-		std::map<Client*, std::string> mapOfClients = server->_channels[chanName].getClientsMap();
-		std::cout << "User added to channel." << std::endl;
-		for (std::map<Client*, std::string>::iterator it = mapOfClients.begin(); it != mapOfClients.end(); it++)
-			send(it->first->getSocket(), fullMsg.c_str(), fullMsg.size(), 0); // JOIN message from server
-		send(client->getSocket(), reply.RPL_NAMREPLY(chanName, "=", "@").c_str(), reply.RPL_NAMREPLY(chanName, "=", "@").size(), 0); // list of members in the channel
-		send(client->getSocket(), reply.RPL_ENDOFNAMES(chanName).c_str(), reply.RPL_ENDOFNAMES(chanName).size(), 0); // end of member list
+		std::string chanName = channels[i].data(); // get channel name
+		std::string fullMsg = ":" + client->getPrefix() + " " + message->getCMD() + " :" + chanName + "\r\n";
+		if (server->_channels.find(chanName) == server->_channels.end())
+		{
+			std::cout << "Channel " << chanName << " does not exist" << std::endl;
+			// Create channel and set first client as chan operator
+			Channel mychan(chanName, client, "o");
+			server->_channels[chanName] = mychan;
+			std::map<Client*, std::string> mapOfClients = server->_channels[chanName].getClientsMap();
+			std::cout << "Channel " << chanName << " created and added to server list. User added to channel." << std::endl;
+			for (std::map<Client*, std::string>::iterator it = mapOfClients.begin(); it != mapOfClients.end(); it++)
+				send(it->first->getSocket(), fullMsg.c_str(), fullMsg.size(), 0); // JOIN message from server
+			send(client->getSocket(), reply.RPL_NAMREPLY(chanName, "=", "@").c_str(), reply.RPL_NAMREPLY(chanName, "=", "@").size(), 0); // list of members in the channel
+			send(client->getSocket(), reply.RPL_ENDOFNAMES(chanName).c_str(), reply.RPL_ENDOFNAMES(chanName).size(), 0); // end of member list
+		}
+		else
+		{
+			std::cout << "Channel " << chanName << " already exists" << std::endl;
+			server->_channels[chanName].addClient(client, "");
+			std::map<Client*, std::string> mapOfClients = server->_channels[chanName].getClientsMap();
+			std::cout << "User added to channel." << std::endl;
+			for (std::map<Client*, std::string>::iterator it = mapOfClients.begin(); it != mapOfClients.end(); it++)
+				send(it->first->getSocket(), fullMsg.c_str(), fullMsg.size(), 0); // JOIN message from server
+			send(client->getSocket(), reply.RPL_NAMREPLY(chanName, "=", "@").c_str(), reply.RPL_NAMREPLY(chanName, "=", "@").size(), 0); // list of members in the channel
+			send(client->getSocket(), reply.RPL_ENDOFNAMES(chanName).c_str(), reply.RPL_ENDOFNAMES(chanName).size(), 0); // end of member list
+		}
 	}
 }
 
 void cmd_part(Message * message)
 {
-	// TO DO: handle error if no given channel ERR_NEEDMOREPARAMS
-	// TO DO: handle multiple channels split with ,
-	std::string chanName = message->getParams()[0]; // get channel name
 	Server * server = message->getServer();
 	Client * client = message->getClient();
 	Replies replies(*client);
-	std::string fullMsg = ":" + client->getPrefix() + " " + message->getFullMsg() + "\r\n";
-	if (server->_channels.find(chanName) == server->_channels.end()) // check if channel exists
+	if (message->getParams().size() < 1)
 	{
-		// std::cout << "Channel " << chanName << " does not exist" << std::endl;
-		send(client->getSocket(), replies.ERR_NOSUCHCHANNEL(chanName).data(), replies.ERR_NOSUCHCHANNEL(chanName).size(), 0); // channel does not exist
+		send(client->getSocket(), replies.ERR_NEEDMOREPARAMS(message->getCMD()).data(), replies.ERR_NEEDMOREPARAMS(message->getCMD()).size(), 0);
+		return ;
 	}
-	else
+	std::vector<std::string>	channels = server->msg_split(message->getParams()[0], ",");
+	for (size_t i = 0; i < channels.size(); i++)
 	{
-		std::map<Client*, std::string>& mapOfClients = server->_channels[chanName].getClientsMap();
+		std::string chanName = channels[i].data(); // get channel name
+		std::string fullMsg = ":" + client->getPrefix() + " " + message->getCMD() + " :" + chanName + "\r\n";
 		std::map<Client*, std::string>::iterator it;
-		for (it = mapOfClients.begin(); it != mapOfClients.end(); it++)
+		if (server->_channels.find(chanName) == server->_channels.end()) // check if channel exists
 		{
-			if (client->getSocket() == it->first->getSocket()) // check if client in channel
+			// std::cout << "Channel " << chanName << " does not exist" << std::endl;
+			send(client->getSocket(), replies.ERR_NOSUCHCHANNEL(chanName).data(), replies.ERR_NOSUCHCHANNEL(chanName).size(), 0); // channel does not exist
+		}
+		else
+		{
+			std::map<Client*, std::string>& mapOfClients = server->_channels[chanName].getClientsMap();
+			for (it = mapOfClients.begin(); it != mapOfClients.end(); it++)
+			{
+				if (client->getSocket() == it->first->getSocket()) // check if client in channel
+					break;
+			}
+			if (it == mapOfClients.end())
+			{
+				send(client->getSocket(), replies.ERR_NOTONCHANNEL(chanName).data(), replies.ERR_NOTONCHANNEL(chanName).size(), 0); // channel exists but client not in it
 				break;
+			}
+			for (std::map<Client*, std::string>::iterator it = mapOfClients.begin(); it != mapOfClients.end(); it++)
+				send(it->first->getSocket(), fullMsg.c_str(), fullMsg.size(), 0); // send /PART message to all clients on channel
+			server->_channels[chanName].removeClient(client); // remove client from our list of clients in channel
+			// Check if channel is empty, if so, erase it
+			if (mapOfClients.empty())
+				server->_channels.erase(chanName);
 		}
-		if (it == mapOfClients.end())
-		{
-			send(client->getSocket(), replies.ERR_NOTONCHANNEL(chanName).data(), replies.ERR_NOTONCHANNEL(chanName).size(), 0); // channel exists but client not in it
-			return ;
-		}
-		for (std::map<Client*, std::string>::iterator it = mapOfClients.begin(); it != mapOfClients.end(); it++)
-			send(it->first->getSocket(), fullMsg.c_str(), fullMsg.size(), 0); // send /PART message to all clients on channel
-		server->_channels[chanName].removeClient(client); // remove client from our list of clients in channel
-		// Check if channel is empty, if so, erase it
-		if (mapOfClients.empty())
-			server->_channels.erase(chanName);
 	}
 }
 
@@ -238,9 +302,12 @@ void cmd_privmsg(Message * message)
 	std::string msgtarget = message->getParams()[0];
 	std::vector<std::string> targets = message->getTargets();
 	std::string fullMsg = ":" + client->getPrefix() + " " + message->getFullMsg() + "\r\n";
+	
 	for (size_t i = 0; i < targets.size(); i++)
 	{
-		if (targets[i][0] == '#')
+		if (targets[i] == "#bot")
+			botReply(message);	
+		else if (targets[i][0] == '#')
 		{
 			if (server->_channels.find(targets[i]) == server->_channels.end()) /* channel does not exist*/
 			{
@@ -348,9 +415,7 @@ void    cmd_wallops(Message * message) {
 	Server	*server = message->getServer();
     Replies replies(*client);
 
-
 	std::string wallop = ":" + client->getPrefix() + " WALLOPS " + message->getParams()[0] + "\r\n";
-
     if (client->getIRCMode().find("o") == std::string::npos) // check if user has IRC operator privileges
         send(client->getSocket(), replies.ERR_NOPRIVILEGES("Permission Denied- You're not an IRC operator").data(), replies.ERR_NOPRIVILEGES("Permission Denied- You're not an IRC operator").size(), 0);
 	else

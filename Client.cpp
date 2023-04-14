@@ -3,7 +3,7 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
+/*   By: rliu <rliu@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 18:12:21 by guillemette       #+#    #+#             */
 /*   Updated: 2023/04/14 11:53:56 by guillemette      ###   ########.fr       */
@@ -16,7 +16,7 @@
 ** ------------------------------- CONSTRUCTOR --------------------------------
 */
 
-Client::Client(void) : _isRegistered(false) {
+Client::Client(void) : _isRegistered(false), _nickRegistered(false), _usrRegistered(false), _passRegistered(false) {
 // TO DO: Change memset to a c++ method/func
 	memset(this->_host, 0, NI_MAXHOST);
 	this->_socklen = sizeof(this->_sockaddr);
@@ -54,6 +54,14 @@ bool		Client::getRegistrationStatus(void) const {return (this->_isRegistered);}
 
 std::string	Client::getPrefix(void) const {return (this->_prefix);}
 
+std::string Client::getRealName(void) const {return (this->_realname);}
+
+bool		Client::getNickStatus (void) const{return (this->_nickRegistered);}
+
+bool		Client::getUsrStatus (void) const{return (this->_usrRegistered);}
+
+bool		Client::getPassStatus (void) const{return (this->_passRegistered);}
+
 /*
 ** --------------------------------- SETTERS ----------------------------------
 */
@@ -67,7 +75,7 @@ void  Client::setPrefix(void)
 {
 		_prefix = _nick + "!" + _user + "@" + _hostname;
 //      _msgWelcome = ":" + _prefix + " 001 " + _nick + " :Welcome to the IRC__ Network, " + _prefix + "\n";
-	   std::cout << "test_setprefic: "<<_prefix << std::endl;
+	//    std::cout << "test_setprefic: "<<_prefix << std::endl;
  }
 
 void  Client::setNick(std::string &nickname)
@@ -98,4 +106,21 @@ void  Client::setHostname(std::string &hostname)
 void    Client::setIRCMode(std::string mode) {
 
     this->_irc_mode = mode;
+}
+
+void	Client::setRealname(std::string &realname)
+{
+	_realname = realname;
+}
+
+void		Client::setNickRegistered(void){
+	_nickRegistered = true;
+}
+
+void		Client::setUsrRegistered(void){
+	_usrRegistered = true;
+}
+
+void	Client::setPassRegistered(void){
+		_passRegistered = true;
 }

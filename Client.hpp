@@ -3,7 +3,7 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
+/*   By: rliu <rliu@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 18:12:51 by guillemette       #+#    #+#             */
 /*   Updated: 2023/04/14 11:53:15 by guillemette      ###   ########.fr       */
@@ -33,7 +33,10 @@ class Client {
         std::string getIRCMode(void) const;
         std::string getHostName(void) const;
 		bool		getRegistrationStatus (void) const;
-
+		std::string getRealName(void) const;
+		bool		getNickStatus (void) const;
+		bool		getUsrStatus (void) const;
+		bool		getPassStatus (void) const;
 		// SETTERS
 		void		setSocket(int socket);
 		void		setNick(std::string &nickname);
@@ -42,7 +45,11 @@ class Client {
 		void		setHostname(std::string &hostname);
 		void		setAsRegistered(void);
 		void		setPrefix(void);
-		void		setIRCMode(std::string mode);
+    void    setIRCMode(std::string mode);
+		void		setRealname(std::string &realname);
+		void		setNickRegistered(void);
+		void		setUsrRegistered(void);
+		void		setPassRegistered(void);
 
 		sockaddr_in _sockaddr;
 		socklen_t   _socklen;
@@ -59,6 +66,10 @@ class Client {
 		std::string	_pass;
 		std::string	_msgWelcome;
 		std::string _irc_mode;
+		std::string _realname;
+		bool		_nickRegistered;
+		bool		_usrRegistered;
+		bool		_passRegistered;
 };
 
 // irc mode (user mode)

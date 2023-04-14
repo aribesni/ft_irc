@@ -3,7 +3,7 @@
 /*                                                        :::      ::::::::   */
 /*   Command.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
+/*   By: rliu <rliu@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 17:43:58 by rliu              #+#    #+#             */
 /*   Updated: 2023/04/13 12:44:37 by guillemette      ###   ########.fr       */
@@ -19,6 +19,8 @@
 #include "Message.hpp"
 #include "Channel.hpp"
 #include <string>
+#include <cstdlib>
+#include <ctime>
 
 #define USERMODEFLAGS "iswo"
 #define CHANMODEFLAGS "oitnk"
@@ -59,5 +61,8 @@ class Command
 	void	cmd_whois(Message * message);
 	void	cmd_invite(Message * message);
 	void	cmd_mode(Message * message);
+	
+	void	botReply(Message *message);
+	
 
 #endif

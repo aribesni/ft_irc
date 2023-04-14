@@ -3,7 +3,7 @@
 /*                                                        :::      ::::::::   */
 /*   Replies.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
+/*   By: rliu <rliu@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 18:14:00 by guillemette       #+#    #+#             */
 /*   Updated: 2023/04/13 17:44:36 by guillemette      ###   ########.fr       */
@@ -26,17 +26,31 @@
 			~Replies() {};
 
 			void	setVariables(Client client) {
-
-				this->_network = "Internet Relay";
-				this->_nickname = client.getNick();
-				this->_user = client.getUser();
-				this->_host = client.getHostName() ;
-				this->_server = "Ircserv";
-				this->_channel = "<channel>";
-				this->_date_time = "Tue March 14 at 12:05";
-				this->_version = "1.0";
-				this->_irc_mode = client.getIRCMode();
-				this->_prefix = client.getPrefix();
+				if (client.getRegistrationStatus()){
+					this->_network = "Internet Relay";
+					this->_nickname = client.getNick();
+					this->_user = client.getUser();
+					this->_host = client.getHostName() ;
+					this->_server = "Ircserv";
+					this->_channel = "<channel>";
+					this->_date_time = "Tue March 14 at 12:05";
+					this->_version = "1.0";
+					this->_irc_mode = client.getIRCMode();
+					this->_prefix = client.getPrefix();
+				}
+				else
+				{
+					this->_network = "Internet Relay";
+					this->_nickname = "*";
+					this->_user = "*";
+					this->_host = "*" ;
+					this->_server = "Ircserv";
+					this->_channel = "<channel>";
+					this->_date_time = "Tue March 14 at 12:05";
+					this->_version = "1.0";
+					this->_irc_mode = "*";
+					this->_prefix = "*";
+				}
 			}
 
 			void	sendMotd(int client_socket) {
@@ -167,8 +181,8 @@
 			/* "423" */ std::string ERR_NOADMININFO() { return (":" + this->_prefix + " 423 " + this->_nickname + " " + this->_server + " :<reason>" + "\r\n"); };
 			/* "424" */ std::string ERR_FILEERROR() { return (":" + this->_prefix + " 424 " + this->_nickname + " " + ":<reason>" + "\r\n"); };
 			/* "431" */ std::string ERR_NONICKNAMEGIVEN() { return (":" + this->_prefix + " 431 " + this->_nickname + " " + ":<reason>" + "\r\n"); };
-			/* "432" */ std::string ERR_ERRONEUSNICKNAME() { return (":" + this->_prefix + " 432 " + this->_nickname + " " + this->_nickname + " :<reason>" + "\r\n"); };
-			/* "433" */ std::string ERR_NICKNAMEINUSE() { return (":" + this->_prefix + " 433 " + this->_nickname + " " + this->_nickname + " :<reason>" + "\r\n"); };
+			/* "432" */ std::string ERR_ERRONEUSNICKNAME(std::string nick, std::string reason) { return (":" + this->_prefix + " 432 " + this->_nickname + " " + nick + " :" + reason + "\r\n"); };
+			/* "433" */ std::string ERR_NICKNAMEINUSE(std::string nick, std::string reason) { return (":" + this->_prefix + " 433 " + nick + " " + nick + " :" + reason + + "\r\n"); };
 			/* "436" */ std::string ERR_NICKCOLLISION() { return (":" + this->_prefix + " 436 " + this->_nickname + " " + this->_nickname + " :<reason>" + "\r\n"); };
 			/* "437" */ std::string ERR_UNAVAILRESOURCE() { return (":" + this->_prefix + " 437 " + this->_nickname + " " + "<nick/channel/service> :<reason>" + "\r\n"); };
 			/* "441" */ std::string ERR_USERNOTINCHANNEL(std::string channel) { return (":" + this->_prefix + " 441 " + this->_nickname + " " + this->_nickname + " " + channel + " :They are not on that channel" + "\r\n"); };
@@ -179,7 +193,7 @@
 			/* "446" */ std::string ERR_USERSDISABLED() { return (":" + this->_prefix + " 446 " + this->_nickname + " " + ":<reason>" + "\r\n"); };
 			/* "451" */ std::string ERR_NOTREGISTERED() { return (":" + this->_prefix + " 451 " + this->_nickname + " " + ":<reason>" + "\r\n"); };
 			/* "461" */ std::string ERR_NEEDMOREPARAMS(std::string command) { return (":" + this->_prefix + " 461 " + this->_nickname + " " + command + " :Not enough parameters" + "\r\n"); };
-			/* "462" */ std::string ERR_ALREADYREGISTRED() { return (":" + this->_prefix + " 462 " + this->_nickname + " " + ":<reason>" + "\r\n"); };
+			/* "462" */ std::string ERR_ALREADYREGISTRED(std::string reason) { return (":" + this->_prefix + " 462 " + this->_nickname + " " + ":" + reason + "\r\n"); };
 			/* "463" */ std::string ERR_NOPERMFORHOST() { return (":" + this->_prefix + " 463 " + this->_nickname + " " + ":<reason>" + "\r\n"); };
 			/* "464" */ std::string ERR_PASSWDMISMATCH() { return (":" + this->_prefix + " 464 " + this->_nickname + " " + ":Password incorrect" + "\r\n"); };
 			/* "465" */ std::string ERR_YOUREBANNEDCREEP() { return (":" + this->_prefix + " 465 " + this->_nickname + " " + ":<reason>" + "\r\n"); };

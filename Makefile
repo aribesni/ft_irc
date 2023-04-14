@@ -3,17 +3,18 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+         #
+#    By: rliu <rliu@student.42.fr>                  +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/03/22 18:38:46 by gduchate          #+#    #+#              #
-#    Updated: 2023/04/06 20:32:23 by guillemette      ###   ########.fr        #
+#    Updated: 2023/04/12 18:43:50 by rliu             ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = ircserv
 
 SRC = ft_irc.cpp Client.cpp Server.cpp \
-		Message.cpp Channel.cpp Command.cpp
+		Message.cpp Channel.cpp Command.cpp \
+		bonus.cpp
 
 OBJ = ${SRC:.cpp=.o}
 
