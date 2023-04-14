@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rliu <rliu@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 18:12:21 by guillemette       #+#    #+#             */
-/*   Updated: 2023/04/14 11:53:56 by guillemette      ###   ########.fr       */
+/*   Updated: 2023/04/14 18:53:39 by guillemette      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,6 +71,11 @@ void Client::setSocket(int socket)
 	this->_socket = socket;
 }
 
+void Client::setServername(std::string servername)
+{
+	this->_servername = servername;
+}
+
 void  Client::setPrefix(void)
 {
 		_prefix = _nick + "!" + _user + "@" + _hostname;
@@ -98,7 +103,7 @@ void  Client::setPass(std::string &pass)
 	_pass = pass;
 }
 
-void  Client::setHostname(std::string &hostname)
+void  Client::setHostname(std::string hostname)
 {
 	_hostname = hostname;
 }

@@ -13,7 +13,7 @@ Channel::Channel(Channel const & src)
 	*this = src;
 }
 
-Channel::Channel(std::string chanName, Client * client, std::string userchanmode) : _name(chanName), _mode("")
+Channel::Channel(std::string chanName, Client * client, std::string userchanmode) : _name(chanName), _mode(""), _modeArguments("")
 {
 	_clientsMap[client] = userchanmode;
 }
@@ -46,6 +46,15 @@ void	Channel::removeClient(Client * client)
 	_clientsMap.erase(client);
 }
 
+void	Channel::addModeArguments(std::string modeArguments)
+{
+	if (_modeArguments == "")
+		_modeArguments = modeArguments;
+	else
+		_modeArguments.append(" " + modeArguments);
+}
+
+
 /*
 ** --------------------------------- SETTERS ---------------------------------
 */
@@ -72,6 +81,11 @@ std::string const &				Channel::getName(void) const
 std::string const &				Channel::getMode(void) const
 {
 	return (_mode);
+}
+
+std::string const &				Channel::getModeArguments(void) const
+{
+	return (_modeArguments);
 }
 
 /* ************************************************************************** */
