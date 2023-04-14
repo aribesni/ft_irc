@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_irc.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gduchate <gduchate@student.42.fr>          +#+  +:+       +#+        */
+/*   By: rliu <rliu@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 18:13:49 by guillemette       #+#    #+#             */
-/*   Updated: 2023/04/04 14:47:41 by gduchate         ###   ########.fr       */
+/*   Updated: 2023/04/14 17:56:46 by rliu             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,11 +26,11 @@ void	sigHandler(int signum) {
 	sig = true;
 }
 
-void    ft_loop(Server server)
+void    ft_loop(Server &server)
 {
 	// signal(SIGINT, sigHandler);
-	// while (sig == false)
-	while (true)
+	while (sig == false)
+	//while (true)
 	{
 		// Watch pollfds and get number of open fds
 		// #1: address of pollfds to watch, #2: number of pollfds to watch,
@@ -41,7 +41,7 @@ void    ft_loop(Server server)
 		if (open_fds == -1)
 		{
 			perror("poll");
-			exit(1);
+			return;
 		}
 		// Run through the pollfds looking for data to read
 		for (size_t i = 0; i < server._pollfds.size(); i++)
@@ -64,6 +64,7 @@ void    ft_loop(Server server)
 int main(int argc, char **argv)
 {
 	// Check for correct usage
+	signal(SIGINT, sigHandler);
     if (argc != 3)
     {
         std::cout << "Port number and password needed." << std::endl;

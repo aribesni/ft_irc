@@ -51,7 +51,7 @@ std::string Client::getIRCMode(void) const {return (this->_irc_mode);}
 
 std::string Client::getHostName(void) const {return (this->_hostname);}
 
-bool		Client::getRegistrationStatus(void) const {return (this->_isRegistered);}
+bool		Client::getRegistrationStatus(void) {return (this->_isRegistered);}
 
 std::string	Client::getPrefix(void) const {return (this->_prefix);}
 

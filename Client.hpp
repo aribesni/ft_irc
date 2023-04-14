@@ -32,7 +32,7 @@ class Client {
 		std::string	getPrefix(void) const;
         std::string getIRCMode(void) const;
         std::string getHostName(void) const;
-		bool		getRegistrationStatus (void) const;
+		bool		getRegistrationStatus (void);
 		std::string getRealName(void) const;
 		bool		getNickStatus (void) const;
 		bool		getUsrStatus (void) const;

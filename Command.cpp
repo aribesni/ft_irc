@@ -34,7 +34,6 @@ void Command::initCmdMap()
 	_cmdMap["PASS"] = &cmd_pass; /*Ran*/
 	_cmdMap["NICK"] = &cmd_nick; /*Ran*/
 	_cmdMap["USER"] = &cmd_user; /*Ran*/
-	_cmdMap["PING"] = &cmd_ping;
 	_cmdMap["JOIN"] = &cmd_join; /*Aristide*/
 	_cmdMap["PRIVMSG"] = &cmd_privmsg; /*Guillemette*/
 	_cmdMap["PART"] = &cmd_part; /*Guillemette*/
@@ -46,6 +45,7 @@ void Command::initCmdMap()
     _cmdMap["WHOIS"] = &cmd_whois; /*Guillemette*/
     _cmdMap["INVITE"] = &cmd_invite; /*Aristide*/
     _cmdMap["MODE"] = &cmd_mode; /*Guillemette*/
+	_cmdMap["QUIT"] = &cmd_quit; /*Ran*/
 	// Ctrl C signal handling Aristide/Ran
 	// Check memory management
 
@@ -180,6 +180,8 @@ void cmd_ping(Message * message)
 {
 	// As a result of server correctly responding "PONG", the irssi client interface does not
 	// show [LAG] message anymore
+	if (message->getClient()->getSocket() < 4)
+		return;
 	std::cout << "[Server] sending PONG to client (" <<message->getClient()->getSocket() << ")" << std::endl;
 	std::string answer = "PONG " + message->getParams()[0] + "\r\n";
 	send(message->getClient()->getSocket(), answer.c_str(), answer.size(), 0);
@@ -832,4 +834,19 @@ void		cmd_mode(Message * message)
 //  (not handled) k - set a channel key (password).
 }
 
+void cmd_quit(Message *message){
+	Client *client = message->getClient();
+	Server *server = message->getServer();
+	std::string msg = message->getFullMsg();
+	int sfd = client->getSocket();
+	close(sfd);
+	for (size_t i = 0; i < server->_pollfds.size(); i++)
+		if(server->_pollfds[i].fd == sfd)
+			server->_pollfds.erase(server->_pollfds.begin() + i);
+	std::cout << "Client " << client->getNick() << "(" << sfd  << ") "  << msg + "\n";
+	if (server->getClients().find(sfd) != server->getClients().end() )
+		server->getClients().erase(sfd);
+
+
+}
 /* ************************************************************************** */

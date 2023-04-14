@@ -6,7 +6,7 @@
 /*   By: rliu <rliu@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 18:14:02 by guillemette       #+#    #+#             */
-/*   Updated: 2023/04/12 16:32:57 by rliu             ###   ########.fr       */
+/*   Updated: 2023/04/14 17:37:02 by rliu             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,8 +129,13 @@ void	Server::handleClientRequest(Client & client)
 			std::cout << "pollserver: socket " << client.getSocket() << " hung up" << std::endl;
 		else
 			perror("recv");
-		close(client.getSocket()); // Bye!
-		this->getClients().erase(client.getSocket()); // remove client from map
+		// for (size_t i = 0; i < _pollfds.size(); i++)
+		// 	if(_pollfds[i].fd == client.getSocket())
+		// 		_pollfds.erase(_pollfds.begin() + i);
+				
+		// close(client.getSocket()); // Bye!
+		// this->getClients().erase(client.getSocket()); // remove client from map
+			
 	}
 	else
 	{
@@ -139,8 +144,9 @@ void	Server::handleClientRequest(Client & client)
 		if (DEBUG)
 			std::cout << "[Client] (" << client.getSocket() << ")" << " received buf: " << buf << std::endl;
 		// Execute all messages that could be parsed
+		bool isWelcome = client.getRegistrationStatus();
 		execMultiMsg(msgList);
-		if (!client.getRegistrationStatus())
+		if (!isWelcome)
 			welcome_msg(client);
 		msgList.clear();
 	}
