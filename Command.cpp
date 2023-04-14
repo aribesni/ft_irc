@@ -6,7 +6,7 @@
 /*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 17:43:49 by rliu              #+#    #+#             */
-/*   Updated: 2023/04/14 19:40:25 by guillemette      ###   ########.fr       */
+/*   Updated: 2023/04/14 20:12:27 by guillemette      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -405,7 +405,7 @@ void    cmd_oper(Message * message) {
     else if (message->getParams()[0] == "operator" && message->getParams()[1] == "password") // checks if <name> is set as "operator" and <password> as "password"
     {
         send(client->getSocket(), replies.RPL_YOUREOPER().data(), replies.RPL_YOUREOPER().size(), 0);
-        client->setIRCMode("wio"); // sets client's privileged to operator
+        client->setIRCMode("o"); // sets client's privileges to operator
         replies.setVariables(*client); // updates client's new info
         send(client->getSocket(), replies.RPL_UMODEIS().data(), replies.RPL_UMODEIS().size(), 0); // displays new privileges
     }
@@ -650,12 +650,13 @@ void		changeChanMode(modes & reqmode, Client * client, Channel * channel, std::v
 	}
 	if (change != "")
 	{
-		std::string fullMsg = ":" + client->getPrefix() + " " + "MODE " + channel->getName() + " " + reqmode.sign + change + "\r\n";
+		std::string fullMsg = ":" + client->getPrefix() + " " + "MODE " + channel->getName() + " " + reqmode.sign + change + " \r\n";
 		// Echo change to all clients in channel
+		std::cout << "fullMsg sent: " << fullMsg << std::endl;
 		for (it = mapOfClients.begin(); it != mapOfClients.end(); it++)
 		{
 			std::cout << "sent" << std::endl;
-			send(it->first->getSocket(), fullMsg.c_str(), fullMsg.size(), 0);
+			send(it->first->getSocket(), fullMsg.data(), fullMsg.size(), 0);
 		}
 		if (reqmode.sign == '+')
 			channel->setMode(currentmode + change);
