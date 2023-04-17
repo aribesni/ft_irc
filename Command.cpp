@@ -6,7 +6,7 @@
 /*   By: gduchate <gduchate@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 17:43:49 by rliu              #+#    #+#             */
-/*   Updated: 2023/04/17 13:09:05 by gduchate         ###   ########.fr       */
+/*   Updated: 2023/04/17 13:27:00 by gduchate         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ void Command::initCmdMap()
     _cmdMap["NOTICE"] = &cmd_notice; /*Guillemette*/
     _cmdMap["WHOIS"] = &cmd_whois; /*Guillemette*/
     _cmdMap["INVITE"] = &cmd_invite; /*Aristide*/
-    // _cmdMap["MODE"] = &cmd_mode; /*Guillemette*/
+    _cmdMap["MODE"] = &cmd_mode; /*Guillemette*/
 	_cmdMap["QUIT"] = &cmd_quit; /*Ran*/
 	// Ctrl C signal handling Aristide/Ran
 	// Check memory management
@@ -770,7 +770,6 @@ void		cmd_mode(Message * message)
 		return ;
 	}
 	std::string msgtarget = message->getParams()[0];
-	std::string mode = message->getParams()[1];
 	// Channel modes
 	if (msgtarget[0] == '#')
 	{
