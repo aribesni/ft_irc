@@ -6,7 +6,7 @@
 /*   By: rliu <rliu@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 18:14:02 by guillemette       #+#    #+#             */
-/*   Updated: 2023/04/14 17:37:02 by rliu             ###   ########.fr       */
+/*   Updated: 2023/04/17 14:41:35 by rliu             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,6 +131,14 @@ void	Server::handleClientRequest(Client & client)
 			std::cout << "pollserver: socket " << client.getSocket() << " hung up" << std::endl;
 		else
 			perror("recv");
+		int sfd = client.getSocket();
+		close(sfd);
+		for (size_t i = 0; i < this->_pollfds.size(); i++)
+			if(this->_pollfds[i].fd == sfd)
+				this->_pollfds.erase(this->_pollfds.begin() + i);
+		if (this->getClients().find(sfd) != this->getClients().end() )
+			this->getClients().erase(sfd);
+
 		// for (size_t i = 0; i < _pollfds.size(); i++)
 		// 	if(_pollfds[i].fd == client.getSocket())
 		// 		_pollfds.erase(_pollfds.begin() + i);
@@ -249,7 +257,7 @@ void	Server::welcome_msg(Client &client)
 		// send(client.getSocket(), replies.RPL_MOTD("372").data(), replies.RPL_MOTD("372").size(), 0);
 		replies.sendMotd(client.getSocket());
 		send(client.getSocket(), replies.RPL_ENDOFMOTD().data(), replies.RPL_ENDOFMOTD().size(), 0);
-		send(client.getSocket(), replies.RPL_UMODEIS().data(), replies.RPL_UMODEIS().size(), 0); // displays client's privileges
+		// send(client.getSocket(), replies.RPL_UMODEIS().data(), replies.RPL_UMODEIS().size(), 0); // displays client's privileges
 		// else deal with client registration issue
 		//this->getClients()[newpollfd.fd] = client;
 		std::cout << "prefix: " << client.getPrefix() << std::endl;
