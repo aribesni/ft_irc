@@ -6,7 +6,7 @@
 /*   By: rliu <rliu@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 18:14:02 by guillemette       #+#    #+#             */
-/*   Updated: 2023/04/14 17:37:02 by rliu             ###   ########.fr       */
+/*   Updated: 2023/04/17 14:41:35 by rliu             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,7 @@ Server::~Server(void) {}
 void	Server::fillServerPollfd(void) {
 	this->_pollfds[0].fd = this->_socket;
 	this->_pollfds[0].events = POLLIN;
+	//this->_pollfds[0].revents = POLLNVAL;
 }
 
 void	Server::createSocket(void) {
@@ -78,6 +79,7 @@ void	Server::acceptNewClient()
 	struct pollfd newpollfd;
 	newpollfd.fd = client.getSocket();
 	newpollfd.events = POLLIN;
+	//newpollfd.revents = POLLNVAL;
 	this->_pollfds.push_back(newpollfd);
 	this->getClients()[newpollfd.fd] = client;
 	// char buf[BUFFER_SIZE];
@@ -129,6 +131,14 @@ void	Server::handleClientRequest(Client & client)
 			std::cout << "pollserver: socket " << client.getSocket() << " hung up" << std::endl;
 		else
 			perror("recv");
+		int sfd = client.getSocket();
+		close(sfd);
+		for (size_t i = 0; i < this->_pollfds.size(); i++)
+			if(this->_pollfds[i].fd == sfd)
+				this->_pollfds.erase(this->_pollfds.begin() + i);
+		if (this->getClients().find(sfd) != this->getClients().end() )
+			this->getClients().erase(sfd);
+
 		// for (size_t i = 0; i < _pollfds.size(); i++)
 		// 	if(_pollfds[i].fd == client.getSocket())
 		// 		_pollfds.erase(_pollfds.begin() + i);
