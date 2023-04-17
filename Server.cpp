@@ -250,7 +250,7 @@ void	Server::welcome_msg(Client &client)
 		send(client.getSocket(), replies.RPL_UMODEIS().data(), replies.RPL_UMODEIS().size(), 0); // displays client's privileges
 		// else deal with client registration issue
 		//this->getClients()[newpollfd.fd] = client;
-		std::cout << "prefix: " << client.getPrefix() << std::endl;
+		// std::cout << "prefix: " << client.getPrefix() << std::endl;
 	}
 }
 
@@ -260,7 +260,6 @@ void	Server::welcome_msg(Client &client)
 
 int						Server::getSocket(void) const
 {
-
 	return (this->_socket);
 }
 
