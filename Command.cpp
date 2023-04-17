@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Command.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
+/*   By: gduchate <gduchate@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 17:43:49 by rliu              #+#    #+#             */
-/*   Updated: 2023/04/14 20:12:27 by guillemette      ###   ########.fr       */
+/*   Updated: 2023/04/17 13:09:05 by gduchate         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ void Command::initCmdMap()
     _cmdMap["NOTICE"] = &cmd_notice; /*Guillemette*/
     _cmdMap["WHOIS"] = &cmd_whois; /*Guillemette*/
     _cmdMap["INVITE"] = &cmd_invite; /*Aristide*/
-    _cmdMap["MODE"] = &cmd_mode; /*Guillemette*/
+    // _cmdMap["MODE"] = &cmd_mode; /*Guillemette*/
 	_cmdMap["QUIT"] = &cmd_quit; /*Ran*/
 	// Ctrl C signal handling Aristide/Ran
 	// Check memory management
@@ -188,6 +188,22 @@ void cmd_ping(Message * message)
 	send(message->getClient()->getSocket(), answer.c_str(), answer.size(), 0);
 }
 
+std::string const				Channel::getStringOfMembers()
+{
+	std::string result = "";
+	for (std::map<Client*, std::string>::iterator it = _clientsMap.begin(); it != _clientsMap.end(); it++)
+	{
+		std::string nick = it->first->getNick();
+		if (it->second.find('o') != std::string::npos)
+			nick = "@" + nick;
+		if (result != "")
+			result += " " + nick;
+		else
+			result = nick;
+	}
+	return (result);
+}
+
 void cmd_join(Message * message)
 {
 	// TO DO: handle channel password
@@ -213,26 +229,31 @@ void cmd_join(Message * message)
 			// Create channel and set first client as chan operator
 			Channel mychan(chanName, client, "o");
 			server->_channels[chanName] = mychan;
-			std::map<Client*, std::string> mapOfClients = server->_channels[chanName].getClientsMap();
+			Channel *channel = &server->_channels[chanName];
+			std::map<Client*, std::string> mapOfClients = channel->getClientsMap();
 			std::cout << "Channel " << chanName << " created and added to server list. User added to channel." << std::endl;
-			for (std::map<Client*, std::string>::iterator it = mapOfClients.begin(); it != mapOfClients.end(); it++)
-				send(it->first->getSocket(), fullMsg.c_str(), fullMsg.size(), 0); // JOIN message from server
+			send(client->getSocket(), fullMsg.data(), fullMsg.size(), 0); // JOIN message from server
 			// TO DO: add topic RPL_TOPIC?
 			// https://modern.ircdocs.horse/#rplnamreply-353
-			send(client->getSocket(), reply.RPL_NAMREPLY(chanName, "=", "@").c_str(), reply.RPL_NAMREPLY(chanName, "=", "@").size(), 0); // list of members in the channel
-			send(client->getSocket(), reply.RPL_ENDOFNAMES(chanName).c_str(), reply.RPL_ENDOFNAMES(chanName).size(), 0); // end of member list
+			if (DEBUG)
+				std::cout << "String of members: " << channel->getStringOfMembers() << std::endl;
+			send(client->getSocket(), reply.RPL_NAMREPLY("=", chanName, channel->getStringOfMembers()).data(), reply.RPL_NAMREPLY(chanName, "=", channel->getStringOfMembers()).size(), 0); // list of members in the channel
+			send(client->getSocket(), reply.RPL_ENDOFNAMES(chanName).data(), reply.RPL_ENDOFNAMES(chanName).size(), 0); // end of member list
 		}
 		else
 		{
 			std::cout << "Channel " << chanName << " already exists" << std::endl;
-			server->_channels[chanName].addClient(client, "");
-			std::map<Client*, std::string> mapOfClients = server->_channels[chanName].getClientsMap();
-			std::cout << "User added to channel." << std::endl;
+			Channel *channel = &server->_channels[chanName];
+			channel->addClient(client, "");
+			std::cout << "User " << client->getNick() << " added to channel." << std::endl;
+			std::map<Client*, std::string> mapOfClients = channel->getClientsMap();
 			for (std::map<Client*, std::string>::iterator it = mapOfClients.begin(); it != mapOfClients.end(); it++)
-				send(it->first->getSocket(), fullMsg.c_str(), fullMsg.size(), 0); // JOIN message from server
+				send(it->first->getSocket(), fullMsg.data(), fullMsg.size(), 0); // JOIN message from server
 			// TO DO: add RPL_TOPIC
-			send(client->getSocket(), reply.RPL_NAMREPLY(chanName, "=", "@").c_str(), reply.RPL_NAMREPLY(chanName, "=", "@").size(), 0); // list of members in the channel
-			send(client->getSocket(), reply.RPL_ENDOFNAMES(chanName).c_str(), reply.RPL_ENDOFNAMES(chanName).size(), 0); // end of member list
+			if (DEBUG)
+				std::cout << "String of members: " << channel->getStringOfMembers() << std::endl;
+			send(client->getSocket(), reply.RPL_NAMREPLY("=", chanName, channel->getStringOfMembers()).data(), reply.RPL_NAMREPLY(chanName, "=", channel->getStringOfMembers()).size(), 0); // list of members in the channel
+			send(client->getSocket(), reply.RPL_ENDOFNAMES(chanName).data(), reply.RPL_ENDOFNAMES(chanName).size(), 0); // end of member list
 		}
 	}
 }

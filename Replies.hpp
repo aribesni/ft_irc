@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Replies.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
+/*   By: gduchate <gduchate@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 18:14:00 by guillemette       #+#    #+#             */
-/*   Updated: 2023/04/14 20:16:10 by guillemette      ###   ########.fr       */
+/*   Updated: 2023/04/17 12:59:16 by gduchate         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,7 +142,7 @@
 			/* "349" */ std::string RPL_ENDOFEXCEPTLIST() { return (":" + this->_prefix + " 349 " + this->_nickname + " " + this->_channel + " :<info>" + "\r\n"); };
 			/* "351" */ std::string RPL_VERSION() { return (":" + this->_prefix + " 351 " + this->_nickname + " " + this->_version + "[.<debuglevel>] " + this->_server + " :<comments>" + "\r\n"); };
 			/* "352" */ std::string RPL_WHOREPLY() { return (":" + this->_prefix + " 352 " + this->_nickname + " " + this->_channel + " " + this->_user + " " + this->_host + " " + this->_server + " " + this->_nickname + " <H|G>[*][@|+] :<hopcount> <real_name>" + "\r\n"); };
-			/* "353" */ std::string RPL_NAMREPLY(std::string channel, std::string arg1, std::string arg2) { return (":" + this->_prefix + " 353 " + this->_nickname + " " + arg1 + " " + channel + " :" + arg2 + this->_nickname + /*" *( ' ' [ " + arg3 + " ] " + this->_nickname + " )" + */"\r\n"); };
+			/* "353" */ std::string RPL_NAMREPLY(std::string chansymbol, std::string channel, std::string members) { return (":" + this->_prefix + " 353 " + this->_nickname + " " + chansymbol + " " + channel + " :" + members + " \r\n"); };
 			/* "364" */ std::string RPL_LINKS() { return (":" + this->_prefix + " 364 " + this->_nickname + " " + "<mask> " + this->_server + " :<hopcount> <server_info>" + "\r\n"); };
 			/* "365" */ std::string RPL_ENDOFLINKS() { return (":" + this->_prefix + " 365 " + this->_nickname + " " + "<mask> :<info>" + "\r\n"); };
 			/* "366" */ std::string RPL_ENDOFNAMES(std::string channel) { return (":" + this->_prefix + " 366 " + this->_nickname + " " + channel + " :End of /NAMES list" + "\r\n"); };
