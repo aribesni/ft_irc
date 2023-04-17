@@ -20,16 +20,24 @@ class Channel
 		// OVERLOADS
 
 		// GETTERS
-		std::string							getName(void) const;
+		std::string const &					getName(void) const;
 		std::map<Client*, std::string>&		getClientsMap(void);
+		std::string const &					getMode(void) const;
+		std::string const &					getModeArguments(void) const;
+
+		// SETTERS
+		void								setMode(std::string mode);
 
 		// METHODS
 		void								addClient(Client * client, std::string chanmode);
 		void								removeClient(Client * client);
-
+		void								addModeArguments(std::string modeArguments);
 	private:
 		std::string							_name;
-		std::map<Client*, std::string>		_clientsMap; /* map of client and chan mode*/
+		std::map<Client*, std::string>		_clientsMap; /* map of client and user chan mode*/
+		std::string							_mode; /* chan mode on chan level*/
+		std::string							_creationTime;
+		std::string							_modeArguments;
 };
 
 // b <mask>: Adds or removes a ban; a ban will prevent a user who matches the given mask from joining the channel unless he or she is invited or in the exempt list.

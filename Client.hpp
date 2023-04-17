@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rliu <rliu@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 18:12:51 by guillemette       #+#    #+#             */
-/*   Updated: 2023/04/12 13:27:39 by rliu             ###   ########.fr       */
+/*   Updated: 2023/04/14 18:50:38 by guillemette      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ class Client {
 		std::string	getPrefix(void) const;
         std::string getIRCMode(void) const;
         std::string getHostName(void) const;
-		bool		getRegistrationStatus (void) const;
+		bool		getRegistrationStatus (void);
 		std::string getRealName(void) const;
 		bool		getNickStatus (void) const;
 		bool		getUsrStatus (void) const;
@@ -42,14 +42,15 @@ class Client {
 		void		setNick(std::string &nickname);
 		void		setUsr(std::string &usrname);
 		void		setPass(std::string &pass);
-		void		setHostname(std::string &hostname);
+		void		setHostname(std::string hostname);
 		void		setAsRegistered(void);
 		void		setPrefix(void);
-        void        setIRCMode(std::string mode);
+		void		setIRCMode(std::string mode);
 		void		setRealname(std::string &realname);
 		void		setNickRegistered(void);
 		void		setUsrRegistered(void);
 		void		setPassRegistered(void);
+		void		setServername(std::string servername);
 
 		sockaddr_in _sockaddr;
 		socklen_t   _socklen;
@@ -60,6 +61,7 @@ class Client {
 		char		_host[NI_MAXHOST];
 		bool		_isRegistered;
 		std::string	_prefix;
+		std::string	_servername;
 		std::string	_hostname;
 		std::string	_user;
 		std::string	_nick;

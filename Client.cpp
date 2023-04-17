@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rliu <rliu@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 18:12:21 by guillemette       #+#    #+#             */
-/*   Updated: 2023/04/12 13:29:59 by rliu             ###   ########.fr       */
+/*   Updated: 2023/04/14 20:13:09 by guillemette      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,8 @@
 ** ------------------------------- CONSTRUCTOR --------------------------------
 */
 
-Client::Client(void) : _isRegistered(false), _nickRegistered(false), _usrRegistered(false), _passRegistered(false) {
+Client::Client(void) : _isRegistered(false), _irc_mode(""), _nickRegistered(false), _usrRegistered(false), _passRegistered(false)
+{
 // TO DO: Change memset to a c++ method/func
 	memset(this->_host, 0, NI_MAXHOST);
 	this->_socklen = sizeof(this->_sockaddr);
@@ -50,7 +51,7 @@ std::string Client::getIRCMode(void) const {return (this->_irc_mode);}
 
 std::string Client::getHostName(void) const {return (this->_hostname);}
 
-bool		Client::getRegistrationStatus(void) const {return (this->_isRegistered);}
+bool		Client::getRegistrationStatus(void) {return (this->_isRegistered);}
 
 std::string	Client::getPrefix(void) const {return (this->_prefix);}
 
@@ -71,6 +72,11 @@ void Client::setSocket(int socket)
 	this->_socket = socket;
 }
 
+void Client::setServername(std::string servername)
+{
+	this->_servername = servername;
+}
+
 void  Client::setPrefix(void)
 {
 		_prefix = _nick + "!" + _user + "@" + _hostname;
@@ -83,9 +89,9 @@ void  Client::setNick(std::string &nickname)
 	_nick = nickname;
 }
 
-void  Client::setAsRegistered(void){
-    _isRegistered = true;
-    this->setIRCMode("wi");
+void 	Client::setAsRegistered(void)
+{
+	_isRegistered = true;
 }
 
 void  Client::setUsr(std::string &usrname)
@@ -98,7 +104,7 @@ void  Client::setPass(std::string &pass)
 	_pass = pass;
 }
 
-void  Client::setHostname(std::string &hostname)
+void  Client::setHostname(std::string hostname)
 {
 	_hostname = hostname;
 }
