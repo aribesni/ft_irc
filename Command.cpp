@@ -231,13 +231,13 @@ void cmd_join(Message * message)
 			Channel *channel = &server->_channels[chanName];
 			std::map<Client*, std::string> mapOfClients = channel->getClientsMap();
 			std::cout << "Channel " << chanName << " created and added to server list. User added to channel." << std::endl;
-			send(client->getSocket(), fullMsg.data(), fullMsg.size(), 0); // JOIN message from server
 			// TO DO: add topic RPL_TOPIC?
 			// https://modern.ircdocs.horse/#rplnamreply-353
 			if (DEBUG)
 				std::cout << "String of members: " << channel->getStringOfMembers() << std::endl;
 			send(client->getSocket(), reply.RPL_NAMREPLY("=", chanName, channel->getStringOfMembers()).data(), reply.RPL_NAMREPLY(chanName, "=", channel->getStringOfMembers()).size(), 0); // list of members in the channel
 			send(client->getSocket(), reply.RPL_ENDOFNAMES(chanName).data(), reply.RPL_ENDOFNAMES(chanName).size(), 0); // end of member list
+			send(client->getSocket(), fullMsg.data(), fullMsg.size(), 0); // JOIN message from server
 		}
 		else
 		{
@@ -246,13 +246,13 @@ void cmd_join(Message * message)
 			channel->addClient(client, "");
 			std::cout << "User " << client->getNick() << " added to channel." << std::endl;
 			std::map<Client*, std::string> mapOfClients = channel->getClientsMap();
-			for (std::map<Client*, std::string>::iterator it = mapOfClients.begin(); it != mapOfClients.end(); it++)
-				send(it->first->getSocket(), fullMsg.data(), fullMsg.size(), 0); // JOIN message from server
 			// TO DO: add RPL_TOPIC
 			if (DEBUG)
 				std::cout << "String of members: " << channel->getStringOfMembers() << std::endl;
 			send(client->getSocket(), reply.RPL_NAMREPLY("=", chanName, channel->getStringOfMembers()).data(), reply.RPL_NAMREPLY(chanName, "=", channel->getStringOfMembers()).size(), 0); // list of members in the channel
 			send(client->getSocket(), reply.RPL_ENDOFNAMES(chanName).data(), reply.RPL_ENDOFNAMES(chanName).size(), 0); // end of member list
+			for (std::map<Client*, std::string>::iterator it = mapOfClients.begin(); it != mapOfClients.end(); it++)
+				send(it->first->getSocket(), fullMsg.data(), fullMsg.size(), 0); // JOIN message from server
 		}
 	}
 }
@@ -568,10 +568,6 @@ void    cmd_kick(Message * message) {
 		{
 			chanName += " ";
 			chanName += targetName;
-			send(client->getSocket(), replies.ERR_USERNOTINCHANNEL(chanName).data(), replies.ERR_USERNOTINCHANNEL(chanName).size(), 0);
-			send(client->getSocket(), replies.ERR_USERNOTINCHANNEL(chanName).data(), replies.ERR_USERNOTINCHANNEL(chanName).size(), 0);
-			send(client->getSocket(), replies.ERR_USERNOTINCHANNEL(chanName).data(), replies.ERR_USERNOTINCHANNEL(chanName).size(), 0);
-			send(client->getSocket(), replies.ERR_USERNOTINCHANNEL(chanName).data(), replies.ERR_USERNOTINCHANNEL(chanName).size(), 0);
 			send(client->getSocket(), replies.ERR_USERNOTINCHANNEL(chanName).data(), replies.ERR_USERNOTINCHANNEL(chanName).size(), 0);
 			return ;
 		}
