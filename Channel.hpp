@@ -32,6 +32,8 @@ class Channel
 		void								addClient(Client * client, std::string chanmode);
 		void								removeClient(Client * client);
 		void								addModeArguments(std::string modeArguments);
+		std::string const					getStringOfMembers();
+
 	private:
 		std::string							_name;
 		std::map<Client*, std::string>		_clientsMap; /* map of client and user chan mode*/
