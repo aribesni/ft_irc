@@ -38,6 +38,7 @@ Server::~Server(void) {}
 void	Server::fillServerPollfd(void) {
 	this->_pollfds[0].fd = this->_socket;
 	this->_pollfds[0].events = POLLIN;
+	this->_pollfds[0].revents = 0;
 }
 
 void	Server::createSocket(void) {
@@ -78,6 +79,7 @@ void	Server::acceptNewClient()
 	struct pollfd newpollfd;
 	newpollfd.fd = client.getSocket();
 	newpollfd.events = POLLIN;
+	newpollfd.revents = 0;
 	this->_pollfds.push_back(newpollfd);
 	this->getClients()[newpollfd.fd] = client;
 	// char buf[BUFFER_SIZE];
@@ -242,7 +244,7 @@ void	Server::welcome_msg(Client &client)
 		send(client.getSocket(), replies.RPL_WELCOME().data(), replies.RPL_WELCOME().size(), 0);
 		send(client.getSocket(), replies.RPL_YOURHOST().data(), replies.RPL_YOURHOST().size(), 0);
 		send(client.getSocket(), replies.RPL_CREATED().data(), replies.RPL_CREATED().size(), 0);
-		send(client.getSocket(), replies.RPL_MYINFO().data(), replies.RPL_MYINFO().size(), 0);
+		// send(client.getSocket(), replies.RPL_MYINFO().data(), replies.RPL_MYINFO().size(), 0);
 		send(client.getSocket(), replies.RPL_MOTDSTART().data(), replies.RPL_MOTDSTART().size(), 0);
 		// send(client.getSocket(), replies.RPL_MOTD("372").data(), replies.RPL_MOTD("372").size(), 0);
 		replies.sendMotd(client.getSocket());
