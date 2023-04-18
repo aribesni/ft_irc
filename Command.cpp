@@ -544,12 +544,10 @@ void	cmd_whois(Message * message)
 
 void    cmd_kick(Message * message) {
 
-	std::string targetName = message->getParams()[1];
 	Server * server = message->getServer();
 	Client * client = message->getClient();
 	Replies replies(*client);
-	std::string fullMsg = ":" + client->getPrefix() + " " + message->getFullMsg() + "\r\n";
-	std::string msgtarget = message->getParams()[0];
+
 	if (message->getParams().size() < 2)
     {
 		send(client->getSocket(), replies.ERR_NEEDMOREPARAMS("KICK").data(), replies.ERR_NEEDMOREPARAMS("KICK").size(), 0);
@@ -557,24 +555,24 @@ void    cmd_kick(Message * message) {
 	}
 	std::vector<std::string>	channelsToKick = server->msg_split(message->getParams()[0], ",");
 	std::vector<std::string>	clientsToKick = server->msg_split(message->getParams()[1], ",");
-	std::map<Client*, std::string> mapOfClients = server->_channels[msgtarget].getClientsMap();
 	std::map<Client*, std::string>::iterator it;
 	for (size_t i = 0; i < channelsToKick.size(); i++)
 	{
 		std::string chanName = channelsToKick[i].data(); // get channel name
-		if (mapOfClients[client].find("o") == std::string::npos) // check if client has channel operator privilege
-		{
-			send(client->getSocket(), replies.ERR_CHANOPRIVSNEEDED(chanName).data(), replies.ERR_CHANOPRIVSNEEDED(chanName).size(), 0);
-			continue;
-		}
 		if (server->_channels.find(chanName) == server->_channels.end()) // check if channel exists
 		{
 			send(client->getSocket(), replies.ERR_NOSUCHCHANNEL(chanName).data(), replies.ERR_NOSUCHCHANNEL(chanName).size(), 0);
 			continue;
 		}
 		std::map<Client*, std::string> mapOfClients = server->_channels[chanName].getClientsMap();
+		if (mapOfClients[client].find("o") == std::string::npos) // check if client has channel operator privilege
+		{
+			send(client->getSocket(), replies.ERR_CHANOPRIVSNEEDED(chanName).data(), replies.ERR_CHANOPRIVSNEEDED(chanName).size(), 0);
+			continue;
+		}
 		for (size_t j = 0; j < clientsToKick.size(); j++)
 		{
+			std::string targetName = clientsToKick[j].data();
 			for (it = mapOfClients.begin(); it != mapOfClients.end(); it++)
 			{
 				if (targetName == it->first->getNick()) // check if target client is in channel
@@ -587,6 +585,8 @@ void    cmd_kick(Message * message) {
 				send(client->getSocket(), replies.ERR_USERNOTINCHANNEL(chanName).data(), replies.ERR_USERNOTINCHANNEL(chanName).size(), 0);
 				return ;
 			}
+			std::string fullMsg = ":" + client->getPrefix() + " " + message->getCMD() + " " + chanName + " " + targetName + "\r\n";
+			std::cout << "FULLMSG : " << fullMsg << std::endl;
 			for (std::map<Client*, std::string>::iterator it = mapOfClients.begin(); it != mapOfClients.end(); it++)
 				send(it->first->getSocket(), fullMsg.c_str(), fullMsg.size(), 0);
 			server->_channels[chanName].removeClient(it->first); // remove target client from our list
