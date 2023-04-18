@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
+/*   By: gduchate <gduchate@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 18:12:21 by guillemette       #+#    #+#             */
-/*   Updated: 2023/04/14 20:13:09 by guillemette      ###   ########.fr       */
+/*   Updated: 2023/04/18 14:07:03 by gduchate         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,10 +79,8 @@ void Client::setServername(std::string servername)
 
 void  Client::setPrefix(void)
 {
-		_prefix = _nick + "!" + _user + "@" + _hostname;
-//      _msgWelcome = ":" + _prefix + " 001 " + _nick + " :Welcome to the IRC__ Network, " + _prefix + "\n";
-	//    std::cout << "test_setprefic: "<<_prefix << std::endl;
- }
+	_prefix = _nick + "!" + _user + "@" + _hostname;
+}
 
 void  Client::setNick(std::string &nickname)
 {
@@ -99,19 +97,19 @@ void  Client::setUsr(std::string &usrname)
 	_user = usrname;
 }
 
-void  Client::setPass(std::string &pass)
+void	Client::setPass(std::string &pass)
 {
 	_pass = pass;
 }
 
-void  Client::setHostname(std::string hostname)
+void	Client::setHostname(std::string hostname)
 {
 	_hostname = hostname;
 }
 
-void    Client::setIRCMode(std::string mode) {
-
-    this->_irc_mode = mode;
+void	Client::setIRCMode(std::string mode)
+{
+	this->_irc_mode = mode;
 }
 
 void	Client::setRealname(std::string &realname)
@@ -119,14 +117,17 @@ void	Client::setRealname(std::string &realname)
 	_realname = realname;
 }
 
-void		Client::setNickRegistered(void){
+void	Client::setNickRegistered(void)
+{
 	_nickRegistered = true;
 }
 
-void		Client::setUsrRegistered(void){
+void	Client::setUsrRegistered(void)
+{
 	_usrRegistered = true;
 }
 
-void	Client::setPassRegistered(void){
-		_passRegistered = true;
+void	Client::setPassRegistered(void)
+{
+	_passRegistered = true;
 }
