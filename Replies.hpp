@@ -6,7 +6,7 @@
 /*   By: gduchate <gduchate@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 18:14:00 by guillemette       #+#    #+#             */
-/*   Updated: 2023/04/17 12:59:16 by gduchate         ###   ########.fr       */
+/*   Updated: 2023/04/18 14:05:10 by gduchate         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -200,7 +200,7 @@
 			/* "465" */ std::string ERR_YOUREBANNEDCREEP() { return (":" + this->_prefix + " 465 " + this->_nickname + " " + ":<reason>" + "\r\n"); };
 			/* "467" */ std::string ERR_KEYSET() { return (":" + this->_prefix + " 467 " + this->_nickname + " " + this->_channel + " :<reason>" + "\r\n"); };
 			/* "471" */ std::string ERR_CHANNELISFULL() { return (":" + this->_prefix + " 471 " + this->_nickname + " " + this->_channel + " :<reason>" + "\r\n"); };
-			/* "472" */ std::string ERR_UNKNOWNMODE() { return (":" + this->_prefix + " 472 " + this->_nickname + " " + "<char> :<reason>" + "\r\n"); };
+			/* "472" */ std::string ERR_UNKNOWNMODE() { return (":" + this->_prefix + " 472 " + this->_nickname + "\r\n"); };
 			/* "473" */ std::string ERR_INVITEONLYCHAN() { return (":" + this->_prefix + " 473 " + this->_nickname + " " + this->_channel + " :<reason>" + "\r\n"); };
 			/* "474" */ std::string ERR_BANNEDFROMCHAN() { return (":" + this->_prefix + " 474 " + this->_nickname + " " + this->_channel + " :<reason>" + "\r\n"); };
 			/* "475" */ std::string ERR_BADCHANNELKEY() { return (":" + this->_prefix + " 475 " + this->_nickname + " " + this->_channel + " :<reason>" + "\r\n"); };

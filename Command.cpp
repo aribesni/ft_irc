@@ -6,7 +6,7 @@
 /*   By: gduchate <gduchate@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 17:43:49 by rliu              #+#    #+#             */
-/*   Updated: 2023/04/18 13:14:02 by gduchate         ###   ########.fr       */
+/*   Updated: 2023/04/18 14:11:11 by gduchate         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,14 +38,14 @@ void Command::initCmdMap()
 	_cmdMap["JOIN"] = &cmd_join; /*Aristide*/
 	_cmdMap["PRIVMSG"] = &cmd_privmsg; /*Guillemette*/
 	_cmdMap["PART"] = &cmd_part; /*Guillemette*/
-    _cmdMap["OPER"] = &cmd_oper; /*Aristide*/
-    _cmdMap["WALLOPS"] = &cmd_wallops;/*Aristide*/
-    _cmdMap["KILL"] = &cmd_kill;/*Aristide*/
-    _cmdMap["KICK"] = &cmd_kick; /*Aristide*/
-    _cmdMap["NOTICE"] = &cmd_notice; /*Guillemette*/
-    _cmdMap["WHOIS"] = &cmd_whois; /*Guillemette*/
-    _cmdMap["INVITE"] = &cmd_invite; /*Aristide*/
-    // _cmdMap["MODE"] = &cmd_mode; /*Guillemette*/
+	_cmdMap["OPER"] = &cmd_oper; /*Aristide*/
+	_cmdMap["WALLOPS"] = &cmd_wallops;/*Aristide*/
+	_cmdMap["KILL"] = &cmd_kill;/*Aristide*/
+	_cmdMap["KICK"] = &cmd_kick; /*Aristide*/
+	_cmdMap["NOTICE"] = &cmd_notice; /*Guillemette*/
+	_cmdMap["WHOIS"] = &cmd_whois; /*Guillemette*/
+	_cmdMap["INVITE"] = &cmd_invite; /*Aristide*/
+	// _cmdMap["MODE"] = &cmd_mode; /*Guillemette*/
 	_cmdMap["QUIT"] = &cmd_quit; /*Ran*/
 	// Ctrl C signal handling Aristide/Ran
 	// Check memory management
@@ -110,8 +110,8 @@ void cmd_nick(Message * message)
 	}
 	else{
 		std::string nick = message->getParams()[0];
-    	if (nick.size() > 9){
-        	nick.resize(9);
+		if (nick.size() > 9){
+			nick.resize(9);
 		}
 		//ERRONEUSNICKNAME
 		for (size_t i = 0; i < nick.size(); i++)
@@ -133,7 +133,7 @@ void cmd_nick(Message * message)
 				send(client->getSocket(),rplNickInUse.c_str(), rplNickInUse.size(), 0);
 				return;
 			}
-    	}
+		}
 		client->setNick(nick);
 		client->setNickRegistered();
 		if (client->getRegistrationStatus())
@@ -304,19 +304,6 @@ void cmd_part(Message * message)
 
 void cmd_privmsg(Message * message)
 {
-//    the actual conversation carried out on a
-//    channel is only sent to servers which are supporting users on a given
-//    channel.  If there are multiple users on a server in the same
-//    channel, the message text is sent only once to that server and then
-//    sent to each client on the channel.  This action is then repeated for
-//    each client-server combination until the original message has fanned
-//    out and reached each member of the channel.
-
-
-        //    ERR_NORECIPIENT                 ERR_NOTEXTTOSEND
-        //    ERR_CANNOTSENDTOCHAN            ERR_NOTOPLEVEL
-        //    ERR_WILDTOPLEVEL                ERR_TOOMANYTARGETS
-        //    ERR_NOSUCHNICK
 	Server * server = message->getServer();
 	Client * client = message->getClient();
 	if (message->getParams().size() == 0)
@@ -396,18 +383,23 @@ void cmd_notice(Message * message)
 	{
 		if (targets[i][0] == '#')
 		{
-			// TO  DO: check that channel exists
-			std::cout << "Message sent to a channel" << std::endl;
-			std::map<Client*, std::string> mapOfClients = server->_channels[targets[i]].getClientsMap();
-			for (std::map<Client*, std::string>::iterator it = mapOfClients.begin();
-				it != mapOfClients.end(); it++)
+			if (server->_channels.find(targets[i]) == server->_channels.end()) /* channel does not exist*/
 			{
-				if (it->first->getSocket() != client->getSocket())
+				Replies reply(*client);
+				if (DEBUG)
+					std::cout << "Unknown channel" << std::endl;
+				send(client->getSocket(), reply.ERR_NOSUCHNICK(client->getNick()).data(), reply.ERR_NOSUCHNICK(client->getNick()).size(), 0);
+			}
+			else
+			{
+				std::map<Client*, std::string> mapOfClients = server->_channels[targets[i]].getClientsMap();
+				for (std::map<Client*, std::string>::iterator it = mapOfClients.begin(); it != mapOfClients.end(); it++)
 				{
-					std::cout << "This client is in the chan: " << it->first->getSocket() <<std::endl;
-					std::cout << "This message is being sent: " << fullMsg << " to client " << it->first->getSocket() << std::endl;
-					send(it->first->getSocket(), fullMsg.c_str(), fullMsg.size(), 0);
+					if (it->first->getSocket() != client->getSocket())
+						send(it->first->getSocket(), fullMsg.c_str(), fullMsg.size(), 0);
 				}
+				if (DEBUG)
+					std::cout << "Message sent to a channel" << std::endl;
 			}
 		}
 		else
@@ -421,31 +413,31 @@ void cmd_notice(Message * message)
 
 void    cmd_oper(Message * message) {
 
-    Client * client = message->getClient();
-    Replies replies(*client);
+	Client * client = message->getClient();
+	Replies replies(*client);
 
 	if (message->getParams().size() < 2) // check if both <name> and <password> are entered
-        send(client->getSocket(), replies.ERR_NEEDMOREPARAMS("OPER").data(), replies.ERR_NEEDMOREPARAMS("OPER").size(), 0);
-    else if (message->getParams()[0] == "operator" && message->getParams()[1] == "password") // checks if <name> is set as "operator" and <password> as "password"
-    {
-        send(client->getSocket(), replies.RPL_YOUREOPER().data(), replies.RPL_YOUREOPER().size(), 0);
-        client->setIRCMode("o"); // sets client's privileges to operator
-        replies.setVariables(*client); // updates client's new info
-        send(client->getSocket(), replies.RPL_UMODEIS().data(), replies.RPL_UMODEIS().size(), 0); // displays new privileges
-    }
-    else
-        send(client->getSocket(), replies.ERR_PASSWDMISMATCH().data(), replies.ERR_PASSWDMISMATCH().size(), 0); // wrong password
+		send(client->getSocket(), replies.ERR_NEEDMOREPARAMS("OPER").data(), replies.ERR_NEEDMOREPARAMS("OPER").size(), 0);
+	else if (message->getParams()[0] == "operator" && message->getParams()[1] == "password") // checks if <name> is set as "operator" and <password> as "password"
+	{
+		send(client->getSocket(), replies.RPL_YOUREOPER().data(), replies.RPL_YOUREOPER().size(), 0);
+		client->setIRCMode("o"); // sets client's privileges to operator
+		replies.setVariables(*client); // updates client's new info
+		send(client->getSocket(), replies.RPL_UMODEIS().data(), replies.RPL_UMODEIS().size(), 0); // displays new privileges
+	}
+	else
+		send(client->getSocket(), replies.ERR_PASSWDMISMATCH().data(), replies.ERR_PASSWDMISMATCH().size(), 0); // wrong password
 }
 
 void    cmd_wallops(Message * message) {
 
-    Client	*client = message->getClient();
+	Client	*client = message->getClient();
 	Server	*server = message->getServer();
-    Replies replies(*client);
+	Replies replies(*client);
 
 	std::string wallop = ":" + client->getPrefix() + " WALLOPS " + message->getParams()[0] + "\r\n";
-    if (client->getIRCMode().find("o") == std::string::npos) // check if user has IRC operator privileges
-        send(client->getSocket(), replies.ERR_NOPRIVILEGES("Permission Denied- You're not an IRC operator").data(), replies.ERR_NOPRIVILEGES("Permission Denied- You're not an IRC operator").size(), 0);
+	if (client->getIRCMode().find("o") == std::string::npos) // check if user has IRC operator privileges
+		send(client->getSocket(), replies.ERR_NOPRIVILEGES("Permission Denied- You're not an IRC operator").data(), replies.ERR_NOPRIVILEGES("Permission Denied- You're not an IRC operator").size(), 0);
 	else
 	{
 		for (size_t i = 0; i < server->getClients().size(); i++)
@@ -458,9 +450,9 @@ void    cmd_wallops(Message * message) {
 
 void    cmd_kill(Message * message) {
 
-    Client	*client = message->getClient();
+	Client	*client = message->getClient();
 	Server	*server = message->getServer();
-    Replies	replies(*client);
+	Replies	replies(*client);
 	size_t	i = 2;
 	bool	nick = false;
 
@@ -478,7 +470,7 @@ void    cmd_kill(Message * message) {
 	std::string quit = ":" + client->getPrefix() + " QUIT " + full_params + "\r\n";
 
 	if (message->getParams().size() < 3 && message->getParams()[1] == ":") // check if both <name> and <reason> are entered
-        send(client->getSocket(), replies.ERR_NEEDMOREPARAMS("KILL").data(), replies.ERR_NEEDMOREPARAMS("KILL").size(), 0);
+		send(client->getSocket(), replies.ERR_NEEDMOREPARAMS("KILL").data(), replies.ERR_NEEDMOREPARAMS("KILL").size(), 0);
 	else if (client->getIRCMode().find("o") == std::string::npos) // check if client has the IRC operator privilege
 		send(client->getSocket(), replies.ERR_NOPRIVILEGES("Permission Denied- You're not an IRC operator").data(), replies.ERR_NOPRIVILEGES("Permission Denied- You're not an IRC operator").size(), 0);
 	else
