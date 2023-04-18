@@ -38,7 +38,7 @@ Server::~Server(void) {}
 void	Server::fillServerPollfd(void) {
 	this->_pollfds[0].fd = this->_socket;
 	this->_pollfds[0].events = POLLIN;
-	//this->_pollfds[0].revents = POLLNVAL;
+	this->_pollfds[0].revents = 0;
 }
 
 void	Server::createSocket(void) {
@@ -79,7 +79,7 @@ void	Server::acceptNewClient()
 	struct pollfd newpollfd;
 	newpollfd.fd = client.getSocket();
 	newpollfd.events = POLLIN;
-	//newpollfd.revents = POLLNVAL;
+	newpollfd.revents = 0;
 	this->_pollfds.push_back(newpollfd);
 	this->getClients()[newpollfd.fd] = client;
 	// char buf[BUFFER_SIZE];
