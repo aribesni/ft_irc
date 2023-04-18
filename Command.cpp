@@ -576,10 +576,9 @@ void    cmd_kick(Message * message) {
 				chanName += " ";
 				chanName += targetName;
 				send(client->getSocket(), replies.ERR_USERNOTINCHANNEL(chanName).data(), replies.ERR_USERNOTINCHANNEL(chanName).size(), 0);
-				return ;
+				continue;
 			}
 			std::string fullMsg = ":" + client->getPrefix() + " " + message->getCMD() + " " + chanName + " " + targetName + "\r\n";
-			std::cout << "FULLMSG : " << fullMsg << std::endl;
 			for (std::map<Client*, std::string>::iterator it = mapOfClients.begin(); it != mapOfClients.end(); it++)
 				send(it->first->getSocket(), fullMsg.c_str(), fullMsg.size(), 0);
 			server->_channels[chanName].removeClient(it->first); // remove target client from our list
