@@ -6,7 +6,7 @@
 /*   By: gduchate <gduchate@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 17:43:49 by rliu              #+#    #+#             */
-/*   Updated: 2023/04/17 13:27:00 by gduchate         ###   ########.fr       */
+/*   Updated: 2023/04/18 13:14:02 by gduchate         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@ Command::~Command(void){}
 
 void Command::initCmdMap()
 {
+	_cmdMap["PING"] = &cmd_ping;
 	_cmdMap["PASS"] = &cmd_pass; /*Ran*/
 	_cmdMap["NICK"] = &cmd_nick; /*Ran*/
 	_cmdMap["USER"] = &cmd_user; /*Ran*/
@@ -44,7 +45,7 @@ void Command::initCmdMap()
     _cmdMap["NOTICE"] = &cmd_notice; /*Guillemette*/
     _cmdMap["WHOIS"] = &cmd_whois; /*Guillemette*/
     _cmdMap["INVITE"] = &cmd_invite; /*Aristide*/
-    _cmdMap["MODE"] = &cmd_mode; /*Guillemette*/
+    // _cmdMap["MODE"] = &cmd_mode; /*Guillemette*/
 	_cmdMap["QUIT"] = &cmd_quit; /*Ran*/
 	// Ctrl C signal handling Aristide/Ran
 	// Check memory management
