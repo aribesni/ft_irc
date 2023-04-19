@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Command.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gduchate <gduchate@student.42.fr>          +#+  +:+       +#+        */
+/*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 17:43:49 by rliu              #+#    #+#             */
-/*   Updated: 2023/04/18 14:11:11 by gduchate         ###   ########.fr       */
+/*   Updated: 2023/04/19 17:20:40 by guillemette      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -223,6 +223,11 @@ void cmd_join(Message * message)
 	for (size_t i = 0; i < channels.size(); i++)
 	{
 		std::string chanName = channels[i].data(); // get channel name
+		if (chanName[0] != '#')
+		{
+			send(client->getSocket(), reply.ERR_BADCHANMASK(chanName).data(), reply.ERR_BADCHANMASK(chanName).size(), 0);
+			break;
+		}
 		std::string fullMsg = ":" + client->getPrefix() + " " + message->getCMD() + " :" + chanName + "\r\n";
 		if (server->_channels.find(chanName) == server->_channels.end())
 		{
@@ -330,7 +335,7 @@ void cmd_privmsg(Message * message)
 				Replies reply(*client);
 				if (DEBUG)
 					std::cout << "Unknown channel" << std::endl;
-				send(client->getSocket(), reply.ERR_NOSUCHNICK(client->getNick()).data(), reply.ERR_NOSUCHNICK(client->getNick()).size(), 0);
+				send(client->getSocket(), reply.ERR_NOSUCHNICK(targets[i]).data(), reply.ERR_NOSUCHNICK(targets[i]).size(), 0);
 			}
 			else
 			{
@@ -339,7 +344,7 @@ void cmd_privmsg(Message * message)
 					it != mapOfClients.end(); it++)
 				{
 					if (it->first->getSocket() != client->getSocket())
-						send(it->first->getSocket(), fullMsg.c_str(), fullMsg.size(), 0);
+						send(it->first->getSocket(), fullMsg.data(), fullMsg.size(), 0);
 				}
 				if (DEBUG)
 					std::cout << "Message sent to a channel" << std::endl;
@@ -351,7 +356,7 @@ void cmd_privmsg(Message * message)
 			if (targetfd == -1)
 			{
 				Replies reply(*client);
-				send(client->getSocket(), reply.ERR_NOSUCHNICK(client->getNick()).data(), reply.ERR_NOSUCHNICK(client->getNick()).size(), 0);
+				send(client->getSocket(), reply.ERR_NOSUCHNICK(targets[i]).data(), reply.ERR_NOSUCHNICK(targets[i]).size(), 0);
 				if (DEBUG)
 					std::cout << "Wrong recipient" << std::endl;
 			}
@@ -389,7 +394,7 @@ void cmd_notice(Message * message)
 				Replies reply(*client);
 				if (DEBUG)
 					std::cout << "Unknown channel" << std::endl;
-				send(client->getSocket(), reply.ERR_NOSUCHNICK(client->getNick()).data(), reply.ERR_NOSUCHNICK(client->getNick()).size(), 0);
+				send(client->getSocket(), reply.ERR_NOSUCHNICK(targets[i]).data(), reply.ERR_NOSUCHNICK(targets[i]).size(), 0);
 			}
 			else
 			{
@@ -491,7 +496,7 @@ void    cmd_kill(Message * message) {
 			i++;
 		}
 		if (nick == false)
-			send(client->getSocket(), replies.ERR_NOSUCHNICK(client->getNick()).data(), replies.ERR_NOSUCHNICK(client->getNick()).size(), 0);
+			send(client->getSocket(), replies.ERR_NOSUCHNICK(message->getParams()[0]).data(), replies.ERR_NOSUCHNICK(message->getParams()[0]).size(), 0);
 	}
 }
 
@@ -527,7 +532,7 @@ void	cmd_whois(Message * message)
 				catch(const std::exception& e)
 				{
 					Replies reply(*client);
-					send(client->getSocket(), reply.ERR_NOSUCHNICK(client->getNick()).data(), reply.ERR_NOSUCHNICK(client->getNick()).size(), 0);
+					send(client->getSocket(), reply.ERR_NOSUCHNICK(targets[i]).data(), reply.ERR_NOSUCHNICK(targets[i]).size(), 0);
 				}
 			}
 		}
@@ -535,7 +540,7 @@ void	cmd_whois(Message * message)
 	}
 }
 
-void    cmd_kick(Message * message) {
+void	cmd_kick(Message * message) {
 
 	Server * server = message->getServer();
 	Client * client = message->getClient();

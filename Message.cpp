@@ -6,7 +6,7 @@
 /*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 18:13:55 by guillemette       #+#    #+#             */
-/*   Updated: 2023/04/06 19:09:34 by guillemette      ###   ########.fr       */
+/*   Updated: 2023/04/19 17:24:29 by guillemette      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,8 +51,7 @@ void						Message::execCmd()
 
 void		Message::setTargets(std::string msgtarget)
 {
-	// Check if msgtarget does not start or end with ,
-
+	// TO DO: Check if msgtarget does not start or end with ,
 	size_t i = 0;
 
 	while( i < msgtarget.length())
@@ -66,12 +65,12 @@ void		Message::setTargets(std::string msgtarget)
 		i++;
 	}
 	_targets.push_back(msgtarget);
-	// if (DEBUG && !_targets.empty())
-	// {
-	// 	std::cout << "Print targets: ";
-	// 	for (size_t j = 0; j < _targets.size(); j++)
-	// 		std::cout << _targets[j] << " ";
-	// }
+	if (DEBUG && !_targets.empty())
+	{
+		std::cout << "Print targets: ";
+		for (size_t j = 0; j < _targets.size(); j++)
+			std::cout << _targets[j] << "/";
+	}
 }
 
 /*

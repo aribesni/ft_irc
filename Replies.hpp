@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Replies.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gduchate <gduchate@student.42.fr>          +#+  +:+       +#+        */
+/*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 18:14:00 by guillemette       #+#    #+#             */
-/*   Updated: 2023/04/18 14:05:10 by gduchate         ###   ########.fr       */
+/*   Updated: 2023/04/19 17:18:52 by guillemette      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -162,7 +162,7 @@
 			/* "393" */ std::string RPL_USERS() { return (":" + this->_prefix + " 393 " + this->_nickname + " " + ":<username> <ttyline> <hostname>" + "\r\n"); };
 			/* "394" */ std::string RPL_ENDOFUSERS() { return (":" + this->_prefix + " 394 " + this->_nickname + " " + ":<info>" + "\r\n"); };
 			/* "395" */ std::string RPL_NOUSERS() { return (":" + this->_prefix + " 395 " + this->_nickname + " " + ":<info>" + "\r\n"); };
-			/* "401" */ std::string ERR_NOSUCHNICK(std::string nickname) { return (":" + this->_prefix + " 401 " + this->_nickname + " " + nickname + " No such nick/channel" + "\r\n"); };
+			/* "401" */ std::string ERR_NOSUCHNICK(std::string nickname) { return (":" + this->_prefix + " 401 " + this->_nickname + " " + nickname + ": No such nick/channel" + "\r\n"); };
 			/* "402" */ std::string ERR_NOSUCHSERVER() { return (":" + this->_prefix + " 402 " + this->_nickname + " " + this->_server + " :<reason>" + "\r\n"); };
 			/* "403" */ std::string ERR_NOSUCHCHANNEL(std::string channel) { return (":" + this->_prefix + " 403 " + this->_nickname + " " + channel + " :No such channel" + "\r\n"); };
 			/* "404" */ std::string ERR_CANNOTSENDTOCHAN() { return (":" + this->_prefix + " 404 " + this->_nickname + " " + this->_channel + " :<reason>" + "\r\n"); };
@@ -204,7 +204,7 @@
 			/* "473" */ std::string ERR_INVITEONLYCHAN() { return (":" + this->_prefix + " 473 " + this->_nickname + " " + this->_channel + " :<reason>" + "\r\n"); };
 			/* "474" */ std::string ERR_BANNEDFROMCHAN() { return (":" + this->_prefix + " 474 " + this->_nickname + " " + this->_channel + " :<reason>" + "\r\n"); };
 			/* "475" */ std::string ERR_BADCHANNELKEY() { return (":" + this->_prefix + " 475 " + this->_nickname + " " + this->_channel + " :<reason>" + "\r\n"); };
-			/* "476" */ std::string ERR_BADCHANMASK() { return (":" + this->_prefix + " 476 " + this->_nickname + " " + this->_channel + " :<reason>" + "\r\n"); };
+			/* "476" */ std::string ERR_BADCHANMASK(std::string channel) { return (":" + this->_prefix + " 476 " + this->_nickname + " " + channel + " :Bad Channel Mask" + "\r\n"); };
 			/* "477" */ std::string ERR_NOCHANMODES() { return (":" + this->_prefix + " 477 " + this->_nickname + " " + this->_channel + " :<reason>" + "\r\n"); };
 			/* "478" */ std::string ERR_BANLISTFULL() { return (":" + this->_prefix + " 478 " + this->_nickname + " " + this->_channel + " <char> :<reason>" + "\r\n"); };
 			/* "481" */ std::string ERR_NOPRIVILEGES(std::string reason) { return (":" + this->_prefix + " 481 " + this->_nickname + " " + ":" + reason + "\r\n"); };
