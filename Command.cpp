@@ -39,9 +39,7 @@ void Command::initCmdMap()
 	_cmdMap["PRIVMSG"] = &cmd_privmsg; /*Guillemette*/
 	_cmdMap["PART"] = &cmd_part; /*Guillemette*/
 	_cmdMap["OPER"] = &cmd_oper; /*Aristide*/
-	_cmdMap["wallops"] = &cmd_wallops;/*Aristide*/
 	_cmdMap["WALLOPS"] = &cmd_wallops;/*Aristide*/
-	_cmdMap["kill"] = &cmd_kill;/*Aristide*/
 	_cmdMap["KILL"] = &cmd_kill;/*Aristide*/
 	_cmdMap["KICK"] = &cmd_kick; /*Aristide*/
 	_cmdMap["NOTICE"] = &cmd_notice; /*Guillemette*/

@@ -40,6 +40,7 @@ Message::~Message(void){}
 
 void						Message::execCmd()
 {
+	std::transform(_cmd.begin(), _cmd.end(), _cmd.begin(), ::toupper);
 	if(g_cmd._cmdMap.find(_cmd) != g_cmd._cmdMap.end())
 	{
 		// std::cout << "[Client] (" << _client->getSocket() << ") Command " << _cmd << " is being processed." << std::endl;
