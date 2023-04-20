@@ -39,7 +39,9 @@ void Command::initCmdMap()
 	_cmdMap["PRIVMSG"] = &cmd_privmsg; /*Guillemette*/
 	_cmdMap["PART"] = &cmd_part; /*Guillemette*/
 	_cmdMap["OPER"] = &cmd_oper; /*Aristide*/
+	_cmdMap["wallops"] = &cmd_wallops;/*Aristide*/
 	_cmdMap["WALLOPS"] = &cmd_wallops;/*Aristide*/
+	_cmdMap["kill"] = &cmd_kill;/*Aristide*/
 	_cmdMap["KILL"] = &cmd_kill;/*Aristide*/
 	_cmdMap["KICK"] = &cmd_kick; /*Aristide*/
 	_cmdMap["NOTICE"] = &cmd_notice; /*Guillemette*/
@@ -441,6 +443,11 @@ void    cmd_wallops(Message * message) {
 	Server	*server = message->getServer();
 	Replies replies(*client);
 
+	if (message->getParams().size() < 2)
+    {
+		send(client->getSocket(), replies.ERR_NEEDMOREPARAMS("WALLOPS").data(), replies.ERR_NEEDMOREPARAMS("WALLOPS").size(), 0);
+		return ;
+	}
 	std::string wallop = ":" + client->getPrefix() + " WALLOPS " + message->getParams()[0] + "\r\n";
 	if (client->getIRCMode().find("o") == std::string::npos) // check if user has IRC operator privileges
 		send(client->getSocket(), replies.ERR_NOPRIVILEGES("Permission Denied- You're not an IRC operator").data(), replies.ERR_NOPRIVILEGES("Permission Denied- You're not an IRC operator").size(), 0);
@@ -462,29 +469,30 @@ void    cmd_kill(Message * message) {
 	size_t	i = 2;
 	bool	nick = false;
 
-	std::string	full_params = message->getParams()[1];
-
-	while (i < message->getParams().size())
-	{
-		full_params = full_params + " " + message->getParams()[i]; // get all the params in one string
-		i++;
-	}
-
-	i = 0;
-
-	std::string kill = ":" + client->getPrefix() + " KILL " + full_params + "\r\n";
-	std::string quit = ":" + client->getPrefix() + " QUIT " + full_params + "\r\n";
-
-	if (message->getParams().size() < 3 && message->getParams()[1] == ":") // check if both <name> and <reason> are entered
+	std::cout << "SIZE : " << message->getParams().size() << std::endl;
+	std::cout << "FULL MSG : " << message->getFullMsg() << std::endl;
+	if (message->getParams().size() < 2 || (message->getParams().size() == 2 && message->getParams()[1] == ":"))  // check if both <name> and <reason> are entered
 		send(client->getSocket(), replies.ERR_NEEDMOREPARAMS("KILL").data(), replies.ERR_NEEDMOREPARAMS("KILL").size(), 0);
 	else if (client->getIRCMode().find("o") == std::string::npos) // check if client has the IRC operator privilege
 		send(client->getSocket(), replies.ERR_NOPRIVILEGES("Permission Denied- You're not an IRC operator").data(), replies.ERR_NOPRIVILEGES("Permission Denied- You're not an IRC operator").size(), 0);
 	else
 	{
+		std::string	full_params = message->getParams()[1];
+
+		while (i < message->getParams().size())
+		{
+			full_params = full_params + " " + message->getParams()[i]; // get all the params in one string
+			i++;
+		}
+
+		i = 0;
+
+		std::string kill = ":" + client->getPrefix() + " KILL " + full_params + "\r\n";
 		while (i < server->getClients().size())
 		{
 			if (server->getClients()[i].getNick() == message->getParams()[0])
 			{
+				std::string quit = ":" + server->getClients()[i].getPrefix() + " QUIT " + full_params + "\r\n";
 				send(server->getClients()[i].getSocket(), kill.data(), kill.size(), 0); // send /KILL message to target client
 				send(server->getClients()[i].getSocket(), quit.data(), quit.size(), 0); // send /QUIT message to target client
 				std::cout << "pollserver: socket " << server->getClients()[i].getSocket() << " hung up" << std::endl;
@@ -583,7 +591,11 @@ void	cmd_kick(Message * message) {
 				send(client->getSocket(), replies.ERR_USERNOTINCHANNEL(chanName).data(), replies.ERR_USERNOTINCHANNEL(chanName).size(), 0);
 				continue;
 			}
-			std::string fullMsg = ":" + client->getPrefix() + " " + message->getCMD() + " " + chanName + " " + targetName + "\r\n";
+			std::string fullMsg;
+			if (message->getParams().size() > 2)
+				fullMsg = ":" + client->getPrefix() + " " + message->getCMD() + " " + chanName + " " + targetName + " " + message->getParams()[2] + "\r\n";
+			else
+				fullMsg = ":" + client->getPrefix() + " " + message->getCMD() + " " + chanName + " " + targetName + "\r\n";
 			for (std::map<Client*, std::string>::iterator it = mapOfClients.begin(); it != mapOfClients.end(); it++)
 				send(it->first->getSocket(), fullMsg.c_str(), fullMsg.size(), 0);
 			server->_channels[chanName].removeClient(it->first); // remove target client from our list
@@ -593,12 +605,17 @@ void	cmd_kick(Message * message) {
 }
 
 void	cmd_invite(Message * message) {
-// TO DO: handle multiple targets
+
+	Client * client = message->getClient();
+	Server * server = message->getServer();
+	Replies replies(*client);
+	if (message->getParams().size() < 2)
+    {
+		send(client->getSocket(), replies.ERR_NEEDMOREPARAMS("INVITE").data(), replies.ERR_NEEDMOREPARAMS("INVITE").size(), 0);
+		return ;
+	}
 	std::string chanName = message->getParams()[1];
 	std::string targetName = message->getParams()[0];
-	Server * server = message->getServer();
-	Client * client = message->getClient();
-	Replies replies(*client);
 	std::string fullMsg = ":" + client->getPrefix() + " " + message->getFullMsg() + "\r\n";
 	if (server->_channels.find(chanName) != server->_channels.end()) // check if channel exists
 	{
