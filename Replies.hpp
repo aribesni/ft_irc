@@ -6,7 +6,7 @@
 /*   By: gduchate <gduchate@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 18:14:00 by guillemette       #+#    #+#             */
-/*   Updated: 2023/04/21 11:01:12 by gduchate         ###   ########.fr       */
+/*   Updated: 2023/04/21 11:47:46 by gduchate         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,7 +123,7 @@
 			/* "314" */ std::string RPL_WHOWASUSER() { return (":" + this->_prefix + " 314 " + this->_nickname + " " + this->_nickname + this->_user + " " + this->_host + " * :<real_name>" + "\r\n"); };
 			/* "315" */ std::string RPL_ENDOFWHO() { return (":" + this->_prefix + " 315 " + this->_nickname + " " + "<name> :<info>" + "\r\n"); };
 			/* "317" */ std::string RPL_WHOISIDLE() { return (":" + this->_prefix + " 317 " + this->_nickname + " " + this->_nickname + " <seconds> :seconds idle" + "\r\n"); };
-			/* "318" */ std::string RPL_ENDOFWHOIS() { return (":" + this->_prefix + " 318 " + this->_nickname + " " + this->_nickname + " :<info>" + "\r\n"); };
+			/* "318" */ std::string RPL_ENDOFWHOIS() { return (":" + this->_prefix + " 318 " + this->_nickname + " " + this->_nickname + " :End of /WHOIS list" + "\r\n"); };
 			/* "319" */ std::string RPL_WHOISCHANNELS() { return (":" + this->_prefix + " 319 " + this->_nickname + " " + this->_nickname + " :*( ( '@' / '+' ) " + this->_channel + " ' ' )" + "\r\n"); };
 			/* "321" */ std::string RPL_LISTSTART() { return (":" + this->_prefix + " 321 " + this->_nickname + " " + "Channels :Clients Name" + "\r\n"); };
 			/* "322" */ std::string RPL_LIST() { return (":" + this->_prefix + " 322 " + this->_nickname + " " + this->_channel + " <#_visible> :<topic>" + "\r\n"); };
