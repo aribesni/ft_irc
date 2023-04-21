@@ -6,7 +6,7 @@
 /*   By: gduchate <gduchate@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 17:43:49 by rliu              #+#    #+#             */
-/*   Updated: 2023/04/21 13:54:56 by gduchate         ###   ########.fr       */
+/*   Updated: 2023/04/21 14:03:11 by gduchate         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -454,7 +454,7 @@ void    cmd_wallops(Message * message) {
 	Replies replies(*client);
 
 	if (message->getParams().size() < 2)
-    {
+	{
 		send(client->getSocket(), replies.ERR_NEEDMOREPARAMS("WALLOPS").data(), replies.ERR_NEEDMOREPARAMS("WALLOPS").size(), 0);
 		return ;
 	}
@@ -573,7 +573,7 @@ void	cmd_kick(Message * message) {
 	Replies replies(*client);
 
 	if (message->getParams().size() < 2)
-    {
+	{
 		send(client->getSocket(), replies.ERR_NEEDMOREPARAMS("KICK").data(), replies.ERR_NEEDMOREPARAMS("KICK").size(), 0);
 		return ;
 	}
@@ -628,7 +628,7 @@ void	cmd_invite(Message * message) {
 	Server * server = message->getServer();
 	Replies replies(*client);
 	if (message->getParams().size() < 2)
-    {
+	{
 		send(client->getSocket(), replies.ERR_NEEDMOREPARAMS("INVITE").data(), replies.ERR_NEEDMOREPARAMS("INVITE").size(), 0);
 		return ;
 	}
@@ -871,32 +871,6 @@ void		cmd_mode(Message * message)
 			return ;
 		}
 	}
-
-//    The MODE command is provided so that user chan change their own mode
-//    i - marks a user as invisible;
-//    s - marks a user for receipt of server notices;
-//    w - user receives wallops;
-//    o - operator flag.
-
-
-//    The MODE command is provided so that channel operators may change the
-//    characteristics of `their' channel.  It is also required that servers
-//    be able to change channel modes so that channel operators may be
-//    created.
-
-//    The various modes available for channels are as follows:
-
-//  o - give/take channel operator privileges;
-//  (not handled) - private channel flag;
-//  (not handled) - secret channel flag;
-//  i - invite-only channel flag;
-//  t - topic settable by channel operator only flag;
-//  n - no messages to channel from clients on the outside;
-//  (not handled) - moderated channel;
-//  (not handled) l - set the user limit to channel;
-//  (not handled) b - set a ban mask to keep users out;
-//  (not handled) v - give/take the ability to speak on a moderated channel;
-//  (not handled) k - set a channel key (password).
 }
 
 void cmd_quit(Message *message) {
@@ -914,4 +888,5 @@ void cmd_quit(Message *message) {
 	if (server->getClients().find(sfd) != server->getClients().end() )
 		server->getClients().erase(sfd);
 }
+
 /* ************************************************************************** */
