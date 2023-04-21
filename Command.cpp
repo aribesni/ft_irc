@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Command.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
+/*   By: gduchate <gduchate@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 17:43:49 by rliu              #+#    #+#             */
-/*   Updated: 2023/04/19 17:20:40 by guillemette      ###   ########.fr       */
+/*   Updated: 2023/04/21 11:35:31 by gduchate         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,6 @@ void Command::initCmdMap()
 
 void cmd_pass(Message * message)
 {
-	// TO DO: ERR_NEEDMOREPARAMS              ERR_ALREADYREGISTRED _ fixed
 	Server * server = message->getServer();
 	Client * client = message->getClient();
 	Replies reply(*client);
@@ -96,12 +95,10 @@ void cmd_pass(Message * message)
 
 void cmd_nick(Message * message)
 {
-	//TO DO:    ERR_NONICKNAMEGIVEN(fixed)     ERR_NICKCOLLISION(this is for multiservers we don't need)
 	Server * server = message->getServer();
 	Client * client = message->getClient();
 	Replies reply(*client);
 	std::string rplErr;
-	//ERR_NONICKNAMEGIVEN
 	if (message->getParams().size()< 1 || message->getParams()[0].empty())
 	{
 		rplErr = reply.ERR_NONICKNAMEGIVEN();
@@ -149,7 +146,6 @@ void cmd_nick(Message * message)
 
 void cmd_user(Message * message)
 {
-	// TO DO ERR_NEEDMOREPARAMS              ERR_ALREADYREGISTRED
 	Client * client = message->getClient();
 	Replies reply(*client);
 	std::string rplErr;
@@ -159,7 +155,6 @@ void cmd_user(Message * message)
 		send(client->getSocket(),rplErr.c_str(), rplErr.size(), 0);
 		return;
 	 }
-	//ERR_NEEDMOREPARAMS
 	if (message->getParams().size()< 4 || message->getParams()[0].empty())
 	{
 		rplErr = reply.ERR_NONICKNAMEGIVEN();
@@ -185,7 +180,15 @@ void cmd_ping(Message * message)
 	// show [LAG] message anymore
 	if (message->getClient()->getSocket() < 4)
 		return;
-	std::cout << "[Server] sending PONG to client (" <<message->getClient()->getSocket() << ")" << std::endl;
+	if (DEBUG)
+		std::cout << "[Server] sending PONG to client (" <<message->getClient()->getSocket() << ")" << std::endl;
+	if (message->getParams().size() < 1)
+	{
+		Client * client = message->getClient();
+		Replies reply(*client);
+		send(client->getSocket(), reply.ERR_NEEDMOREPARAMS(message->getCMD()).data(), reply.ERR_NEEDMOREPARAMS(message->getCMD()).size(), 0);
+		return ;
+	}
 	std::string answer = "PONG " + message->getParams()[0] + "\r\n";
 	send(message->getClient()->getSocket(), answer.c_str(), answer.size(), 0);
 }
@@ -239,8 +242,6 @@ void cmd_join(Message * message)
 			Channel *channel = &server->_channels[chanName];
 			std::map<Client*, std::string> mapOfClients = channel->getClientsMap();
 			std::cout << "Channel " << chanName << " created and added to server list. User added to channel." << std::endl;
-			// TO DO: add topic RPL_TOPIC?
-			// https://modern.ircdocs.horse/#rplnamreply-353
 			if (DEBUG)
 				std::cout << "String of members: " << channel->getStringOfMembers() << std::endl;
 			send(client->getSocket(), reply.RPL_NAMREPLY("=", chanName, channel->getStringOfMembers()).data(), reply.RPL_NAMREPLY(chanName, "=", channel->getStringOfMembers()).size(), 0); // list of members in the channel
@@ -254,7 +255,6 @@ void cmd_join(Message * message)
 			channel->addClient(client, "");
 			std::cout << "User " << client->getNick() << " added to channel." << std::endl;
 			std::map<Client*, std::string> mapOfClients = channel->getClientsMap();
-			// TO DO: add RPL_TOPIC
 			if (DEBUG)
 				std::cout << "String of members: " << channel->getStringOfMembers() << std::endl;
 			send(client->getSocket(), reply.RPL_NAMREPLY("=", chanName, channel->getStringOfMembers()).data(), reply.RPL_NAMREPLY(chanName, "=", channel->getStringOfMembers()).size(), 0); // list of members in the channel
@@ -372,12 +372,12 @@ void cmd_privmsg(Message * message)
 	}
 }
 
-void cmd_notice(Message * message)
+void	cmd_notice(Message * message)
 {
 	Server * server = message->getServer();
 	Client * client = message->getClient();
 
-	if (message->getParams().size() == 0)
+	if (message->getParams().size() < 1)
 	{
 		Replies reply(*client);
 		reply.ERR_NORECIPIENT(message->getCMD());
@@ -411,14 +411,25 @@ void cmd_notice(Message * message)
 		}
 		else
 		{
-			// TO DO: check that user exists
-			std::cout << "Message sent to a user" << std::endl;
-			send(server->getFdWithNick(targets[i]), fullMsg.c_str(), fullMsg.size(), 0);
+			int targetfd = server->getFdWithNick(targets[i]);
+			if (targetfd == -1)
+			{
+				Replies reply(*client);
+				send(client->getSocket(), reply.ERR_NOSUCHNICK(targets[i]).data(), reply.ERR_NOSUCHNICK(targets[i]).size(), 0);
+				if (DEBUG)
+					std::cout << "Wrong recipient" << std::endl;
+			}
+			else
+			{
+				if (DEBUG)
+					std::cout << "Message sent to a user" << std::endl;
+				send(server->getFdWithNick(targets[i]), fullMsg.c_str(), fullMsg.size(), 0);
+			}
 		}
 	}
 }
 
-void    cmd_oper(Message * message) {
+void	cmd_oper(Message * message) {
 
 	Client * client = message->getClient();
 	Replies replies(*client);
@@ -510,9 +521,10 @@ void	cmd_whois(Message * message)
 	Server * server = message->getServer();
 	Client * client = message->getClient();
 
-	if (message->getParams().size() == 0)
+	if (message->getParams().size() < 1)
 	{
-		// TO DO: ERR_NO_RECIPIENT to handle
+		Replies reply(*client);
+		send(client->getSocket(), reply.ERR_NONICKNAMEGIVEN().data(), reply.ERR_NONICKNAMEGIVEN().size(), 0);
 		return ;
 	}
 	else
