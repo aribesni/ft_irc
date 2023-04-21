@@ -109,7 +109,6 @@ void cmd_nick(Message * message)
 		std::string nick = message->getParams()[0];
 		if (nick.size() > 9){
 			nick.resize(9);
-			std::cout << "NICK : " << nick << std::endl;
 		}
 		//ERRONEUSNICKNAME
 		for (size_t i = 0; i < nick.size(); i++)
@@ -219,9 +218,6 @@ std::string const				Channel::getStringOfMembers()
 
 void cmd_join(Message * message)
 {
-	// TO DO: handle channel password
-	// User must provide a password if channel is key protected (k mode)
-	// to set a password: channel operator must do command: MODE #name_of_channel +k
 	Server * server = message->getServer();
 	Client * client = message->getClient();
 	Replies reply(*client);
@@ -243,13 +239,15 @@ void cmd_join(Message * message)
 		std::string fullMsg = ":" + client->getPrefix() + " " + message->getCMD() + " :" + chanName + "\r\n";
 		if (server->_channels.find(chanName) == server->_channels.end())
 		{
-			std::cout << "Channel " << chanName << " does not exist" << std::endl;
+			if (DEBUG)
+				std::cout << "Channel " << chanName << " does not exist" << std::endl;
 			// Create channel and set first client as chan operator
 			Channel mychan(chanName, client, "o");
 			server->_channels[chanName] = mychan;
 			Channel *channel = &server->_channels[chanName];
 			std::map<Client*, std::string> mapOfClients = channel->getClientsMap();
-			std::cout << "Channel " << chanName << " created and added to server list. User added to channel." << std::endl;
+			if (DEBUG)
+				std::cout << "Channel " << chanName << " created and added to server list. User added to channel." << std::endl;
 			if (DEBUG)
 				std::cout << "String of members: " << channel->getStringOfMembers() << std::endl;
 			send(client->getSocket(), reply.RPL_NAMREPLY("=", chanName, channel->getStringOfMembers()).data(), reply.RPL_NAMREPLY(chanName, "=", channel->getStringOfMembers()).size(), 0); // list of members in the channel
@@ -258,10 +256,12 @@ void cmd_join(Message * message)
 		}
 		else
 		{
-			std::cout << "Channel " << chanName << " already exists" << std::endl;
+			if (DEBUG)
+				std::cout << "Channel " << chanName << " already exists" << std::endl;
 			Channel *channel = &server->_channels[chanName];
 			channel->addClient(client, "");
-			std::cout << "User " << client->getNick() << " added to channel." << std::endl;
+			if (DEBUG)
+				std::cout << "User " << client->getNick() << " added to channel." << std::endl;
 			std::map<Client*, std::string> mapOfClients = channel->getClientsMap();
 			if (DEBUG)
 				std::cout << "String of members: " << channel->getStringOfMembers() << std::endl;
@@ -503,7 +503,8 @@ void	cmd_kill(Message * message) {
 				std::string quit = ":" + server->getClients()[i].getPrefix() + " QUIT " + full_params + "\r\n";
 				send(server->getClients()[i].getSocket(), kill.data(), kill.size(), 0); // send /KILL message to target client
 				send(server->getClients()[i].getSocket(), quit.data(), quit.size(), 0); // send /QUIT message to target client
-				std::cout << "pollserver: socket " << server->getClients()[i].getSocket() << " hung up" << std::endl;
+				if (DEBUG)
+					std::cout << "pollserver: socket " << server->getClients()[i].getSocket() << " hung up" << std::endl;
 				// close(server->getClients()[i].getSocket()); // close target client fd
 				// server->getClients().erase(server->getClients()[i].getSocket()); // erase client from our list
 				int sfd = server->getClients()[i].getSocket();
@@ -669,7 +670,8 @@ void		changeChanMode(modes & reqmode, Client * client, Channel * channel, std::v
 {
 	std::string change = "";
 	std::string currentmode = channel->getMode();
-	std::cout << "currentmode: " << currentmode << std::endl;
+	if (DEBUG)
+		std::cout << "currentmode: " << currentmode << std::endl;
 	std::map<Client*, std::string> mapOfClients = channel->getClientsMap();
 	std::map<Client*, std::string>::iterator it;
 	if (reqmode.sign == '+')
@@ -681,7 +683,6 @@ void		changeChanMode(modes & reqmode, Client * client, Channel * channel, std::v
 				change.push_back(reqmode.match[i]);
 			else if (currentmode.find(reqmode.match[i]) == std::string::npos && reqmode.match[i] == 'o' && msg_params.size() > 2) /*if o option, check that nickname is in chan*/
 			{
-				// TO DO: check what happens if given nick is user's nick
 				for (it = mapOfClients.begin(); it != mapOfClients.end(); it++)
 				{
 					if (msg_params[2] == it->first->getNick())
@@ -703,7 +704,6 @@ void		changeChanMode(modes & reqmode, Client * client, Channel * channel, std::v
 				change.push_back(reqmode.match[i]);
 			else if (currentmode.find(reqmode.match[i]) != std::string::npos && reqmode.match[i] == 'o' && msg_params.size() > 2)
 			{
-				// TO DO: check what happens if given nick is user's nick
 				for (it = mapOfClients.begin(); it != mapOfClients.end(); it++)
 				{
 					if (msg_params[2] == it->first->getNick())
@@ -718,10 +718,12 @@ void		changeChanMode(modes & reqmode, Client * client, Channel * channel, std::v
 	{
 		std::string fullMsg = ":" + client->getPrefix() + " " + "MODE " + channel->getName() + " " + reqmode.sign + change + " \r\n";
 		// Echo change to all clients in channel
-		std::cout << "fullMsg sent: " << fullMsg << std::endl;
+		if (DEBUG)
+			std::cout << "fullMsg sent: " << fullMsg << std::endl;
 		for (it = mapOfClients.begin(); it != mapOfClients.end(); it++)
 		{
-			std::cout << "sent" << std::endl;
+			if (DEBUG)
+				std::cout << "sent" << std::endl;
 			send(it->first->getSocket(), fullMsg.data(), fullMsg.size(), 0);
 		}
 		if (reqmode.sign == '+')
@@ -907,7 +909,8 @@ void cmd_quit(Message *message) {
 	for (size_t i = 0; i < server->_pollfds.size(); i++)
 		if(server->_pollfds[i].fd == sfd)
 			server->_pollfds.erase(server->_pollfds.begin() + i);
-	std::cout << "Client " << client->getNick() << "(" << sfd  << ") "  << msg + "\n";
+	if (DEBUG)
+		std::cout << "Client " << client->getNick() << "(" << sfd  << ") "  << msg + "\n";
 	if (server->getClients().find(sfd) != server->getClients().end() )
 		server->getClients().erase(sfd);
 }

@@ -52,7 +52,6 @@ void						Message::execCmd()
 
 void		Message::setTargets(std::string msgtarget)
 {
-	// TO DO: Check if msgtarget does not start or end with ,
 	size_t i = 0;
 
 	while( i < msgtarget.length())

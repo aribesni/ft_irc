@@ -170,7 +170,7 @@
 			/* "407" */ std::string ERR_TOOMANYTARGETS() { return (":" + this->_prefix + " 407 " + this->_nickname + " " + "<target> :<reason>" + "\r\n"); };
 			/* "408" */ std::string ERR_NOSUCHSERVICE() { return (":" + this->_prefix + " 408 " + this->_nickname + " " + "<service_name> :<reason>" + "\r\n"); };
 			/* "409" */ std::string ERR_NOORIGIN() { return (":" + this->_prefix + " 409 " + this->_nickname + " " + ":No origin specified" + "\r\n"); };
-			/* "411" */ std::string ERR_NORECIPIENT(std::string cmd) { return (":" + this->_prefix + " 411 " + this->_nickname + ":No recipient given (" + cmd + ")" + "\r\n"); };
+			/* "411" */ std::string ERR_NORECIPIENT(std::string cmd) { return (":" + this->_prefix + " 411 " + this->_nickname + " :No recipient given (" + cmd + ")" + "\r\n"); };
 			/* "412" */ std::string ERR_NOTEXTTOSEND() { return (":" + this->_prefix + " 412 " + this->_nickname + " " + ":<reason>" + "\r\n"); };
 			/* "413" */ std::string ERR_NOTOPLEVEL() { return (":" + this->_prefix + " 413 " + this->_nickname + " " + "<mask> :<reason>" + "\r\n"); };
 			/* "414" */ std::string ERR_WILDTOPLEVEL() { return (":" + this->_prefix + " 414 " + this->_nickname + " " + "<mask> :<reason>" + "\r\n"); };

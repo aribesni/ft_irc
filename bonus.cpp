@@ -54,8 +54,6 @@ void botReply(Message *message){
     else if (msgLower == "what's the time now?")
         msgSend += "The time now: " + currentDateTime();
     else if (msgLower == "where are you?"){
-        // char a = 😘;
-        // msgSend += a;
         msgSend += "I am in 42 School with you";   
     }
     else if (msgLower == "tell me a joke")
