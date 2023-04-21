@@ -19,7 +19,6 @@
 Server::Server(std::string name) : _name(name)
 {
 	this->_pollfds = std::vector<pollfd>(1);
-// TO DO: change memset function with c++ equivalent
 	memset(this->_svc, 0, NI_MAXSERV);
 }
 
@@ -82,41 +81,6 @@ void	Server::acceptNewClient()
 	newpollfd.revents = 0;
 	this->_pollfds.push_back(newpollfd);
 	this->getClients()[newpollfd.fd] = client;
-	// char buf[BUFFER_SIZE];
-	// while (client.getRegistrationStatus() == false)
-	// {
-	// 	memset(buf,0, BUFFER_SIZE);
-	// 	recv(client.getSocket(), buf, sizeof(buf), 0);
-	// 	if (DEBUG)
-	// 		std::cout << "[Client] (" << client.getSocket() << ")" << " received buf: " << buf << std::endl;
-	// 	std::vector<Message>  msgList = this->bufferParser(buf, client);
-	// 	execMultiMsg(msgList);
-	// 	if (DEBUG)
-	// 		std::cout << "[Client] (" << client.getSocket() << ")" << " is now registered" << std::endl;
-	// 	if(this->_password != client.getPass())
-	// 	{
-	// 		std::cout << "pollserver: socket " << client.getSocket() << " hung up" << std::endl;
-	// 		close(client.getSocket()); // Bye!
-	// 		// this->getClients().erase(client.getSocket());
-	// 		return ;
-	// 	}
-	// 	client.setAsRegistered();
-	// }
-
-	// client.setPrefix();
-	// Replies replies(client);
-	// send(client.getSocket(), replies.RPL_WELCOME().data(), replies.RPL_WELCOME().size(), 0);
-	// send(client.getSocket(), replies.RPL_YOURHOST().data(), replies.RPL_YOURHOST().size(), 0);
-	// send(client.getSocket(), replies.RPL_CREATED().data(), replies.RPL_CREATED().size(), 0);
-	// send(client.getSocket(), replies.RPL_MYINFO().data(), replies.RPL_MYINFO().size(), 0);
-	// send(client.getSocket(), replies.RPL_MOTDSTART().data(), replies.RPL_MOTDSTART().size(), 0);
-	// // send(client.getSocket(), replies.RPL_MOTD("372").data(), replies.RPL_MOTD("372").size(), 0);
-	// replies.sendMotd(client.getSocket());
-	// send(client.getSocket(), replies.RPL_ENDOFMOTD().data(), replies.RPL_ENDOFMOTD().size(), 0);
-	// send(client.getSocket(), replies.RPL_UMODEIS().data(), replies.RPL_UMODEIS().size(), 0); // displays client's privileges
-	// // else deal with client registration issue
-	// this->getClients()[newpollfd.fd] = client;
-	// std::cout << "prefix: " << this->getClients()[newpollfd.fd].getPrefix() << std::endl;
 }
 
 void	Server::handleClientRequest(Client & client)
@@ -138,14 +102,6 @@ void	Server::handleClientRequest(Client & client)
 				this->_pollfds.erase(this->_pollfds.begin() + i);
 		if (this->getClients().find(sfd) != this->getClients().end() )
 			this->getClients().erase(sfd);
-
-		// for (size_t i = 0; i < _pollfds.size(); i++)
-		// 	if(_pollfds[i].fd == client.getSocket())
-		// 		_pollfds.erase(_pollfds.begin() + i);
-				
-		// close(client.getSocket()); // Bye!
-		// this->getClients().erase(client.getSocket()); // remove client from map
-			
 	}
 	else
 	{
@@ -259,8 +215,6 @@ void	Server::welcome_msg(Client &client)
 		send(client.getSocket(), replies.RPL_ENDOFMOTD().data(), replies.RPL_ENDOFMOTD().size(), 0);
 		send(client.getSocket(), replies.RPL_UMODEIS().data(), replies.RPL_UMODEIS().size(), 0); // displays client's privileges
 		// else deal with client registration issue
-		//this->getClients()[newpollfd.fd] = client;
-		std::cout << "prefix: " << client.getPrefix() << std::endl;
 	}
 }
 

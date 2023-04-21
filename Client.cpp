@@ -18,7 +18,6 @@
 
 Client::Client(void) : _isRegistered(false), _irc_mode(""), _nickRegistered(false), _usrRegistered(false), _passRegistered(false)
 {
-// TO DO: Change memset to a c++ method/func
 	memset(this->_host, 0, NI_MAXHOST);
 	this->_socklen = sizeof(this->_sockaddr);
 }
