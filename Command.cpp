@@ -6,7 +6,7 @@
 /*   By: gduchate <gduchate@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 17:43:49 by rliu              #+#    #+#             */
-/*   Updated: 2023/04/21 11:35:31 by gduchate         ###   ########.fr       */
+/*   Updated: 2023/04/21 11:55:52 by gduchate         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -544,7 +544,7 @@ void	cmd_whois(Message * message)
 					if (DEBUG)
 						std::cout << reply.RPL_WHOISUSER(targetclient.getNick(), targetclient.getUser(), targetclient.getHostName(), targetclient.getRealName()).data() << std::endl;
 					send(client->getSocket(), reply.RPL_WHOISUSER(targetclient.getNick(), targetclient.getUser(), targetclient.getHostName(), targetclient.getRealName()).data(), reply.RPL_WHOISUSER(targetclient.getNick(), targetclient.getUser(), targetclient.getHostName(), targetclient.getRealName()).size(), 0);
-					send(client->getSocket(), reply.RPL_ENDOFWHOIS().data(), reply.RPL_ENDOFWHOIS().size(), 0);
+					send(client->getSocket(), reply.RPL_ENDOFWHOIS(targetclient.getNick()).data(), reply.RPL_ENDOFWHOIS(targetclient.getNick()).size(), 0);
 				}
 				catch(const std::exception& e)
 				{
