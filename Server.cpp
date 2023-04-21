@@ -257,7 +257,7 @@ void	Server::welcome_msg(Client &client)
 		// send(client.getSocket(), replies.RPL_MOTD("372").data(), replies.RPL_MOTD("372").size(), 0);
 		replies.sendMotd(client.getSocket());
 		send(client.getSocket(), replies.RPL_ENDOFMOTD().data(), replies.RPL_ENDOFMOTD().size(), 0);
-		// send(client.getSocket(), replies.RPL_UMODEIS().data(), replies.RPL_UMODEIS().size(), 0); // displays client's privileges
+		send(client.getSocket(), replies.RPL_UMODEIS().data(), replies.RPL_UMODEIS().size(), 0); // displays client's privileges
 		// else deal with client registration issue
 		//this->getClients()[newpollfd.fd] = client;
 		std::cout << "prefix: " << client.getPrefix() << std::endl;

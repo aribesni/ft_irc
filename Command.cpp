@@ -467,8 +467,6 @@ void    cmd_kill(Message * message) {
 	size_t	i = 2;
 	bool	nick = false;
 
-	std::cout << "SIZE : " << message->getParams().size() << std::endl;
-	std::cout << "FULL MSG : " << message->getFullMsg() << std::endl;
 	if (message->getParams().size() < 2 || (message->getParams().size() == 2 && message->getParams()[1] == ":"))  // check if both <name> and <reason> are entered
 		send(client->getSocket(), replies.ERR_NEEDMOREPARAMS("KILL").data(), replies.ERR_NEEDMOREPARAMS("KILL").size(), 0);
 	else if (client->getIRCMode().find("o") == std::string::npos) // check if client has the IRC operator privilege
@@ -617,12 +615,11 @@ void	cmd_invite(Message * message) {
 	std::string fullMsg = ":" + client->getPrefix() + " " + message->getFullMsg() + "\r\n";
 	if (server->_channels.find(chanName) != server->_channels.end()) // check if channel exists
 	{
-		// std::cout << "Channel " << chanName << " does not exist" << std::endl;
 		std::map<Client*, std::string> mapOfClients = server->_channels[chanName].getClientsMap();
 		std::map<Client*, std::string>::iterator it;
 		for (it = mapOfClients.begin(); it != mapOfClients.end(); it++)
 		{
-			if (targetName == it->first->getNick()) // check if client is in channel in order to invite
+			if (client->getNick() == it->first->getNick()) // check if client is in channel in order to invite
 				break;
 		}
 		if (it == mapOfClients.end())
