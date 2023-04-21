@@ -6,7 +6,7 @@
 /*   By: rliu <rliu@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 18:14:02 by guillemette       #+#    #+#             */
-/*   Updated: 2023/04/17 14:41:35 by rliu             ###   ########.fr       */
+/*   Updated: 2023/04/21 10:08:39 by rliu             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -282,6 +282,10 @@ std::string				Server::getPassword(void) const
 std::map<int, Client>&	Server::getClients(void)
 {
 	return (this->_clients);
+}
+
+std::string 			Server::getServerName(void) const{
+	return (this->_name);
 }
 
 /*
