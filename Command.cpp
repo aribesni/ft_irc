@@ -157,7 +157,7 @@ void cmd_user(Message * message)
 	 }
 	if (message->getParams().size()< 4 || message->getParams()[0].empty())
 	{
-		rplErr = reply.ERR_NONICKNAMEGIVEN();
+		rplErr = reply.ERR_NEEDMOREPARAMS("USER");
 		send(client->getSocket(),rplErr.c_str(), rplErr.size(), 0);
 		return;
 	}
@@ -166,10 +166,18 @@ void cmd_user(Message * message)
 		client->setUsr(message->getParams()[0]);
 		client->setHostname(message->getParams()[1]);
 		client->setServername(message->getParams()[2]);
-		std::string realName(message->getParams()[3], 1, message->getParams()[3].size()-1);
-		for (size_t i = 4; i < message->getParams().size(); i++)
-			realName += " " + message->getParams()[i];
-		client->setRealname(realName);
+		if (message->getParams()[3][0] == ':')
+		{
+			std::string realName(message->getParams()[3], 1, message->getParams()[3].size()-1);
+			for (size_t i = 4; i < message->getParams().size(); i++)
+				realName += " " + message->getParams()[i];
+			client->setRealname(realName);
+		}
+		else
+		{	
+			std::string realName = message->getParams()[3];
+			client->setRealname(realName);
+		}
 		client->setUsrRegistered();
 	 }
 }
