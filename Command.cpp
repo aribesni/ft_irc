@@ -881,8 +881,9 @@ void cmd_quit(Message *message) {
 	for (size_t i = 0; i < server->_pollfds.size(); i++)
 		if(server->_pollfds[i].fd == sfd)
 			server->_pollfds.erase(server->_pollfds.begin() + i);
-	if (DEBUG)
-		std::cout << "Client " << client->getNick() << "(" << sfd  << ") "  << msg + "\n";
+	// if (DEBUG)
+	std::cout << "Client " << client->getNick() << "(" << sfd  << ") "  << msg + "\n";
+	std::cout << "pollserver: socket " << client->getSocket() << " hung up" << std::endl;
 	if (server->getClients().find(sfd) != server->getClients().end() )
 		server->getClients().erase(sfd);
 }

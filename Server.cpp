@@ -110,9 +110,10 @@ void	Server::handleClientRequest(Client & client)
 		// If _buff contains \r\n then proceed and empty buff
 		// Else do nothing
 		client.addToBuffer(buf);
-		if (client.getBuffer().find("\r\n") != std::string::npos)
+		if (!client.getBuffer().empty() && client.getBuffer().find("\r\n") != std::string::npos)
 		{
 			std::vector<Message>  msgList = this->bufferParser(client.getBuffer().c_str(), client);
+			client.emptyBuffer();
 			if (DEBUG)
 				std::cout << "[Client] (" << client.getSocket() << ")" << " received buf: " << buf << std::endl;
 			// Execute all messages that could be parsed
@@ -121,7 +122,6 @@ void	Server::handleClientRequest(Client & client)
 			if (!isWelcome)
 				welcome_msg(client);
 			msgList.clear();
-			client.emptyBuffer();
 		}
 	}
 }

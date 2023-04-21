@@ -16,7 +16,7 @@
 ** ------------------------------- CONSTRUCTOR --------------------------------
 */
 
-Client::Client(void) : _isRegistered(false), _irc_mode(""), _nickRegistered(false), _usrRegistered(false), _passRegistered(false), _buffer("")
+Client::Client(void) : _buffer(), _isRegistered(false), _irc_mode(""), _nickRegistered(false), _usrRegistered(false), _passRegistered(false)
 {
 	memset(this->_host, 0, NI_MAXHOST);
 	this->_socklen = sizeof(this->_sockaddr);
@@ -35,11 +35,16 @@ Client::~Client(void) {}
 
 void	Client::addToBuffer(std::string appended)
 {
-	_buffer += appended;
+	// if (!_buffer.empty())
+		_buffer += appended;
+	// else
+		// _buffer = appended;
+	
 }
 
 void	Client::emptyBuffer(void)
 {
+	// if (_buffer != "")
 	_buffer.clear();
 }
 

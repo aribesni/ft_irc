@@ -63,6 +63,7 @@ class Client {
 		socklen_t   _socklen;
 
 	private :
+		std::string	_buffer;
 		std::string	_password;
 		int			_socket;
 		char		_host[NI_MAXHOST];
@@ -79,7 +80,6 @@ class Client {
 		bool		_nickRegistered;
 		bool		_usrRegistered;
 		bool		_passRegistered;
-		std::string	_buffer;
 };
 
 // irc mode (user mode)
