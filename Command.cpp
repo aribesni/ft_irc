@@ -6,7 +6,7 @@
 /*   By: gduchate <gduchate@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 17:43:49 by rliu              #+#    #+#             */
-/*   Updated: 2023/04/21 11:55:52 by gduchate         ###   ########.fr       */
+/*   Updated: 2023/04/21 13:54:56 by gduchate         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -174,7 +174,7 @@ void cmd_user(Message * message)
 			client->setRealname(realName);
 		}
 		else
-		{	
+		{
 			std::string realName = message->getParams()[3];
 			client->setRealname(realName);
 		}
@@ -321,7 +321,7 @@ void cmd_privmsg(Message * message)
 {
 	Server * server = message->getServer();
 	Client * client = message->getClient();
-	if (message->getParams().size() == 0)
+	if (message->getParams().size() < 1)
 	{
 		Replies reply(*client);
 		send(client->getSocket(), reply.ERR_NORECIPIENT(message->getCMD()).data(), reply.ERR_NORECIPIENT(message->getCMD()).size(), 0);
@@ -330,54 +330,50 @@ void cmd_privmsg(Message * message)
 		return ;
 	}
 	std::string msgtarget = message->getParams()[0];
-	std::vector<std::string> targets = message->getTargets();
 	std::string fullMsg = ":" + client->getPrefix() + " " + message->getFullMsg() + "\r\n";
 
-	for (size_t i = 0; i < targets.size(); i++)
+	if (msgtarget == "#bot")
+		botReply(message);
+	else if (msgtarget[0] == '#')
 	{
-		if (targets[i] == "#bot")
-			botReply(message);
-		else if (targets[i][0] == '#')
+		if (server->_channels.find(msgtarget) == server->_channels.end()) /* channel does not exist*/
 		{
-			if (server->_channels.find(targets[i]) == server->_channels.end()) /* channel does not exist*/
-			{
-				Replies reply(*client);
-				if (DEBUG)
-					std::cout << "Unknown channel" << std::endl;
-				send(client->getSocket(), reply.ERR_NOSUCHNICK(targets[i]).data(), reply.ERR_NOSUCHNICK(targets[i]).size(), 0);
-			}
-			else
-			{
-				std::map<Client*, std::string> mapOfClients = server->_channels[targets[i]].getClientsMap();
-				for (std::map<Client*, std::string>::iterator it = mapOfClients.begin();\
-					it != mapOfClients.end(); it++)
-				{
-					if (it->first->getSocket() != client->getSocket())
-						send(it->first->getSocket(), fullMsg.data(), fullMsg.size(), 0);
-				}
-				if (DEBUG)
-					std::cout << "Message sent to a channel" << std::endl;
-			}
+			Replies reply(*client);
+			if (DEBUG)
+				std::cout << "Unknown channel" << std::endl;
+			send(client->getSocket(), reply.ERR_NOSUCHNICK(msgtarget).data(), reply.ERR_NOSUCHNICK(msgtarget).size(), 0);
 		}
 		else
 		{
-			int targetfd = server->getFdWithNick(targets[i]);
-			if (targetfd == -1)
+			std::map<Client*, std::string> mapOfClients = server->_channels[msgtarget].getClientsMap();
+			for (std::map<Client*, std::string>::iterator it = mapOfClients.begin();\
+				it != mapOfClients.end(); it++)
 			{
-				Replies reply(*client);
-				send(client->getSocket(), reply.ERR_NOSUCHNICK(targets[i]).data(), reply.ERR_NOSUCHNICK(targets[i]).size(), 0);
-				if (DEBUG)
-					std::cout << "Wrong recipient" << std::endl;
+				if (it->first->getSocket() != client->getSocket())
+					send(it->first->getSocket(), fullMsg.data(), fullMsg.size(), 0);
 			}
-			else
-			{
-				if (DEBUG)
-					std::cout << "Message sent to a user" << std::endl;
-				send(server->getFdWithNick(targets[i]), fullMsg.c_str(), fullMsg.size(), 0);
-			}
+			if (DEBUG)
+				std::cout << "Message sent to a channel" << std::endl;
 		}
-		return ;
 	}
+	else
+	{
+		int targetfd = server->getFdWithNick(msgtarget);
+		if (targetfd == -1)
+		{
+			Replies reply(*client);
+			if (DEBUG)
+				std::cout << "Unknown recipient" << std::endl;
+			send(client->getSocket(), reply.ERR_NOSUCHNICK(msgtarget).data(), reply.ERR_NOSUCHNICK(msgtarget).size(), 0);
+		}
+		else
+		{
+			if (DEBUG)
+				std::cout << "Message sent to a user" << std::endl;
+			send(server->getFdWithNick(msgtarget), fullMsg.c_str(), fullMsg.size(), 0);
+		}
+	}
+	return ;
 }
 
 void	cmd_notice(Message * message)
@@ -392,47 +388,43 @@ void	cmd_notice(Message * message)
 		return ;
 	}
 	std::string msgtarget = message->getParams()[0];
-	std::vector<std::string> targets = message->getTargets();
 	std::string fullMsg = ":" + client->getPrefix() + " " + message->getFullMsg() + "\r\n";
-	for (size_t i = 0; i < targets.size(); i++)
+	if (msgtarget[0] == '#')
 	{
-		if (targets[i][0] == '#')
+		if (server->_channels.find(msgtarget) == server->_channels.end()) /* channel does not exist*/
 		{
-			if (server->_channels.find(targets[i]) == server->_channels.end()) /* channel does not exist*/
-			{
-				Replies reply(*client);
-				if (DEBUG)
-					std::cout << "Unknown channel" << std::endl;
-				send(client->getSocket(), reply.ERR_NOSUCHNICK(targets[i]).data(), reply.ERR_NOSUCHNICK(targets[i]).size(), 0);
-			}
-			else
-			{
-				std::map<Client*, std::string> mapOfClients = server->_channels[targets[i]].getClientsMap();
-				for (std::map<Client*, std::string>::iterator it = mapOfClients.begin(); it != mapOfClients.end(); it++)
-				{
-					if (it->first->getSocket() != client->getSocket())
-						send(it->first->getSocket(), fullMsg.c_str(), fullMsg.size(), 0);
-				}
-				if (DEBUG)
-					std::cout << "Message sent to a channel" << std::endl;
-			}
+			Replies reply(*client);
+			if (DEBUG)
+				std::cout << "Unknown channel" << std::endl;
+			send(client->getSocket(), reply.ERR_NOSUCHNICK(msgtarget).data(), reply.ERR_NOSUCHNICK(msgtarget).size(), 0);
 		}
 		else
 		{
-			int targetfd = server->getFdWithNick(targets[i]);
-			if (targetfd == -1)
+			std::map<Client*, std::string> mapOfClients = server->_channels[msgtarget].getClientsMap();
+			for (std::map<Client*, std::string>::iterator it = mapOfClients.begin(); it != mapOfClients.end(); it++)
 			{
-				Replies reply(*client);
-				send(client->getSocket(), reply.ERR_NOSUCHNICK(targets[i]).data(), reply.ERR_NOSUCHNICK(targets[i]).size(), 0);
-				if (DEBUG)
-					std::cout << "Wrong recipient" << std::endl;
+				if (it->first->getSocket() != client->getSocket())
+					send(it->first->getSocket(), fullMsg.c_str(), fullMsg.size(), 0);
 			}
-			else
-			{
-				if (DEBUG)
-					std::cout << "Message sent to a user" << std::endl;
-				send(server->getFdWithNick(targets[i]), fullMsg.c_str(), fullMsg.size(), 0);
-			}
+			if (DEBUG)
+				std::cout << "Message sent to a channel" << std::endl;
+		}
+	}
+	else
+	{
+		int targetfd = server->getFdWithNick(msgtarget);
+		if (targetfd == -1)
+		{
+			Replies reply(*client);
+			if (DEBUG)
+				std::cout << "Unknown recipient" << std::endl;
+			send(client->getSocket(), reply.ERR_NOSUCHNICK(msgtarget).data(), reply.ERR_NOSUCHNICK(msgtarget).size(), 0);
+		}
+		else
+		{
+			if (DEBUG)
+				std::cout << "Message sent to a user" << std::endl;
+			send(server->getFdWithNick(msgtarget), fullMsg.c_str(), fullMsg.size(), 0);
 		}
 	}
 }
@@ -479,7 +471,7 @@ void    cmd_wallops(Message * message) {
 	}
 }
 
-void    cmd_kill(Message * message) {
+void	cmd_kill(Message * message) {
 
 	Client	*client = message->getClient();
 	Server	*server = message->getServer();
