@@ -512,8 +512,16 @@ void    cmd_kill(Message * message) {
 				send(server->getClients()[i].getSocket(), kill.data(), kill.size(), 0); // send /KILL message to target client
 				send(server->getClients()[i].getSocket(), quit.data(), quit.size(), 0); // send /QUIT message to target client
 				std::cout << "pollserver: socket " << server->getClients()[i].getSocket() << " hung up" << std::endl;
-				close(server->getClients()[i].getSocket()); // close target client fd
-				server->getClients().erase(server->getClients()[i].getSocket()); // erase client from our list
+				// close(server->getClients()[i].getSocket()); // close target client fd
+				// server->getClients().erase(server->getClients()[i].getSocket()); // erase client from our list
+				int sfd = server->getClients()[i].getSocket();
+				close(sfd);
+				for (size_t i = 0; i < server->_pollfds.size(); i++)
+					if(server->_pollfds[i].fd == sfd)
+						server->_pollfds.erase(server->_pollfds.begin() + i);
+				// std::cout << "Client " << client->getNick() << "(" << sfd  << ") "  << msg + "\n";
+				if (server->getClients().find(sfd) != server->getClients().end() )
+					server->getClients().erase(sfd);
 				nick = true;
 				break;
 			}
@@ -897,7 +905,8 @@ void		cmd_mode(Message * message)
 //  (not handled) k - set a channel key (password).
 }
 
-void cmd_quit(Message *message){
+void cmd_quit(Message *message) {
+
 	Client *client = message->getClient();
 	Server *server = message->getServer();
 	std::string msg = message->getFullMsg();
@@ -909,7 +918,5 @@ void cmd_quit(Message *message){
 	std::cout << "Client " << client->getNick() << "(" << sfd  << ") "  << msg + "\n";
 	if (server->getClients().find(sfd) != server->getClients().end() )
 		server->getClients().erase(sfd);
-
-
 }
 /* ************************************************************************** */
