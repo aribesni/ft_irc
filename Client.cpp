@@ -16,7 +16,7 @@
 ** ------------------------------- CONSTRUCTOR --------------------------------
 */
 
-Client::Client(void) : _isRegistered(false), _irc_mode(""), _nickRegistered(false), _usrRegistered(false), _passRegistered(false)
+Client::Client(void) : _isRegistered(false), _irc_mode(""), _nickRegistered(false), _usrRegistered(false), _passRegistered(false), _buffer("")
 {
 	memset(this->_host, 0, NI_MAXHOST);
 	this->_socklen = sizeof(this->_sockaddr);
@@ -33,6 +33,15 @@ Client::~Client(void) {}
 ** --------------------------------- METHODS ----------------------------------
 */
 
+void	Client::addToBuffer(std::string appended)
+{
+	_buffer += appended;
+}
+
+void	Client::emptyBuffer(void)
+{
+	_buffer.clear();
+}
 
 /*
 ** --------------------------------- GETTERS ----------------------------------
@@ -61,6 +70,8 @@ bool		Client::getNickStatus (void) const{return (this->_nickRegistered);}
 bool		Client::getUsrStatus (void) const{return (this->_usrRegistered);}
 
 bool		Client::getPassStatus (void) const{return (this->_passRegistered);}
+
+std::string	Client::getBuffer (void) const{return (this->_buffer);}
 
 /*
 ** --------------------------------- SETTERS ----------------------------------
@@ -130,3 +141,4 @@ void	Client::setPassRegistered(void)
 {
 	_passRegistered = true;
 }
+

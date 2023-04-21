@@ -150,7 +150,6 @@ void cmd_user(Message * message)
 	std::string rplErr;
 	if (client->getUsrStatus()){
 		rplErr = reply.ERR_ALREADYREGISTRED("USER is already registered");
-		std::cout << "test usr" << message->getFullMsg() << std::endl;
 		send(client->getSocket(),rplErr.c_str(), rplErr.size(), 0);
 		return;
 	 }
@@ -503,8 +502,7 @@ void	cmd_kill(Message * message) {
 				std::string quit = ":" + server->getClients()[i].getPrefix() + " QUIT " + full_params + "\r\n";
 				send(server->getClients()[i].getSocket(), kill.data(), kill.size(), 0); // send /KILL message to target client
 				send(server->getClients()[i].getSocket(), quit.data(), quit.size(), 0); // send /QUIT message to target client
-				if (DEBUG)
-					std::cout << "pollserver: socket " << server->getClients()[i].getSocket() << " hung up" << std::endl;
+				std::cout << "pollserver: socket " << server->getClients()[i].getSocket() << " hung up" << std::endl;
 				// close(server->getClients()[i].getSocket()); // close target client fd
 				// server->getClients().erase(server->getClients()[i].getSocket()); // erase client from our list
 				int sfd = server->getClients()[i].getSocket();

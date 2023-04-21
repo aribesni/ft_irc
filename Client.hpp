@@ -37,6 +37,8 @@ class Client {
 		bool		getNickStatus (void) const;
 		bool		getUsrStatus (void) const;
 		bool		getPassStatus (void) const;
+		std::string getBuffer(void) const;
+		
 		// SETTERS
 		void		setSocket(int socket);
 		void		setNick(std::string &nickname);
@@ -51,6 +53,11 @@ class Client {
 		void		setUsrRegistered(void);
 		void		setPassRegistered(void);
 		void		setServername(std::string servername);
+
+
+		// METHODS
+		void		addToBuffer(std::string appended);
+		void		emptyBuffer(void);
 
 		sockaddr_in _sockaddr;
 		socklen_t   _socklen;
@@ -72,6 +79,7 @@ class Client {
 		bool		_nickRegistered;
 		bool		_usrRegistered;
 		bool		_passRegistered;
+		std::string	_buffer;
 };
 
 // irc mode (user mode)

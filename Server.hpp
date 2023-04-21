@@ -55,7 +55,7 @@ class Server {
 		void						_bind(sockaddr_in bind);
 		void						_accept(Client & client);
 		void						_listen(void);
-		std::vector<Message>		bufferParser(char* buf, Client & client);
+		std::vector<Message>		bufferParser(const char* buf, Client & client);
 		std::vector<std::string>	msg_split(std::string str, std::string delimiter);
 		void						msg_replace(std::string &message, char find, char replace);
 		void						execMultiMsg(std::vector<Message> msgList);

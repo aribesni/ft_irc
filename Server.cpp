@@ -106,15 +106,23 @@ void	Server::handleClientRequest(Client & client)
 	else
 	{
 		// Handle buffer as a vector of messages
-		std::vector<Message>  msgList = this->bufferParser(buf, client);
-		if (DEBUG)
-			std::cout << "[Client] (" << client.getSocket() << ")" << " received buf: " << buf << std::endl;
-		// Execute all messages that could be parsed
-		bool isWelcome = client.getRegistrationStatus();
-		execMultiMsg(msgList);
-		if (!isWelcome)
-			welcome_msg(client);
-		msgList.clear();
+		// Append buf with _buff
+		// If _buff contains \r\n then proceed and empty buff
+		// Else do nothing
+		client.addToBuffer(buf);
+		if (client.getBuffer().find("\r\n") != std::string::npos)
+		{
+			std::vector<Message>  msgList = this->bufferParser(client.getBuffer().c_str(), client);
+			if (DEBUG)
+				std::cout << "[Client] (" << client.getSocket() << ")" << " received buf: " << buf << std::endl;
+			// Execute all messages that could be parsed
+			bool isWelcome = client.getRegistrationStatus();
+			execMultiMsg(msgList);
+			if (!isWelcome)
+				welcome_msg(client);
+			msgList.clear();
+			client.emptyBuffer();
+		}
 	}
 }
 
@@ -141,7 +149,7 @@ void Server::msg_replace(std::string &message, char find, char replace){
     }
 }
 // Parser buffer from char * to a vector of class Message
-std::vector<Message>	Server::bufferParser(char* buf, Client &client){
+std::vector<Message>	Server::bufferParser(const char* buf, Client &client){
 	std::string                                     message(buf);
 	std::vector<std::string>                        lines;
 	std::vector<std::vector<std::string> >          tokens;
@@ -149,7 +157,7 @@ std::vector<Message>	Server::bufferParser(char* buf, Client &client){
 	size_t                                          msgSize = 0;
 
 	// message = buf;
-	msg_replace(message, 4, ' ');
+	// msg_replace(message, 4, ' ');
 	lines = msg_split(message, "\r\n");
 	// Display lines vector
 	msgSize = lines.size();
