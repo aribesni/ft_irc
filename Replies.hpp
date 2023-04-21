@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Replies.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
+/*   By: gduchate <gduchate@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 18:14:00 by guillemette       #+#    #+#             */
-/*   Updated: 2023/04/19 17:18:52 by guillemette      ###   ########.fr       */
+/*   Updated: 2023/04/21 11:01:12 by gduchate         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -170,7 +170,7 @@
 			/* "406" */ std::string ERR_WASNOSUCHNICK() { return (":" + this->_prefix + " 406 " + this->_nickname + " " + this->_nickname + " :<reason>" + "\r\n"); };
 			/* "407" */ std::string ERR_TOOMANYTARGETS() { return (":" + this->_prefix + " 407 " + this->_nickname + " " + "<target> :<reason>" + "\r\n"); };
 			/* "408" */ std::string ERR_NOSUCHSERVICE() { return (":" + this->_prefix + " 408 " + this->_nickname + " " + "<service_name> :<reason>" + "\r\n"); };
-			/* "409" */ std::string ERR_NOORIGIN() { return (":" + this->_prefix + " 409 " + this->_nickname + " " + ":<reason>" + "\r\n"); };
+			/* "409" */ std::string ERR_NOORIGIN() { return (":" + this->_prefix + " 409 " + this->_nickname + " " + ":No origin specified" + "\r\n"); };
 			/* "411" */ std::string ERR_NORECIPIENT(std::string cmd) { return (":" + this->_prefix + " 411 " + this->_nickname + ":No recipient given (" + cmd + ")" + "\r\n"); };
 			/* "412" */ std::string ERR_NOTEXTTOSEND() { return (":" + this->_prefix + " 412 " + this->_nickname + " " + ":<reason>" + "\r\n"); };
 			/* "413" */ std::string ERR_NOTOPLEVEL() { return (":" + this->_prefix + " 413 " + this->_nickname + " " + "<mask> :<reason>" + "\r\n"); };
@@ -181,7 +181,7 @@
 			/* "422" */ std::string ERR_NOMOTD() { return (":" + this->_prefix + " 422 " + this->_nickname + " " + ":<reason>" + "\r\n"); };
 			/* "423" */ std::string ERR_NOADMININFO() { return (":" + this->_prefix + " 423 " + this->_nickname + " " + this->_server + " :<reason>" + "\r\n"); };
 			/* "424" */ std::string ERR_FILEERROR() { return (":" + this->_prefix + " 424 " + this->_nickname + " " + ":<reason>" + "\r\n"); };
-			/* "431" */ std::string ERR_NONICKNAMEGIVEN() { return (":" + this->_prefix + " 431 " + this->_nickname + " " + ":<reason>" + "\r\n"); };
+			/* "431" */ std::string ERR_NONICKNAMEGIVEN() { return (":" + this->_prefix + " 431 " + this->_nickname + " " + ":No nickname given" + "\r\n"); };
 			/* "432" */ std::string ERR_ERRONEUSNICKNAME(std::string nick, std::string reason) { return (":" + this->_prefix + " 432 " + this->_nickname + " " + nick + " :" + reason + "\r\n"); };
 			/* "433" */ std::string ERR_NICKNAMEINUSE(std::string nick, std::string reason) { return (":" + this->_prefix + " 433 " + nick + " " + nick + " :" + reason + + "\r\n"); };
 			/* "436" */ std::string ERR_NICKCOLLISION() { return (":" + this->_prefix + " 436 " + this->_nickname + " " + this->_nickname + " :<reason>" + "\r\n"); };

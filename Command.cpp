@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Command.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: guillemette.duchateau <guillemette.duch    +#+  +:+       +#+        */
+/*   By: gduchate <gduchate@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 17:43:49 by rliu              #+#    #+#             */
-/*   Updated: 2023/04/19 17:20:40 by guillemette      ###   ########.fr       */
+/*   Updated: 2023/04/21 10:59:03 by gduchate         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -184,7 +184,15 @@ void cmd_ping(Message * message)
 	// show [LAG] message anymore
 	if (message->getClient()->getSocket() < 4)
 		return;
-	std::cout << "[Server] sending PONG to client (" <<message->getClient()->getSocket() << ")" << std::endl;
+	if (DEBUG)
+		std::cout << "[Server] sending PONG to client (" <<message->getClient()->getSocket() << ")" << std::endl;
+	if (message->getParams().size() < 1)
+	{
+		Client * client = message->getClient();
+		Replies reply(*client);
+		send(client->getSocket(), reply.ERR_NEEDMOREPARAMS(message->getCMD()).data(), reply.ERR_NEEDMOREPARAMS(message->getCMD()).size(), 0);
+		return ;
+	}
 	std::string answer = "PONG " + message->getParams()[0] + "\r\n";
 	send(message->getClient()->getSocket(), answer.c_str(), answer.size(), 0);
 }
@@ -509,9 +517,10 @@ void	cmd_whois(Message * message)
 	Server * server = message->getServer();
 	Client * client = message->getClient();
 
-	if (message->getParams().size() == 0)
+	if (message->getParams().size() < 1)
 	{
-		// TO DO: ERR_NO_RECIPIENT to handle
+		Replies reply(*client);
+		send(client->getSocket(), reply.ERR_NONICKNAMEGIVEN().data(), reply.ERR_NONICKNAMEGIVEN().size(), 0);
 		return ;
 	}
 	else
