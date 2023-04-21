@@ -117,7 +117,6 @@
 			/* "303" */ std::string RPL_ISON() { return (":" + this->_prefix + " 303 " + this->_nickname + " " + ":*1" + this->_nickname + " *( ' ' " + this->_nickname + " )" + "\r\n"); };
 			/* "305" */ std::string RPL_UNAWAY() { return (":" + this->_prefix + " 305 " + this->_nickname + " " + ":<info>" + "\r\n"); };
 			/* "306" */ std::string RPL_NOWAWAY() { return (":" + this->_prefix + " 306 " + this->_nickname + " " + ":<info>" + "\r\n"); };
-			// /* "311" */ std::string RPL_WHOISUSER() { return (":" + this->_prefix + " 311 " + this->_nickname + " " + this->_user + " " + this->_host + " * :" + this->_realname + "\r\n"); };
 			/* "311" */ std::string RPL_WHOISUSER(std::string nick, std::string user, std::string host, std::string realname) { return (":" + this->_prefix + " 311 " + this->_nickname + " " + nick + " " + user + " " + host + " * :" + realname + "\r\n"); };
 			/* "312" */ std::string RPL_WHOISSERVER() { return (":" + this->_prefix + " 312 " + this->_nickname + " " + this->_nickname +  " " + this->_server + " :<server_info>" + "\r\n"); };
 			/* "313" */ std::string RPL_WHOISOPERATOR() { return (":" + this->_prefix + " 313 " + this->_nickname + " " + this->_nickname + " :<privileges>" + "\r\n"); };
