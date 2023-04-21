@@ -6,7 +6,7 @@
 /*   By: rliu <rliu@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 18:14:04 by guillemette       #+#    #+#             */
-/*   Updated: 2023/04/14 17:31:02 by rliu             ###   ########.fr       */
+/*   Updated: 2023/04/21 10:09:14 by rliu             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,7 @@ class Server {
 		std::string					getPassword(void) const;
 		int							getSocket(void) const;
 		std::map<int, Client>&		getClients(void);
+		std::string 				getServerName(void) const;
 
 		// METHODS
 		void						fillServerPollfd(void);

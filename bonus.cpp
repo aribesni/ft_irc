@@ -6,7 +6,7 @@
 /*   By: rliu <rliu@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/12 17:30:12 by rliu              #+#    #+#             */
-/*   Updated: 2023/04/12 19:22:37 by rliu             ###   ########.fr       */
+/*   Updated: 2023/04/21 10:22:59 by rliu             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@ void botReply(Message *message){
     for (size_t i = 1; i < msg.size(); i++)
             msgLower += tolower(msg[i]);
     if (msgLower == "help")
-        msgSend += "You can ask bot: help; Hello; Bonjour; What's the time now?; Where are you?; Tell me a joke";
+        msgSend += "You can ask bot: help; Hello; Bonjour; What's the time now?; Where are you?; Tell me a joke; Nickname; Realname; Servername;";
     else if (msgLower == "bonjour")
         msgSend += "Bonjour";
     else if (msgLower == "hello")
@@ -60,6 +60,15 @@ void botReply(Message *message){
     }
     else if (msgLower == "tell me a joke")
         msgSend += " – Maman, maman, j’ai vu un zinc!  – D’accord, mais non mon chéri, il vaut mieux dire avion. – Ah, d’accord : J’avions vu un zinc.";
+     else if (msgLower == "nickname")
+        msgSend += message->getClient()->getNick();
+    else if (msgLower == "realname")
+        msgSend += message->getClient()->getRealName();
+    else if (msgLower == "servername")
+    {
+        std::string servername = message->getServer()->getServerName();
+        msgSend += servername.substr(2, servername.size()-2);
+    }
     else
         msgSend += "It's a good question, let me think about, have a good day! You could also type \"help\"."; 
     msgSend += "\r\n";
