@@ -80,12 +80,12 @@ void cmd_pass(Message * message)
 	}
 	else if (message->getParams().size() < 1 || message->getParams().empty()){
 		std::string rplErr = reply.ERR_NEEDMOREPARAMS("PASS");
-		//send(client->getSocket(),rplErr.c_str(), rplErr.size(), 0);
+		send(client->getSocket(),rplErr.c_str(), rplErr.size(), 0);
 	}
 	else if (server->getPassword() != message->getParams()[0]){
-		std::string reason = "password is wrong";
-		std::string rplErr = reply.ERR_NEEDMOREPARAMS("PASS");
-		std::cout << reason << std::endl;
+		if (DEBUG)
+			std::cout << "password is wrong" << std::endl;
+		std::string rplErr = reply.ERR_PASSWDMISMATCH();
 		send(client->getSocket(),rplErr.c_str(), rplErr.size(), 0);
 	}
 	else{
@@ -112,6 +112,7 @@ void cmd_nick(Message * message)
 		std::string nick = message->getParams()[0];
 		if (nick.size() > 9){
 			nick.resize(9);
+			std::cout << "NICK : " << nick << std::endl;
 		}
 		//ERRONEUSNICKNAME
 		for (size_t i = 0; i < nick.size(); i++)
@@ -138,7 +139,7 @@ void cmd_nick(Message * message)
 		client->setNickRegistered();
 		if (client->getRegistrationStatus())
 		{
-			std::string msg = ":" + client->getPrefix() + " " + message->getFullMsg() + "\r\n";
+			std::string msg = ":" + client->getPrefix() + " NICK " + nick + "\r\n";
 			send(client->getSocket(), msg.c_str(), msg.size(), 0);
 			client->setPrefix();
 		}
